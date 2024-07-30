@@ -1,7 +1,7 @@
 import '@/styles/global.css';
+import ThemeRegistry from '@/ui/theme/ThemeRegistry';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import ThemeRegistry from './ThemeRegistry';
 
 export const metadata: Metadata = {
   title: 'Picals Dashboard',
@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="cn">
       <body className={`${inter.className} antialiased`}>
-        <ThemeRegistry options={{ key: 'joy' }}>{children}</ThemeRegistry>
+        <ThemeRegistry>{children}</ThemeRegistry>
       </body>
     </html>
   );

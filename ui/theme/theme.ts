@@ -30,14 +30,21 @@ const theme = extendTheme({
     display: inter.style.fontFamily,
     code: sourceCodePro.style.fontFamily,
   },
-  components: {
-    JoyButton: {
-      styleOverrides: {
-        root: ({ ownerState }) => ({
-          ...(ownerState.color === 'primary' && {
-            backgroundColor: '#4338ca',
-          }),
-        }),
+  colorSchemes: {
+    light: {
+      palette: {
+        primary: {
+          50: '#eff8ff',
+          100: '#deefff',
+          200: '#b6e0ff',
+          300: '#75caff',
+          400: '#2cafff',
+          500: '#0090f0',
+          600: '#0075d4',
+          700: '#005dab',
+          800: '#004e8d',
+          900: '#064274',
+        },
       },
     },
   },

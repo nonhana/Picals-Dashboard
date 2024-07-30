@@ -1,10 +1,13 @@
-import Button from '@mui/joy/Button';
-import FormControl from '@mui/joy/FormControl';
-import FormLabel from '@mui/joy/FormLabel';
-import Input from '@mui/joy/Input';
-import Link from '@mui/joy/Link';
-import Sheet from '@mui/joy/Sheet';
-import Typography from '@mui/joy/Typography';
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Link,
+  Sheet,
+  Typography,
+} from '@mui/joy';
 
 export default function SignUp() {
   return (
@@ -21,9 +24,7 @@ export default function SignUp() {
         sx={{
           width: 400,
           mx: 'auto',
-          my: 4,
-          py: 3,
-          px: 2,
+          p: 3,
           display: 'flex',
           flexDirection: 'column',
           gap: 4,
@@ -32,12 +33,18 @@ export default function SignUp() {
         }}
         variant="outlined"
       >
-        <div>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
           <Typography level="h4" component="h1">
-            <strong>Welcome 👋</strong>
+            <strong>Picals Dashboard</strong>
           </Typography>
           <Typography level="body-sm">Sign up for an account.</Typography>
-        </div>
+        </Box>
         <FormControl>
           <FormLabel>Email</FormLabel>
           <Input name="email" type="email" placeholder="johndoe@email.com" />

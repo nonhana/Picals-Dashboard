@@ -15,10 +15,10 @@
     "@mui/joy": "^5.0.0-beta.48",
     "@mui/material": "^5.16.5",
     "autoprefixer": "^10.4.19",
-    "jotai": "^2.9.1",
     "next": "14.2.5",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@types/node": "^20",

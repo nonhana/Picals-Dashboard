@@ -1,8 +1,10 @@
+import UserTable from '@/ui/users/Table';
+import { Sheet } from '@mui/joy';
+
 export default function Page() {
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <p>Welcome to the dashboard!</p>
-    </div>
+    <Sheet>
+      <UserTable />
+    </Sheet>
   );
 }

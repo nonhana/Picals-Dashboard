@@ -11,12 +11,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <Sheet>
       <UserStoreProvider>
         <SidebarDrawer />
-        <DashboardLayout.Root
-          sx={{
-            height: '100vh',
-            overflow: 'hidden',
-          }}
-        >
+        <DashboardLayout.Root>
           <DashboardLayout.Header>
             <Header />
           </DashboardLayout.Header>

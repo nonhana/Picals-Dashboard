@@ -1,10 +1,15 @@
+import Pagination from '@/ui/Pagination';
+import UserFilter from '@/ui/users/Filter';
+import UserMobileFilter from '@/ui/users/MobileFilter';
 import UserTable from '@/ui/users/Table';
-import { Sheet } from '@mui/joy';
 
 export default function Page() {
   return (
-    <Sheet>
+    <>
+      <UserMobileFilter />
+      <UserFilter />
       <UserTable />
-    </Sheet>
+      <Pagination />
+    </>
   );
 }

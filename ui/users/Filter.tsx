@@ -3,6 +3,7 @@
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, FormControl, FormLabel, Input } from '@mui/joy';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import * as React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import UserSelector from './Selector';
 
@@ -17,10 +18,18 @@ export default function UserFilter() {
     if (keywords) {
       params.set('keywords', keywords);
     } else {
-      params.delete('query');
+      params.delete('keywords');
     }
     replace(`${pathname}?${params.toString()}`);
   }, 300);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (!params.get('page')) {
+      params.set('page', '1');
+      replace(`${pathname}?${params.toString()}`);
+    }
+  }, [pathname, replace, searchParams]);
 
   return (
     <Box
@@ -36,10 +45,10 @@ export default function UserFilter() {
       }}
     >
       <FormControl sx={{ flex: 1 }} size="sm">
-        <FormLabel>Search for order</FormLabel>
+        <FormLabel>搜索用户</FormLabel>
         <Input
           size="sm"
-          placeholder="Search"
+          placeholder="请输入用户名"
           startDecorator={<SearchIcon />}
           onChange={(e) => handleInput(e.target.value)}
           defaultValue={searchParams.get('keywords') || ''}

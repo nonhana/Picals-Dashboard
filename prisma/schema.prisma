@@ -1,0 +1,259 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model collect_records {
+  id              String         @id @db.VarChar(36)
+  created_at      DateTime       @default(now()) @db.Timestamp(6)
+  user_id         String?        @db.VarChar(36)
+  illustration_id String?        @db.VarChar(36)
+  favorite_id     String?        @db.VarChar(36)
+  illustrations   illustrations? @relation(fields: [illustration_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_0e5d812d904d073b88f56de4e27")
+  favorites       favorites?     @relation(fields: [favorite_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_b08958ea246b4f789f1cb4848af")
+  users           users?         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_ce45aaa41147517d9e60229d91f")
+
+  @@index([illustration_id], map: "FK_0e5d812d904d073b88f56de4e27")
+  @@index([favorite_id], map: "FK_b08958ea246b4f789f1cb4848af")
+  @@index([user_id], map: "FK_ce45aaa41147517d9e60229d91f")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model comments {
+  id                                   String         @id @db.VarChar(36)
+  content                              String         @db.VarChar(2047)
+  level                                Int
+  createTime                           DateTime       @default(now()) @db.Timestamp(6)
+  res_to_comment_id                    String?        @db.VarChar(36)
+  res_to_user_id                       String?        @db.VarChar(36)
+  user_id                              String?        @db.VarChar(36)
+  illustration_id                      String?        @db.VarChar(36)
+  illustrations                        illustrations? @relation(fields: [illustration_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_2513552a5a29d1c97015aae6b67")
+  users_comments_user_idTousers        users?         @relation("comments_user_idTousers", fields: [user_id], references: [id], onUpdate: NoAction, map: "FK_4c675567d2a58f0b07cef09c13d")
+  comments                             comments?      @relation("commentsTocomments", fields: [res_to_comment_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_91c5e0f27a6c64f17f3ca23a599")
+  other_comments                       comments[]     @relation("commentsTocomments")
+  users_comments_res_to_user_idTousers users?         @relation("comments_res_to_user_idTousers", fields: [res_to_user_id], references: [id], onUpdate: NoAction, map: "FK_df5e3f02c8f8eb95786a20bb8d8")
+
+  @@index([illustration_id], map: "FK_2513552a5a29d1c97015aae6b67")
+  @@index([user_id], map: "FK_4c675567d2a58f0b07cef09c13d")
+  @@index([res_to_comment_id], map: "FK_91c5e0f27a6c64f17f3ca23a599")
+  @@index([res_to_user_id], map: "FK_df5e3f02c8f8eb95786a20bb8d8")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model favorites {
+  id                                String                              @id @db.VarChar(36)
+  name                              String                              @db.VarChar(31)
+  introduce                         String                              @db.VarChar(255)
+  cover                             String?                             @db.VarChar(255)
+  order                             Int
+  work_count                        Int                                 @default(0)
+  created_at                        DateTime                            @default(now()) @db.Timestamp(6)
+  updated_at                        DateTime                            @default(now()) @db.Timestamp(6)
+  user_id                           String?                             @db.VarChar(36)
+  collect_records                   collect_records[]
+  users                             users?                              @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_35a6b05ee3b624d0de01ee50593")
+  illustrations_favorites_favorites illustrations_favorites_favorites[]
+
+  @@index([user_id], map: "FK_35a6b05ee3b624d0de01ee50593")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model history {
+  id              String         @id @db.VarChar(36)
+  last_time       DateTime       @default(now()) @db.Timestamp(6)
+  user_id         String?        @db.VarChar(36)
+  illustration_id String?        @db.VarChar(36)
+  illustrations   illustrations? @relation(fields: [illustration_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_4f5334355ba59118c84e96c14cb")
+  users           users?         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_ea92daa642af67e2a924a5547d5")
+
+  @@index([illustration_id], map: "FK_4f5334355ba59118c84e96c14cb")
+  @@index([user_id], map: "FK_ea92daa642af67e2a924a5547d5")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model illustrations {
+  id                                String                              @id @db.VarChar(36)
+  name                              String                              @default("") @db.VarChar(63)
+  intro                             String                              @default("") @db.VarChar(2047)
+  reprintType                       Int                                 @db.TinyInt
+  openComment                       Int                                 @db.TinyInt
+  isAIGenerated                     Int                                 @db.TinyInt
+  imgList                           String                              @db.Text
+  cover                             String                              @db.VarChar(255)
+  original_url                      String?                             @db.VarChar(255)
+  like_count                        Int                                 @default(0)
+  view_count                        Int                                 @default(0)
+  collect_count                     Int                                 @default(0)
+  comment_count                     Int                                 @default(0)
+  created_time                      DateTime                            @default(now()) @db.Timestamp(6)
+  updated_time                      DateTime                            @default(now()) @db.Timestamp(6)
+  user_id                           String?                             @db.VarChar(36)
+  illustrator_id                    String?                             @db.VarChar(36)
+  collect_records                   collect_records[]
+  comments                          comments[]
+  history                           history[]
+  illustrators                      illustrators?                       @relation(fields: [illustrator_id], references: [id], onUpdate: NoAction, map: "FK_2f91c000c6242f915b6f37e21c3")
+  users                             users?                              @relation(fields: [user_id], references: [id], onUpdate: NoAction, map: "FK_9a3053ecad4d6d4e311f255ba57")
+  illustrations_favorites_favorites illustrations_favorites_favorites[]
+  illustrations_labels_labels       illustrations_labels_labels[]
+  images                            images[]
+  users_like_works_illustrations    users_like_works_illustrations[]
+  work_push_temp                    work_push_temp[]
+
+  @@index([illustrator_id], map: "FK_2f91c000c6242f915b6f37e21c3")
+  @@index([user_id], map: "FK_9a3053ecad4d6d4e311f255ba57")
+  @@index([created_time], map: "IDX_749dfa9607151be265707b0095")
+}
+
+model illustrations_favorites_favorites {
+  illustrationsId String        @db.VarChar(36)
+  favoritesId     String        @db.VarChar(36)
+  illustrations   illustrations @relation(fields: [illustrationsId], references: [id], onDelete: Cascade, map: "FK_533243c39ff009f20478c3e5581")
+  favorites       favorites     @relation(fields: [favoritesId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_8987c3717fd7d8309f47604a1d6")
+
+  @@id([illustrationsId, favoritesId])
+  @@index([illustrationsId], map: "IDX_533243c39ff009f20478c3e558")
+  @@index([favoritesId], map: "IDX_8987c3717fd7d8309f47604a1d")
+}
+
+model illustrations_labels_labels {
+  illustrationsId String        @db.VarChar(36)
+  labelsId        String        @db.VarChar(36)
+  labels          labels        @relation(fields: [labelsId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_58e398b616cf27eaf017381fc20")
+  illustrations   illustrations @relation(fields: [illustrationsId], references: [id], onDelete: Cascade, map: "FK_b995476472941ea72a54fb84dc5")
+
+  @@id([illustrationsId, labelsId])
+  @@index([labelsId], map: "IDX_58e398b616cf27eaf017381fc2")
+  @@index([illustrationsId], map: "IDX_b995476472941ea72a54fb84dc")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model illustrators {
+  id            String          @id @db.VarChar(36)
+  name          String          @db.VarChar(31)
+  avatar        String?         @db.VarChar(255)
+  intro         String          @default("暂无简介") @db.VarChar(255)
+  home_url      String          @db.VarChar(255)
+  work_count    Int             @default(0)
+  created_time  DateTime        @default(now()) @db.Timestamp(6)
+  updated_time  DateTime        @default(now()) @db.Timestamp(6)
+  illustrations illustrations[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model images {
+  id              String         @id @db.VarChar(36)
+  originUrl       String         @db.VarChar(255)
+  originWidth     Int
+  originHeight    Int
+  thumbnailUrl    String         @db.VarChar(255)
+  thumbnailWidth  Int
+  thumbnailHeight Int
+  illustration_id String?        @db.VarChar(36)
+  illustrations   illustrations? @relation(fields: [illustration_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_b888fc414904f895473e06c4e86")
+
+  @@index([illustration_id], map: "FK_b888fc414904f895473e06c4e86")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model labels {
+  id                          String                        @id @db.VarChar(36)
+  value                       String                        @db.VarChar(31)
+  color                       String                        @db.VarChar(7)
+  cover                       String?                       @db.VarChar(255)
+  work_count                  Int                           @default(0)
+  illustrations_labels_labels illustrations_labels_labels[]
+  users_liked_labels_labels   users_liked_labels_labels[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model users {
+  id                                                              String                           @id @db.VarChar(36)
+  username                                                        String                           @default("一只小萌新") @db.VarChar(31)
+  email                                                           String                           @db.VarChar(125)
+  password                                                        String                           @db.VarChar(255)
+  background_img                                                  String?                          @db.VarChar(127)
+  avatar                                                          String                           @default("https://moe.nonhana.pics/images/image-1718290795662-173119738-default-avatar.jpg") @db.VarChar(127)
+  signature                                                       String                           @default("请多多指教！~") @db.VarChar(255)
+  gender                                                          Int                              @default(2) @db.TinyInt
+  fan_count                                                       Int                              @default(0)
+  follow_count                                                    Int                              @default(0)
+  origin_count                                                    Int                              @default(0)
+  reprinted_count                                                 Int                              @default(0)
+  like_count                                                      Int                              @default(0)
+  collect_count                                                   Int                              @default(0)
+  favorite_count                                                  Int                              @default(0)
+  created_time                                                    DateTime                         @default(now()) @db.Timestamp(6)
+  updated_time                                                    DateTime                         @default(now()) @db.Timestamp(6)
+  little_avatar                                                   String                           @default("https://moe.nonhana.pics/images/image-1718290795662-173119738-default-avatar.jpg") @db.VarChar(127)
+  collect_records                                                 collect_records[]
+  comments_comments_user_idTousers                                comments[]                       @relation("comments_user_idTousers")
+  comments_comments_res_to_user_idTousers                         comments[]                       @relation("comments_res_to_user_idTousers")
+  favorites                                                       favorites[]
+  history                                                         history[]
+  illustrations                                                   illustrations[]
+  users_following_users_users_following_users_following_idTousers users_following_users[]          @relation("users_following_users_following_idTousers")
+  users_following_users_users_following_users_follower_idTousers  users_following_users[]          @relation("users_following_users_follower_idTousers")
+  users_like_works_illustrations                                  users_like_works_illustrations[]
+  users_liked_labels_labels                                       users_liked_labels_labels[]
+  work_push_temp_work_push_temp_user_idTousers                    work_push_temp[]                 @relation("work_push_temp_user_idTousers")
+  work_push_temp_work_push_temp_author_idTousers                  work_push_temp[]                 @relation("work_push_temp_author_idTousers")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model users_following_users {
+  id                                              String   @id @db.VarChar(36)
+  followTime                                      DateTime @default(now()) @db.DateTime(6)
+  follower_id                                     String?  @db.VarChar(36)
+  following_id                                    String?  @db.VarChar(36)
+  users_users_following_users_following_idTousers users?   @relation("users_following_users_following_idTousers", fields: [following_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_a35e8319289c44c069f21125f48")
+  users_users_following_users_follower_idTousers  users?   @relation("users_following_users_follower_idTousers", fields: [follower_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_f055b381ea64c0d6698cfb4b514")
+
+  @@index([following_id], map: "FK_a35e8319289c44c069f21125f48")
+  @@index([follower_id], map: "FK_f055b381ea64c0d6698cfb4b514")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model users_like_works_illustrations {
+  id              String         @id @db.VarChar(36)
+  likeTime        DateTime       @default(now()) @db.DateTime(6)
+  user_id         String?        @db.VarChar(36)
+  illustration_id String?        @db.VarChar(36)
+  users           users?         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_56d30e57ec718b943638eabbade")
+  illustrations   illustrations? @relation(fields: [illustration_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_b436c1c5d4dcc2f6a9f0529ef5c")
+
+  @@index([user_id], map: "FK_56d30e57ec718b943638eabbade")
+  @@index([illustration_id], map: "FK_b436c1c5d4dcc2f6a9f0529ef5c")
+}
+
+model users_liked_labels_labels {
+  usersId  String @db.VarChar(36)
+  labelsId String @db.VarChar(36)
+  labels   labels @relation(fields: [labelsId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_36148fe2e6b35bbd567ed720519")
+  users    users  @relation(fields: [usersId], references: [id], onDelete: Cascade, map: "FK_fb3786e991ca340e908102cda93")
+
+  @@id([usersId, labelsId])
+  @@index([labelsId], map: "IDX_36148fe2e6b35bbd567ed72051")
+  @@index([usersId], map: "IDX_fb3786e991ca340e908102cda9")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model work_push_temp {
+  id                                    String         @id @db.VarChar(36)
+  user_id                               String?        @db.VarChar(36)
+  illustration_id                       String?        @db.VarChar(36)
+  author_id                             String?        @db.VarChar(36)
+  illustrations                         illustrations? @relation(fields: [illustration_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_3def8eaa6ba9bf66f83e85f74c7")
+  users_work_push_temp_user_idTousers   users?         @relation("work_push_temp_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_8892038c5a1b61a89c3a5138657")
+  users_work_push_temp_author_idTousers users?         @relation("work_push_temp_author_idTousers", fields: [author_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_d52120b520b3ca0ba861d956695")
+
+  @@index([illustration_id], map: "FK_3def8eaa6ba9bf66f83e85f74c7")
+  @@index([user_id], map: "FK_8892038c5a1b61a89c3a5138657")
+  @@index([author_id], map: "FK_d52120b520b3ca0ba861d956695")
+}

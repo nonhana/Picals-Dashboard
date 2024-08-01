@@ -23,10 +23,14 @@ export default function UserSelector() {
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  const handleSelect = (key: string, value: string) => {
+  const handleSelect = (key: string, value: string | null) => {
     const params = new URLSearchParams(searchParams);
     params.set('page', '1');
-    params.set(key, value);
+    if (value) {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
     replace(`${pathname}?${params.toString()}`);
   };
 
@@ -37,16 +41,16 @@ export default function UserSelector() {
           <FormLabel>{option.label}</FormLabel>
           <Select
             size="sm"
-            placeholder="请选择"
             slotProps={{ button: { sx: { whiteSpace: 'nowrap' } } }}
-            onChange={(_, value) => handleSelect(option.value, value as string)}
-            defaultValue={searchParams.get(option.value) || ''}
+            onChange={(_, value) => handleSelect(option.value, value)}
+            defaultValue={searchParams.get(option.value)}
           >
             {option.options.map((o) => (
               <Option key={o.value} value={o.value}>
                 {o.label}
               </Option>
             ))}
+            <Option value={null}>不限</Option>
           </Select>
         </FormControl>
       ))}

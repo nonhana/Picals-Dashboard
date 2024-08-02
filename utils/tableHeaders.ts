@@ -1,9 +1,11 @@
-export const userTableHeads: {
+type TableHead = {
   name: string;
   value: string;
   width?: number;
   sortable: boolean;
-}[] = [
+};
+
+export const userTableHeads: TableHead[] = [
   {
     name: '用户id',
     value: 'id',
@@ -79,6 +81,87 @@ export const userTableHeads: {
   {
     name: '注册时间',
     value: 'created_time',
+    width: 120,
+    sortable: true,
+  },
+  {
+    name: '操作',
+    value: 'action',
+    width: 60,
+    sortable: false,
+  },
+];
+
+export const workTableHeads: TableHead[] = [
+  {
+    name: '作品id',
+    value: 'id',
+    width: 100,
+    sortable: false,
+  },
+  {
+    name: '作品名',
+    value: 'name',
+    width: 120,
+    sortable: false,
+  },
+  {
+    name: '简介',
+    value: 'intro',
+    width: 150,
+    sortable: false,
+  },
+  {
+    name: '转载状态',
+    value: 'reprintType',
+    width: 100,
+    sortable: false,
+  },
+  {
+    name: '图片列表',
+    value: 'imgList',
+    width: 120,
+    sortable: false,
+  },
+  {
+    name: '封面',
+    value: 'cover',
+    width: 60,
+    sortable: false,
+  },
+  {
+    name: '点赞数',
+    value: 'like_count',
+    width: 100,
+    sortable: true,
+  },
+  {
+    name: '浏览数',
+    value: 'view_count',
+    width: 100,
+    sortable: true,
+  },
+  {
+    name: '收藏数',
+    value: 'collect_count',
+    width: 100,
+    sortable: true,
+  },
+  {
+    name: '评论数',
+    value: 'comment_count',
+    width: 100,
+    sortable: true,
+  },
+  {
+    name: '发布时间',
+    value: 'created_time',
+    width: 120,
+    sortable: true,
+  },
+  {
+    name: '更新时间',
+    value: 'updated_time',
     width: 120,
     sortable: true,
   },

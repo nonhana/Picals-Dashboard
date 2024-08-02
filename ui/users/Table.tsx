@@ -5,17 +5,11 @@ import { userTableHeads } from '@/utils/tableHeaders';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
-import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
-import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 import {
   Box,
-  Button,
   Chip,
   ColorPaletteProp,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   Divider,
   Dropdown,
   IconButton,
@@ -23,14 +17,14 @@ import {
   Menu,
   MenuButton,
   MenuItem,
-  Modal,
-  ModalDialog,
   Table,
   Typography,
 } from '@mui/joy';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import UserDelModal from './DelModal';
+import UserEditModal from './EditModal';
 
 type TargetUser = {
   id: string;
@@ -67,25 +61,42 @@ export default function UserTable() {
   const [targetUser, setTargetUser] = React.useState<TargetUser>();
 
   const preEditUser = (target: TargetUser) => {
+    setTargetUser(target);
     setEditModalVisible(true);
-    setTargetUser(target);
-  };
-
-  const preDelUser = (target: TargetUser) => {
-    setDelModalVisible(true);
-    setTargetUser(target);
   };
 
   React.useEffect(() => {
-    if (!delModalVisible) setTargetUser(undefined);
-    if (!editModalVisible) setTargetUser(undefined);
-  }, [delModalVisible, editModalVisible]);
+    if (!editModalVisible) {
+      setTargetUser(undefined);
+    }
+  }, [editModalVisible]);
+
+  const handleEditUser = () => {
+    setEditModalVisible(false);
+  };
+
+  const preDelUser = (target: TargetUser) => {
+    setTargetUser(target);
+    setDelModalVisible(true);
+  };
+
+  React.useEffect(() => {
+    if (!delModalVisible) {
+      setTargetUser(undefined);
+    }
+  }, [delModalVisible]);
+
+  const handleDelUser = () => {
+    console.log(targetUser?.id);
+    setDelModalVisible(false);
+  };
 
   return (
     <>
       <Box
         sx={{
           width: '100%',
+          maxHeight: 'calc(100vh - 280px)',
           overflow: 'auto',
         }}
       >
@@ -266,62 +277,16 @@ export default function UserTable() {
           </tbody>
         </Table>
       </Box>
-      <Modal open={delModalVisible} onClose={() => setDelModalVisible(false)}>
-        <ModalDialog variant="outlined" role="alertdialog">
-          <DialogTitle>
-            <WarningRoundedIcon />
-            注意
-          </DialogTitle>
-          <Divider />
-          <DialogContent>
-            <Typography level="body-md">
-              确定要删除用户 <strong>{targetUser?.username}</strong> 吗？
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button
-              variant="solid"
-              color="danger"
-              onClick={() => setDelModalVisible(false)}
-            >
-              删除
-            </Button>
-            <Button
-              variant="plain"
-              color="neutral"
-              onClick={() => setDelModalVisible(false)}
-            >
-              取消
-            </Button>
-          </DialogActions>
-        </ModalDialog>
-      </Modal>
-      <Modal open={editModalVisible} onClose={() => setEditModalVisible(false)}>
-        <ModalDialog variant="outlined" role="alertdialog">
-          <DialogTitle>
-            <EditRoundedIcon />
-            编辑用户
-          </DialogTitle>
-          <Divider />
-          <DialogContent>
-            <Typography level="body-md">
-              这是用户 <strong>{targetUser?.username}</strong> 的编辑表单。
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button variant="solid" onClick={() => setEditModalVisible(false)}>
-              确定
-            </Button>
-            <Button
-              variant="plain"
-              color="neutral"
-              onClick={() => setEditModalVisible(false)}
-            >
-              取消
-            </Button>
-          </DialogActions>
-        </ModalDialog>
-      </Modal>
+      <UserDelModal
+        visible={delModalVisible}
+        setVisible={setDelModalVisible}
+        handleDel={handleDelUser}
+      />
+      <UserEditModal
+        visible={editModalVisible}
+        setVisible={setEditModalVisible}
+        handleEdit={handleEditUser}
+      />
     </>
   );
 }

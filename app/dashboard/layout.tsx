@@ -1,6 +1,7 @@
 import { UserStoreProvider } from '@/store/provider/user-provider';
 import DashboardLayout from '@/ui/DashboardLayout';
 import Header from '@/ui/Header';
+import RouteNavigator from '@/ui/RouteNavigator';
 import Sidebar from '@/ui/Sidebar';
 import SidebarDrawer from '@/ui/SidebarDrawer';
 import { Sheet } from '@mui/joy';
@@ -18,7 +19,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <DashboardLayout.SideNav>
             <Sidebar />
           </DashboardLayout.SideNav>
-          <DashboardLayout.Main>{children}</DashboardLayout.Main>
+          <DashboardLayout.Main>
+            <RouteNavigator />
+            {children}
+          </DashboardLayout.Main>
         </DashboardLayout.Root>
       </UserStoreProvider>
     </Sheet>

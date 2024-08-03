@@ -1,6 +1,6 @@
 'use client';
 
-import { WorkOptions } from '@/utils/selectOptions';
+import { IllustratorOptions } from '@/utils/selectOptions';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, FormControl, FormLabel, Input } from '@mui/joy';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -8,7 +8,7 @@ import * as React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import Selector from '../Selector';
 
-export default function WorkFilter() {
+export default function IllustratorFilter() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -46,36 +46,16 @@ export default function WorkFilter() {
       }}
     >
       <FormControl sx={{ flex: 1 }} size="sm">
-        <FormLabel>作品id</FormLabel>
-        <Input
-          size="sm"
-          placeholder="请输入作品id"
-          startDecorator={<SearchIcon />}
-          onChange={(e) => handleInput('id', e.target.value)}
-          defaultValue={searchParams.get('id') || ''}
-        />
-      </FormControl>
-      <FormControl sx={{ flex: 1 }} size="sm">
-        <FormLabel>发布者id</FormLabel>
-        <Input
-          size="sm"
-          placeholder="请输入发布者id"
-          startDecorator={<SearchIcon />}
-          onChange={(e) => handleInput('user_id', e.target.value)}
-          defaultValue={searchParams.get('user_id') || ''}
-        />
-      </FormControl>
-      <FormControl sx={{ flex: 1 }} size="sm">
         <FormLabel>插画家id</FormLabel>
         <Input
           size="sm"
           placeholder="请输入插画家id"
           startDecorator={<SearchIcon />}
-          onChange={(e) => handleInput('illustrator_id', e.target.value)}
-          defaultValue={searchParams.get('illustrator_id') || ''}
+          onChange={(e) => handleInput('id', e.target.value)}
+          defaultValue={searchParams.get('id') || ''}
         />
       </FormControl>
-      <Selector options={WorkOptions} />
+      <Selector options={IllustratorOptions} />
     </Box>
   );
 }

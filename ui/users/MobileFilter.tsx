@@ -1,5 +1,6 @@
 'use client';
 
+import { UserOptions } from '@/utils/selectOptions';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import SearchIcon from '@mui/icons-material/Search';
 import {
@@ -16,7 +17,7 @@ import {
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
-import UserSelector from './Selector';
+import Selector from '../Selector';
 
 export default function UserMobileFilter() {
   const [open, setOpen] = React.useState(false);
@@ -65,7 +66,7 @@ export default function UserMobileFilter() {
           </Typography>
           <Divider sx={{ my: 2 }} />
           <Sheet sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <UserSelector />
+            <Selector options={UserOptions} />
             <Button color="primary" onClick={() => setOpen(false)}>
               确定
             </Button>

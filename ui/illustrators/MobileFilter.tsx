@@ -1,6 +1,6 @@
 'use client';
 
-import { WorkOptions } from '@/utils/selectOptions';
+import { IllustratorOptions } from '@/utils/selectOptions';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import SearchIcon from '@mui/icons-material/Search';
 import {
@@ -19,7 +19,7 @@ import * as React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import Selector from '../Selector';
 
-export default function WorkMobileFilter() {
+export default function IllustratorMobileFilter() {
   const [open, setOpen] = React.useState(false);
 
   const searchParams = useSearchParams();
@@ -50,26 +50,10 @@ export default function WorkMobileFilter() {
       <Sheet sx={{ display: { xs: 'flex', sm: 'none' }, my: 1, gap: 1 }}>
         <Input
           size="sm"
-          placeholder="请输入作品id"
+          placeholder="请输入插画家id"
           startDecorator={<SearchIcon />}
           onChange={(e) => handleInput('id', e.target.value)}
           defaultValue={searchParams.get('id') || ''}
-          sx={{ flexGrow: 1 }}
-        />
-        <Input
-          size="sm"
-          placeholder="请输入发布者id"
-          startDecorator={<SearchIcon />}
-          onChange={(e) => handleInput('user_id', e.target.value)}
-          defaultValue={searchParams.get('user_id') || ''}
-          sx={{ flexGrow: 1 }}
-        />
-        <Input
-          size="sm"
-          placeholder="请输入插画家id"
-          startDecorator={<SearchIcon />}
-          onChange={(e) => handleInput('illustrator_id', e.target.value)}
-          defaultValue={searchParams.get('illustrator_id') || ''}
           sx={{ flexGrow: 1 }}
         />
         <IconButton
@@ -90,7 +74,7 @@ export default function WorkMobileFilter() {
           </Typography>
           <Divider sx={{ my: 2 }} />
           <Sheet sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Selector options={WorkOptions} />
+            <Selector options={IllustratorOptions} />
             <Button color="primary" onClick={() => setOpen(false)}>
               确定
             </Button>

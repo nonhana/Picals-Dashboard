@@ -1,4 +1,4 @@
-import type { illustrations, users } from '@prisma/client';
+import type { illustrations, illustrators, users } from '@prisma/client';
 
 // TODO: status 为临时数据，后续需要从数据库获取类型
 type User = Omit<
@@ -61,6 +61,25 @@ export const IllustrationTableData: Illustration[] = Array.from(
     status: index % 3,
     user_name: `user${index}`,
     illustrator_name: `illustrator${index}`,
+    created_time: '2021-08-01',
+  })
+);
+
+type Illustrator = Omit<illustrators, 'updated_time' | 'created_time'> & {
+  status: number;
+  created_time: string;
+};
+
+export const IllustratorTableData: Illustrator[] = Array.from(
+  { length: 30 },
+  (_, index) => ({
+    id: String(index),
+    name: `illustrator${index}`,
+    avatar: index % 2 ? 'https://dummyimage.com/32x32' : null,
+    intro: `intro${index}`,
+    home_url: 'https://www.pixiv.net/users/47945116',
+    work_count: index,
+    status: index % 2,
     created_time: '2021-08-01',
   })
 );

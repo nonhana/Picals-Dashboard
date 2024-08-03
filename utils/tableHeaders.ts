@@ -184,3 +184,60 @@ export const workTableHeads: TableHead[] = [
     sortable: false,
   },
 ];
+
+export const illustratorTableHeads: TableHead[] = [
+  {
+    name: '插画师id',
+    value: 'id',
+    width: 100,
+    sortable: false,
+  },
+  {
+    name: '插画师名',
+    value: 'name',
+    width: 120,
+    sortable: false,
+  },
+  {
+    name: '简介',
+    value: 'intro',
+    width: 150,
+    sortable: false,
+  },
+  {
+    name: '头像',
+    value: 'avatar',
+    width: 60,
+    sortable: false,
+  },
+  {
+    name: '主页',
+    value: 'home_url',
+    width: 150,
+    sortable: false,
+  },
+  {
+    name: '作品数',
+    value: 'work_count',
+    width: 100,
+    sortable: true,
+  },
+  {
+    name: '状态',
+    value: 'status',
+    width: 100,
+    sortable: false,
+  },
+  {
+    name: '注册时间',
+    value: 'created_time',
+    width: 120,
+    sortable: true,
+  },
+  {
+    name: '操作',
+    value: 'action',
+    width: 60,
+    sortable: false,
+  },
+];

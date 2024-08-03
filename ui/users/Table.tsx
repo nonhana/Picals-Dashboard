@@ -95,6 +95,7 @@ export default function UserTable() {
     <>
       <Box
         sx={{
+          position: { xs: 'absolute', sm: 'relative' },
           width: '100%',
           maxHeight: 'calc(100vh - 280px)',
           overflow: 'auto',

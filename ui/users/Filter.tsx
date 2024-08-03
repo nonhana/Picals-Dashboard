@@ -1,11 +1,12 @@
 'use client';
 
+import { UserOptions } from '@/utils/selectOptions';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, FormControl, FormLabel, Input } from '@mui/joy';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
-import UserSelector from './Selector';
+import Selector from '../Selector';
 
 export default function UserFilter() {
   const searchParams = useSearchParams();
@@ -54,7 +55,7 @@ export default function UserFilter() {
           defaultValue={searchParams.get('keywords') || ''}
         />
       </FormControl>
-      <UserSelector />
+      <Selector options={UserOptions} />
     </Box>
   );
 }

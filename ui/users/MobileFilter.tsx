@@ -13,11 +13,28 @@ import {
   Sheet,
   Typography,
 } from '@mui/joy';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 import UserSelector from './Selector';
 
 export default function UserMobileFilter() {
   const [open, setOpen] = React.useState(false);
+
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+
+  const handleInput = useDebouncedCallback((keywords: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', '1');
+    if (keywords) {
+      params.set('keywords', keywords);
+    } else {
+      params.delete('keywords');
+    }
+    replace(`${pathname}?${params.toString()}`);
+  }, 300);
 
   return (
     <Sheet
@@ -26,8 +43,10 @@ export default function UserMobileFilter() {
     >
       <Input
         size="sm"
-        placeholder="Search"
+        placeholder="请输入用户名"
         startDecorator={<SearchIcon />}
+        onChange={(e) => handleInput(e.target.value)}
+        defaultValue={searchParams.get('keywords') || ''}
         sx={{ flexGrow: 1 }}
       />
       <IconButton
@@ -42,13 +61,13 @@ export default function UserMobileFilter() {
         <ModalDialog aria-labelledby="filter-modal" layout="fullscreen">
           <ModalClose />
           <Typography id="filter-modal" level="h2">
-            Filters
+            筛选
           </Typography>
           <Divider sx={{ my: 2 }} />
           <Sheet sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <UserSelector />
             <Button color="primary" onClick={() => setOpen(false)}>
-              Submit
+              确定
             </Button>
           </Sheet>
         </ModalDialog>

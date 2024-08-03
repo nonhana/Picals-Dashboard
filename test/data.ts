@@ -29,16 +29,38 @@ export const userTableData: User[] = Array.from({ length: 30 }, (_, index) => ({
 
 type Illustration = Omit<
   illustrations,
-  | 'like_count'
-  | 'view_count'
-  | 'collect_count'
-  | 'comment_count'
+  | 'imgList'
   | 'created_time'
   | 'updated_time'
   | 'user_id'
->;
+  | 'illustrator_id'
+  | 'openComment'
+  | 'isAIGenerated'
+> & {
+  status: number;
+  imgList: string[];
+  user_name: string;
+  illustrator_name: string;
+  created_time: string;
+};
 
-// export const IllustrationTableData: Illustration[] = Array.from(
-//   { length: 30 },
-//   (_, index) => ({})
-// );
+export const IllustrationTableData: Illustration[] = Array.from(
+  { length: 30 },
+  (_, index) => ({
+    id: String(index),
+    name: `illustration${index}`,
+    intro: `intro${index}`,
+    reprintType: index % 3,
+    imgList: Array<string>(10).fill('https://dummyimage.com/400X400'),
+    cover: 'https://dummyimage.com/400X400',
+    like_count: index,
+    view_count: index,
+    collect_count: index,
+    comment_count: index,
+    original_url: index % 2 ? 'https://dummyimage.com/400X400' : null,
+    status: index % 3,
+    user_name: `user${index}`,
+    illustrator_name: `illustrator${index}`,
+    created_time: '2021-08-01',
+  })
+);

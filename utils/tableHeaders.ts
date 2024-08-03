@@ -241,3 +241,81 @@ export const illustratorTableHeads: TableHead[] = [
     sortable: false,
   },
 ];
+
+export const labelTableHeads: TableHead[] = [
+  {
+    name: '标签id',
+    value: 'id',
+    width: 100,
+    sortable: false,
+  },
+  {
+    name: '标签名',
+    value: 'value',
+    width: 120,
+    sortable: false,
+  },
+  {
+    name: '标签颜色',
+    value: 'color',
+    width: 60,
+    sortable: false,
+  },
+  {
+    name: '标签封面',
+    value: 'color',
+    width: 60,
+    sortable: false,
+  },
+  {
+    name: '作品数',
+    value: 'work_count',
+    width: 100,
+    sortable: true,
+  },
+  {
+    name: '操作',
+    value: 'action',
+    width: 60,
+    sortable: false,
+  },
+];
+
+export const commentTableHeads: TableHead[] = [
+  {
+    name: '评论id',
+    value: 'id',
+    width: 100,
+    sortable: false,
+  },
+  {
+    name: '内容',
+    value: 'content',
+    width: 150,
+    sortable: false,
+  },
+  {
+    name: '等级',
+    value: 'level',
+    width: 100,
+    sortable: false,
+  },
+  {
+    name: '用户名',
+    value: 'user_name',
+    width: 120,
+    sortable: false,
+  },
+  {
+    name: '发布时间',
+    value: 'createTime',
+    width: 120,
+    sortable: true,
+  },
+  {
+    name: '操作',
+    value: 'action',
+    width: 60,
+    sortable: false,
+  },
+];

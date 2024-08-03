@@ -1,8 +1,20 @@
+import CommentFilter from '@/ui/comments/Filter';
+import CommentMobileFilter from '@/ui/comments/MobileFilter';
+import CommentTable from '@/ui/comments/Table';
+import Pagination from '@/ui/Pagination';
+import { Typography } from '@mui/joy';
+import { Suspense } from 'react';
+
 export default function Page() {
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <p>Welcome to the dashboard!</p>
-    </div>
+    <>
+      <Typography level="h2">评论管理</Typography>
+      <Suspense fallback={<div>Loading...</div>}>
+        <CommentMobileFilter />
+        <CommentFilter />
+        <CommentTable />
+      </Suspense>
+      <Pagination />
+    </>
   );
 }

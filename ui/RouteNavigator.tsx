@@ -12,7 +12,7 @@ export default function RouteNavigator() {
     .filter(Boolean)
     .filter((path) => path !== 'dashboard');
 
-  return (
+  return paths.length > 0 ? (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Breadcrumbs
         size="sm"
@@ -34,7 +34,7 @@ export default function RouteNavigator() {
               key={path}
               underline="hover"
               color="neutral"
-              href={`/${paths.slice(0, index + 1).join('/')}`}
+              href={`/dashboard/${paths.slice(0, index + 1).join('/')}`}
               fontSize={12}
               fontWeight={500}
             >
@@ -53,5 +53,5 @@ export default function RouteNavigator() {
         )}
       </Breadcrumbs>
     </Box>
-  );
+  ) : null;
 }

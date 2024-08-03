@@ -1,15 +1,9 @@
 'use client';
 
-import { IllustrationTableData } from '@/test/data';
-import { workTableHeads } from '@/utils/tableHeaders';
+import { CommentTableData } from '@/test/data';
+import { commentTableHeads } from '@/utils/tableHeaders';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import BookmarkAddedRoundedIcon from '@mui/icons-material/BookmarkAddedRounded';
-import BookmarksRoundedIcon from '@mui/icons-material/BookmarksRounded';
-import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import IndeterminateCheckBoxRoundedIcon from '@mui/icons-material/IndeterminateCheckBoxRounded';
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
-import TripOriginRoundedIcon from '@mui/icons-material/TripOriginRounded';
 import {
   Box,
   Chip,
@@ -25,73 +19,32 @@ import {
   Tooltip,
   Typography,
 } from '@mui/joy';
-import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-function reprintedTypeChip(type: number) {
+function levelChip(type: number) {
   return (
     <Chip
       variant="soft"
       size="sm"
-      startDecorator={
-        {
-          0: <TripOriginRoundedIcon />,
-          1: <BookmarkAddedRoundedIcon />,
-          2: <BookmarksRoundedIcon />,
-        }[type]
-      }
       color={
         {
           0: 'success',
-          1: 'warning',
-          2: 'neutral',
+          1: 'danger',
         }[type] as ColorPaletteProp
       }
     >
       {
         {
-          0: '原创',
-          1: '转载',
-          2: '合集',
+          0: '一级评论',
+          1: '二级评论',
         }[type]
       }
     </Chip>
   );
 }
 
-function statusChip(type: number) {
-  return (
-    <Chip
-      variant="soft"
-      size="sm"
-      startDecorator={
-        {
-          0: <IndeterminateCheckBoxRoundedIcon />,
-          1: <CheckRoundedIcon />,
-          2: <CloseRoundedIcon />,
-        }[type]
-      }
-      color={
-        {
-          0: 'neutral',
-          1: 'success',
-          2: 'danger',
-        }[type] as ColorPaletteProp
-      }
-    >
-      {
-        {
-          0: '审核中',
-          1: '已发布',
-          2: '已删除',
-        }[type]
-      }
-    </Chip>
-  );
-}
-
-export default function WorkTable() {
-  const sortableHeads = workTableHeads
+export default function CommentTable() {
+  const sortableHeads = commentTableHeads
     .filter((head) => head.sortable)
     .map((item) => item.value);
 
@@ -125,7 +78,7 @@ export default function WorkTable() {
       }}
     >
       <Table
-        aria-labelledby="workTable"
+        aria-labelledby="illustratorTable"
         stickyHeader
         hoverRow
         sx={{
@@ -138,7 +91,7 @@ export default function WorkTable() {
       >
         <thead>
           <tr>
-            {workTableHeads.map((head) => (
+            {commentTableHeads.map((head) => (
               <th
                 key={head.value}
                 style={{
@@ -184,17 +137,14 @@ export default function WorkTable() {
           </tr>
         </thead>
         <tbody>
-          {IllustrationTableData.map((row) => (
+          {CommentTableData.map((row) => (
             <tr key={row.id}>
               <td style={{ textAlign: 'center', width: 100 }}>
                 <Typography level="body-xs">{row.id}</Typography>
               </td>
-              <td style={{ textAlign: 'center', width: 120 }}>
-                <Typography level="body-xs">{row.name}</Typography>
-              </td>
               <td style={{ textAlign: 'center', width: 150 }}>
                 <Typography level="body-xs">
-                  <Tooltip title={row.intro} placement="top" arrow>
+                  <Tooltip title={row.content} placement="top" arrow>
                     <Typography
                       level="body-xs"
                       sx={{
@@ -204,62 +154,19 @@ export default function WorkTable() {
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {row.intro}
+                      {row.content}
                     </Typography>
                   </Tooltip>
                 </Typography>
               </td>
               <td style={{ textAlign: 'center', width: 100 }}>
-                {reprintedTypeChip(row.reprintType)}
-              </td>
-              <td style={{ textAlign: 'center', width: 60 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                  <Image
-                    src={row.cover}
-                    alt={row.name}
-                    width={32}
-                    height={32}
-                  />
-                </Box>
-              </td>
-              <td style={{ textAlign: 'center', width: 100 }}>
-                <Typography level="body-xs">{row.like_count}</Typography>
-              </td>
-              <td style={{ textAlign: 'center', width: 100 }}>
-                <Typography level="body-xs">{row.view_count}</Typography>
-              </td>
-              <td style={{ textAlign: 'center', width: 100 }}>
-                <Typography level="body-xs">{row.collect_count}</Typography>
-              </td>
-              <td style={{ textAlign: 'center', width: 120 }}>
-                <Typography level="body-xs">{row.comment_count}</Typography>
-              </td>
-              <td style={{ textAlign: 'center', width: 150 }}>
-                <Tooltip title={row.original_url} placement="top" arrow>
-                  <Typography
-                    level="body-xs"
-                    sx={{
-                      display: 'block',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {row.original_url}
-                  </Typography>
-                </Tooltip>
-              </td>
-              <td style={{ textAlign: 'center', width: 100 }}>
-                {statusChip(row.status)}
+                {levelChip(row.level)}
               </td>
               <td style={{ textAlign: 'center', width: 120 }}>
                 <Typography level="body-xs">{row.user_name}</Typography>
               </td>
               <td style={{ textAlign: 'center', width: 120 }}>
-                <Typography level="body-xs">{row.illustrator_name}</Typography>
-              </td>
-              <td style={{ textAlign: 'center', width: 120 }}>
-                <Typography level="body-xs">{row.created_time}</Typography>
+                <Typography level="body-xs">{row.createTime}</Typography>
               </td>
               <td style={{ textAlign: 'center', width: 60 }}>
                 <Dropdown>
@@ -276,9 +183,9 @@ export default function WorkTable() {
                     <MoreHorizRoundedIcon />
                   </MenuButton>
                   <Menu size="sm" sx={{ minWidth: 140 }}>
-                    <MenuItem>查看完整信息</MenuItem>
+                    <MenuItem>编辑信息</MenuItem>
                     <Divider />
-                    <MenuItem color="danger">删除作品</MenuItem>
+                    <MenuItem color="danger">删除评论</MenuItem>
                   </Menu>
                 </Dropdown>
               </td>

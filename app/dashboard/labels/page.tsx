@@ -1,8 +1,20 @@
+import LabelFilter from '@/ui/labels/Filter';
+import LabelMobileFilter from '@/ui/labels/MobileFilter';
+import LabelTable from '@/ui/labels/Table';
+import Pagination from '@/ui/Pagination';
+import { Typography } from '@mui/joy';
+import { Suspense } from 'react';
+
 export default function Page() {
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <p>Welcome to the dashboard!</p>
-    </div>
+    <>
+      <Typography level="h2">标签管理</Typography>
+      <Suspense fallback={<div>Loading...</div>}>
+        <LabelMobileFilter />
+        <LabelFilter />
+        <LabelTable />
+      </Suspense>
+      <Pagination />
+    </>
   );
 }

@@ -97,7 +97,7 @@ export default function UserTable() {
         sx={{
           position: { xs: 'absolute', sm: 'relative' },
           width: '100%',
-          maxHeight: 'calc(100vh - 280px)',
+          maxHeight: 'calc(100vh - 310px)',
           overflow: 'auto',
         }}
       >

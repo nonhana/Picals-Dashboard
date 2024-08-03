@@ -1,15 +1,11 @@
 'use client';
 
-import { IllustratorTableData } from '@/test/data';
-import { illustratorTableHeads } from '@/utils/tableHeaders';
+import { LabelTableData } from '@/test/data';
+import { labelTableHeads } from '@/utils/tableHeaders';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
 import {
   Box,
-  Chip,
-  ColorPaletteProp,
   Divider,
   Dropdown,
   IconButton,
@@ -24,36 +20,8 @@ import {
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-function statusChip(type: number) {
-  return (
-    <Chip
-      variant="soft"
-      size="sm"
-      startDecorator={
-        {
-          0: <CheckRoundedIcon />,
-          1: <CloseRoundedIcon />,
-        }[type]
-      }
-      color={
-        {
-          0: 'success',
-          1: 'danger',
-        }[type] as ColorPaletteProp
-      }
-    >
-      {
-        {
-          0: '正常',
-          1: '删除',
-        }[type]
-      }
-    </Chip>
-  );
-}
-
-export default function IllustratorTable() {
-  const sortableHeads = illustratorTableHeads
+export default function LabelTable() {
+  const sortableHeads = labelTableHeads
     .filter((head) => head.sortable)
     .map((item) => item.value);
 
@@ -100,7 +68,7 @@ export default function IllustratorTable() {
       >
         <thead>
           <tr>
-            {illustratorTableHeads.map((head) => (
+            {labelTableHeads.map((head) => (
               <th
                 key={head.value}
                 style={{
@@ -146,37 +114,33 @@ export default function IllustratorTable() {
           </tr>
         </thead>
         <tbody>
-          {IllustratorTableData.map((row) => (
+          {LabelTableData.map((row) => (
             <tr key={row.id}>
               <td style={{ textAlign: 'center', width: 100 }}>
                 <Typography level="body-xs">{row.id}</Typography>
               </td>
               <td style={{ textAlign: 'center', width: 120 }}>
-                <Typography level="body-xs">{row.name}</Typography>
+                <Typography level="body-xs">{row.value}</Typography>
               </td>
-              <td style={{ textAlign: 'center', width: 150 }}>
-                <Typography level="body-xs">
-                  <Tooltip title={row.intro} placement="top" arrow>
-                    <Typography
-                      level="body-xs"
-                      sx={{
-                        display: 'block',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {row.intro}
-                    </Typography>
-                  </Tooltip>
-                </Typography>
+              <td style={{ textAlign: 'center', width: 60 }}>
+                <Tooltip title={row.color} placement="top" arrow>
+                  <Box
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: '50%',
+                      backgroundColor: row.color,
+                      margin: '0 auto',
+                    }}
+                  />
+                </Tooltip>
               </td>
               <td style={{ textAlign: 'center', width: 60 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                  {row.avatar ? (
+                  {row.cover ? (
                     <Image
-                      src={row.avatar}
-                      alt={row.name}
+                      src={row.cover}
+                      alt={row.value}
                       width={32}
                       height={32}
                     />
@@ -185,29 +149,8 @@ export default function IllustratorTable() {
                   )}
                 </Box>
               </td>
-              <td style={{ textAlign: 'center', width: 150 }}>
-                <Tooltip title={row.home_url} placement="top" arrow>
-                  <Typography
-                    level="body-xs"
-                    sx={{
-                      display: 'block',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {row.home_url}
-                  </Typography>
-                </Tooltip>
-              </td>
               <td style={{ textAlign: 'center', width: 100 }}>
                 <Typography level="body-xs">{row.work_count}</Typography>
-              </td>
-              <td style={{ textAlign: 'center', width: 100 }}>
-                {statusChip(row.status)}
-              </td>
-              <td style={{ textAlign: 'center', width: 120 }}>
-                <Typography level="body-xs">{row.created_time}</Typography>
               </td>
               <td style={{ textAlign: 'center', width: 60 }}>
                 <Dropdown>
@@ -227,7 +170,7 @@ export default function IllustratorTable() {
                     <MenuItem>编辑信息</MenuItem>
                     <MenuItem>查看作品</MenuItem>
                     <Divider />
-                    <MenuItem color="danger">删除插画家</MenuItem>
+                    <MenuItem color="danger">删除标签</MenuItem>
                   </Menu>
                 </Dropdown>
               </td>

@@ -99,3 +99,20 @@ export const IllustratorOptions: SelectOption[] = [
     ],
   },
 ];
+
+export const commentOptions: SelectOption[] = [
+  {
+    label: '评论等级',
+    value: 'level',
+    options: [
+      {
+        label: '一级评论',
+        value: 0,
+      },
+      {
+        label: '二级评论',
+        value: 1,
+      },
+    ],
+  },
+];

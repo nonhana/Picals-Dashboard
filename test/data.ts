@@ -1,4 +1,10 @@
-import type { illustrations, illustrators, users } from '@prisma/client';
+import type {
+  comments,
+  illustrations,
+  illustrators,
+  labels,
+  users,
+} from '@prisma/client';
 
 // TODO: status 为临时数据，后续需要从数据库获取类型
 type User = Omit<
@@ -81,5 +87,41 @@ export const IllustratorTableData: Illustrator[] = Array.from(
     work_count: index,
     status: index % 2,
     created_time: '2021-08-01',
+  })
+);
+
+type Label = labels;
+
+export const LabelTableData: Label[] = Array.from(
+  { length: 30 },
+  (_, index) => ({
+    id: String(index),
+    value: `label${index}`,
+    color: '#000000',
+    cover: index % 2 ? 'https://dummyimage.com/32x32' : null,
+    work_count: index,
+  })
+);
+
+type Comment = Omit<
+  comments,
+  | 'res_to_comment_id'
+  | 'res_to_user_id'
+  | 'createTime'
+  | 'user_id'
+  | 'illustration_id'
+> & {
+  createTime: string;
+  user_name: string;
+};
+
+export const CommentTableData: Comment[] = Array.from(
+  { length: 30 },
+  (_, index) => ({
+    id: String(index),
+    content: `content${index}`,
+    level: index % 2,
+    createTime: '2021-08-01',
+    user_name: `user${index}`,
   })
 );

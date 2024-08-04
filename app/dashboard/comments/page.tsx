@@ -1,7 +1,6 @@
 import CommentFilter from '@/ui/comments/Filter';
 import CommentMobileFilter from '@/ui/comments/MobileFilter';
 import CommentTable from '@/ui/comments/Table';
-import Pagination from '@/ui/Pagination';
 import { Typography } from '@mui/joy';
 import { Suspense } from 'react';
 
@@ -14,7 +13,6 @@ export default function Page() {
         <CommentFilter />
         <CommentTable />
       </Suspense>
-      <Pagination />
     </>
   );
 }

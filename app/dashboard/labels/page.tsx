@@ -1,7 +1,6 @@
 import LabelFilter from '@/ui/labels/Filter';
 import LabelMobileFilter from '@/ui/labels/MobileFilter';
 import LabelTable from '@/ui/labels/Table';
-import Pagination from '@/ui/Pagination';
 import { Typography } from '@mui/joy';
 import { Suspense } from 'react';
 
@@ -14,7 +13,6 @@ export default function Page() {
         <LabelFilter />
         <LabelTable />
       </Suspense>
-      <Pagination />
     </>
   );
 }

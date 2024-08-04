@@ -1,7 +1,6 @@
 import IllustratorFilter from '@/ui/illustrators/Filter';
 import IllustratorMobileFilter from '@/ui/illustrators/MobileFilter';
 import IllustratorTable from '@/ui/illustrators/Table';
-import Pagination from '@/ui/Pagination';
 import { Typography } from '@mui/joy';
 import { Suspense } from 'react';
 
@@ -14,7 +13,6 @@ export default function Page() {
         <IllustratorFilter />
         <IllustratorTable />
       </Suspense>
-      <Pagination />
     </>
   );
 }

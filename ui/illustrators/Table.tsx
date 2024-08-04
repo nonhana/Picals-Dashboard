@@ -23,6 +23,7 @@ import {
 } from '@mui/joy';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import Pagination from '../Pagination';
 
 function statusChip(type: number) {
   return (
@@ -78,85 +79,118 @@ export default function IllustratorTable() {
   };
 
   return (
-    <Box
-      sx={{
-        position: { xs: 'absolute', sm: 'relative' },
-        width: '100%',
-        maxHeight: 'calc(100vh - 310px)',
-        overflow: 'auto',
-      }}
-    >
-      <Table
-        aria-labelledby="illustratorTable"
-        stickyHeader
-        hoverRow
+    <>
+      <Box
         sx={{
-          '--TableCell-headBackground': 'var(--joy-palette-background-level1)',
-          '--Table-headerUnderlineThickness': '.0625rem',
-          '--TableRow-hoverBackground': 'var(--joy-palette-background-level1)',
-          '--TableCell-paddingY': '.25rem',
-          '--TableCell-paddingX': '.5rem',
+          position: { xs: 'absolute', sm: 'relative' },
+          width: '100%',
+          maxHeight: 'calc(100vh - 310px)',
+          overflow: 'auto',
         }}
       >
-        <thead>
-          <tr>
-            {illustratorTableHeads.map((head) => (
-              <th
-                key={head.value}
-                style={{
-                  padding: '.75rem .375rem',
-                  width: head.width ?? '',
-                  textAlign: 'center',
-                }}
-              >
-                {head.sortable ? (
-                  <Link
-                    underline="none"
-                    color="primary"
-                    component="button"
-                    onClick={() => handleSort(head.value)}
-                    endDecorator={
-                      searchParams.get(head.value) ? (
-                        <ArrowDropDownIcon />
-                      ) : null
-                    }
-                    sx={[
-                      {
-                        fontWeight: 'lg',
-                        '& svg': {
-                          transition: '0.2s',
-                          transform:
-                            searchParams.get(head.value) === 'desc'
-                              ? 'rotate(0deg)'
-                              : 'rotate(180deg)',
+        <Table
+          aria-labelledby="illustratorTable"
+          stickyHeader
+          hoverRow
+          sx={{
+            '--TableCell-headBackground':
+              'var(--joy-palette-background-level1)',
+            '--Table-headerUnderlineThickness': '.0625rem',
+            '--TableRow-hoverBackground':
+              'var(--joy-palette-background-level1)',
+            '--TableCell-paddingY': '.25rem',
+            '--TableCell-paddingX': '.5rem',
+          }}
+        >
+          <thead>
+            <tr>
+              {illustratorTableHeads.map((head) => (
+                <th
+                  key={head.value}
+                  style={{
+                    padding: '.75rem .375rem',
+                    width: head.width ?? '',
+                    textAlign: 'center',
+                  }}
+                >
+                  {head.sortable ? (
+                    <Link
+                      underline="none"
+                      color="primary"
+                      component="button"
+                      onClick={() => handleSort(head.value)}
+                      endDecorator={
+                        searchParams.get(head.value) ? (
+                          <ArrowDropDownIcon />
+                        ) : null
+                      }
+                      sx={[
+                        {
+                          fontWeight: 'lg',
+                          '& svg': {
+                            transition: '0.2s',
+                            transform:
+                              searchParams.get(head.value) === 'desc'
+                                ? 'rotate(0deg)'
+                                : 'rotate(180deg)',
+                          },
                         },
-                      },
-                      searchParams.get(head.value) === 'desc'
-                        ? { '& svg': { transform: 'rotate(0deg)' } }
-                        : { '& svg': { transform: 'rotate(180deg)' } },
-                    ]}
-                  >
-                    {head.name}
-                  </Link>
-                ) : (
-                  head.name
-                )}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {IllustratorTableData.map((row) => (
-            <tr key={row.id}>
-              <td style={{ textAlign: 'center', width: 100 }}>
-                <Typography level="body-xs">{row.id}</Typography>
-              </td>
-              <td style={{ textAlign: 'center', width: 120 }}>
-                <Typography level="body-xs">{row.name}</Typography>
-              </td>
-              <td style={{ textAlign: 'center', width: 150 }}>
-                <Typography level="body-xs">
-                  <Tooltip title={row.intro} placement="top" arrow>
+                        searchParams.get(head.value) === 'desc'
+                          ? { '& svg': { transform: 'rotate(0deg)' } }
+                          : { '& svg': { transform: 'rotate(180deg)' } },
+                      ]}
+                    >
+                      {head.name}
+                    </Link>
+                  ) : (
+                    head.name
+                  )}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {IllustratorTableData.map((row) => (
+              <tr key={row.id}>
+                <td style={{ textAlign: 'center', width: 100 }}>
+                  <Typography level="body-xs">{row.id}</Typography>
+                </td>
+                <td style={{ textAlign: 'center', width: 120 }}>
+                  <Typography level="body-xs">{row.name}</Typography>
+                </td>
+                <td style={{ textAlign: 'center', width: 150 }}>
+                  <Typography level="body-xs">
+                    <Tooltip title={row.intro} placement="top" arrow>
+                      <Typography
+                        level="body-xs"
+                        sx={{
+                          display: 'block',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {row.intro}
+                      </Typography>
+                    </Tooltip>
+                  </Typography>
+                </td>
+                <td style={{ textAlign: 'center', width: 60 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                    {row.avatar ? (
+                      <Image
+                        src={row.avatar}
+                        alt={row.name}
+                        width={32}
+                        height={32}
+                      />
+                    ) : (
+                      <Typography level="body-xs">暂无</Typography>
+                    )}
+                  </Box>
+                </td>
+                <td style={{ textAlign: 'center', width: 150 }}>
+                  <Tooltip title={row.home_url} placement="top" arrow>
                     <Typography
                       level="body-xs"
                       sx={{
@@ -166,75 +200,47 @@ export default function IllustratorTable() {
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {row.intro}
+                      {row.home_url}
                     </Typography>
                   </Tooltip>
-                </Typography>
-              </td>
-              <td style={{ textAlign: 'center', width: 60 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                  {row.avatar ? (
-                    <Image
-                      src={row.avatar}
-                      alt={row.name}
-                      width={32}
-                      height={32}
-                    />
-                  ) : (
-                    <Typography level="body-xs">暂无</Typography>
-                  )}
-                </Box>
-              </td>
-              <td style={{ textAlign: 'center', width: 150 }}>
-                <Tooltip title={row.home_url} placement="top" arrow>
-                  <Typography
-                    level="body-xs"
-                    sx={{
-                      display: 'block',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {row.home_url}
-                  </Typography>
-                </Tooltip>
-              </td>
-              <td style={{ textAlign: 'center', width: 100 }}>
-                <Typography level="body-xs">{row.work_count}</Typography>
-              </td>
-              <td style={{ textAlign: 'center', width: 100 }}>
-                {statusChip(row.status)}
-              </td>
-              <td style={{ textAlign: 'center', width: 120 }}>
-                <Typography level="body-xs">{row.created_time}</Typography>
-              </td>
-              <td style={{ textAlign: 'center', width: 60 }}>
-                <Dropdown>
-                  <MenuButton
-                    slots={{ root: IconButton }}
-                    slotProps={{
-                      root: {
-                        variant: 'plain',
-                        color: 'neutral',
-                        size: 'sm',
-                      },
-                    }}
-                  >
-                    <MoreHorizRoundedIcon />
-                  </MenuButton>
-                  <Menu size="sm" sx={{ minWidth: 140 }}>
-                    <MenuItem>编辑信息</MenuItem>
-                    <MenuItem>查看作品</MenuItem>
-                    <Divider />
-                    <MenuItem color="danger">删除插画家</MenuItem>
-                  </Menu>
-                </Dropdown>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-    </Box>
+                </td>
+                <td style={{ textAlign: 'center', width: 100 }}>
+                  <Typography level="body-xs">{row.work_count}</Typography>
+                </td>
+                <td style={{ textAlign: 'center', width: 100 }}>
+                  {statusChip(row.status)}
+                </td>
+                <td style={{ textAlign: 'center', width: 120 }}>
+                  <Typography level="body-xs">{row.created_time}</Typography>
+                </td>
+                <td style={{ textAlign: 'center', width: 60 }}>
+                  <Dropdown>
+                    <MenuButton
+                      slots={{ root: IconButton }}
+                      slotProps={{
+                        root: {
+                          variant: 'plain',
+                          color: 'neutral',
+                          size: 'sm',
+                        },
+                      }}
+                    >
+                      <MoreHorizRoundedIcon />
+                    </MenuButton>
+                    <Menu size="sm" sx={{ minWidth: 140 }}>
+                      <MenuItem>编辑信息</MenuItem>
+                      <MenuItem>查看作品</MenuItem>
+                      <Divider />
+                      <MenuItem color="danger">删除插画家</MenuItem>
+                    </Menu>
+                  </Dropdown>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </Box>
+      <Pagination total={1000} pageSize={30} />
+    </>
   );
 }

@@ -37,14 +37,6 @@ export default function IllustratorMobileFilter() {
     replace(`${pathname}?${params.toString()}`);
   }, 300);
 
-  React.useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    if (!params.get('page')) {
-      params.set('page', '1');
-      replace(`${pathname}?${params.toString()}`);
-    }
-  }, [pathname, replace, searchParams]);
-
   return (
     <>
       <Sheet sx={{ display: { xs: 'flex', sm: 'none' }, my: 1, gap: 1 }}>

@@ -23,6 +23,7 @@ import {
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import Pagination from '../Pagination';
 import UserDelModal from './DelModal';
 import UserEditModal from './EditModal';
 
@@ -288,6 +289,7 @@ export default function UserTable() {
         setVisible={setEditModalVisible}
         handleEdit={handleEditUser}
       />
+      <Pagination total={1000} pageSize={30} />
     </>
   );
 }

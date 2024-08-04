@@ -1,7 +1,6 @@
 import ImageFilter from '@/ui/images/Filter';
 import ImageMobileFilter from '@/ui/images/MobileFilter';
 import ImageTable from '@/ui/images/Table';
-import Pagination from '@/ui/Pagination';
 import { Typography } from '@mui/joy';
 import { Suspense } from 'react';
 
@@ -14,7 +13,6 @@ export default function Page() {
         <ImageFilter />
         <ImageTable />
       </Suspense>
-      <Pagination />
     </>
   );
 }

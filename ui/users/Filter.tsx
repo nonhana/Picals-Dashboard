@@ -4,7 +4,6 @@ import { UserOptions } from '@/utils/selectOptions';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, FormControl, FormLabel, Input } from '@mui/joy';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import * as React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import Selector from '../Selector';
 
@@ -23,14 +22,6 @@ export default function UserFilter() {
     }
     replace(`${pathname}?${params.toString()}`);
   }, 300);
-
-  React.useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    if (!params.get('page')) {
-      params.set('page', '1');
-      replace(`${pathname}?${params.toString()}`);
-    }
-  }, [pathname, replace, searchParams]);
 
   return (
     <Box

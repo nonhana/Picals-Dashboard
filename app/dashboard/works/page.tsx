@@ -1,4 +1,3 @@
-import Pagination from '@/ui/Pagination';
 import WorkFilter from '@/ui/works/Filter';
 import WorkMobileFilter from '@/ui/works/MobileFilter';
 import WorkTable from '@/ui/works/Table';
@@ -25,7 +24,6 @@ export default function Page() {
         <WorkFilter />
         <WorkTable />
       </Suspense>
-      <Pagination />
     </>
   );
 }

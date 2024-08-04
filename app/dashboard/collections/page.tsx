@@ -1,7 +1,6 @@
 import CollectionFilter from '@/ui/collections/Filter';
 import CollectionMobileFilter from '@/ui/collections/MobileFilter';
 import CollectionTable from '@/ui/collections/Table';
-import Pagination from '@/ui/Pagination';
 import { Typography } from '@mui/joy';
 import { Suspense } from 'react';
 
@@ -14,7 +13,6 @@ export default function Page() {
         <CollectionFilter />
         <CollectionTable />
       </Suspense>
-      <Pagination />
     </>
   );
 }

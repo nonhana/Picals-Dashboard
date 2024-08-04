@@ -116,3 +116,42 @@ export const commentOptions: SelectOption[] = [
     ],
   },
 ];
+
+export const imageOptions: SelectOption[] = [
+  {
+    label: '原图大小',
+    value: 'originSizeRange',
+    options: [
+      {
+        label: '5mb以下',
+        value: '0',
+      },
+      {
+        label: '5mb-10mb',
+        value: '1',
+      },
+      {
+        label: '10mb以上',
+        value: '2',
+      },
+    ],
+  },
+  {
+    label: '缩略图大小',
+    value: 'thumbnailSizeRange',
+    options: [
+      {
+        label: '0.5mb以下',
+        value: '0',
+      },
+      {
+        label: '0.5mb-1mb',
+        value: '1',
+      },
+      {
+        label: '1mb以上',
+        value: '2',
+      },
+    ],
+  },
+];

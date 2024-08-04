@@ -319,3 +319,129 @@ export const commentTableHeads: TableHead[] = [
     sortable: false,
   },
 ];
+
+export const imageTableHeads: TableHead[] = [
+  {
+    name: '图片id',
+    value: 'id',
+    width: 100,
+    sortable: false,
+  },
+  {
+    name: '原图',
+    value: 'originUrl',
+    width: 150,
+    sortable: false,
+  },
+  {
+    name: '原图宽度',
+    value: 'originWidth',
+    width: 100,
+    sortable: true,
+  },
+  {
+    name: '原图高度',
+    value: 'originHeight',
+    width: 100,
+    sortable: true,
+  },
+  {
+    name: '原图大小',
+    value: 'originSize',
+    width: 100,
+    sortable: true,
+  },
+  {
+    name: '缩略图',
+    value: 'thumbnailUrl',
+    width: 150,
+    sortable: false,
+  },
+  {
+    name: '缩略图宽度',
+    value: 'thumbnailWidth',
+    width: 100,
+    sortable: true,
+  },
+  {
+    name: '缩略图高度',
+    value: 'thumbnailHeight',
+    width: 100,
+    sortable: true,
+  },
+  {
+    name: '缩略图大小',
+    value: 'thumbnailSize',
+    width: 100,
+    sortable: true,
+  },
+  {
+    name: '插画id',
+    value: 'illustration_id',
+    width: 100,
+    sortable: false,
+  },
+  {
+    name: '操作',
+    value: 'action',
+    width: 60,
+    sortable: false,
+  },
+];
+
+export const collectionTableHeads: TableHead[] = [
+  {
+    name: '收藏夹id',
+    value: 'id',
+    width: 100,
+    sortable: false,
+  },
+  {
+    name: '收藏夹名',
+    value: 'name',
+    width: 120,
+    sortable: false,
+  },
+  {
+    name: '简介',
+    value: 'introduce',
+    width: 150,
+    sortable: false,
+  },
+  {
+    name: '封面',
+    value: 'cover',
+    width: 60,
+    sortable: false,
+  },
+  {
+    name: '排序',
+    value: 'order',
+    width: 60,
+    sortable: true,
+  },
+  {
+    name: '作品数',
+    value: 'work_count',
+    width: 100,
+    sortable: true,
+  },
+  {
+    name: '创建时间',
+    value: 'created_at',
+    width: 120,
+    sortable: true,
+  },
+  {
+    name: '用户名',
+    value: 'user_name',
+    width: 120,
+    sortable: false,
+  },
+  {
+    name: '操作',
+    value: 'action',
+    width: 60,
+    sortable: false,
+  },
+];

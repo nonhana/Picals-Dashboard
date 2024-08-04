@@ -1,7 +1,9 @@
 import type {
   comments,
+  favorites,
   illustrations,
   illustrators,
+  images,
   labels,
   users,
 } from '@prisma/client';
@@ -122,6 +124,47 @@ export const CommentTableData: Comment[] = Array.from(
     content: `content${index}`,
     level: index % 2,
     createTime: '2021-08-01',
+    user_name: `user${index}`,
+  })
+);
+
+type Image = images & { originSize: number; thumbnailSize: number };
+
+export const ImageTableData: Image[] = Array.from(
+  { length: 30 },
+  (_, index) => ({
+    id: String(index),
+    originUrl: 'https://dummyimage.com/400X400',
+    originWidth: 400,
+    originHeight: 400,
+    originSize: 7.62,
+    thumbnailUrl: 'https://dummyimage.com/200X200',
+    thumbnailWidth: 200,
+    thumbnailHeight: 200,
+    thumbnailSize: 1.91,
+    illustration_id: index % 2 ? String(index) : null,
+  })
+);
+
+// created_at: Date;
+// updated_at: Date;
+// user_id: string | null;
+
+type Collection = Omit<favorites, 'created_at' | 'updated_at' | 'user_id'> & {
+  created_at: string;
+  user_name: string;
+};
+
+export const CollectionTableData: Collection[] = Array.from(
+  { length: 30 },
+  (_, index) => ({
+    id: String(index),
+    name: `collection${index}`,
+    introduce: `introduce${index}`,
+    cover: index % 2 ? 'https://dummyimage.com/400X400' : null,
+    order: index,
+    work_count: index,
+    created_at: '2021-08-01',
     user_name: `user${index}`,
   })
 );

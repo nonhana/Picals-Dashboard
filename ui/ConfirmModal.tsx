@@ -15,11 +15,13 @@ import {
 export default function UserDelModal({
   visible,
   setVisible,
-  handleDel,
+  handle,
+  message,
 }: {
   visible: boolean;
   setVisible: (visible: boolean) => void;
-  handleDel: () => void;
+  handle: () => void;
+  message: string;
 }) {
   return (
     <Modal open={visible} onClose={() => setVisible(false)}>
@@ -30,11 +32,11 @@ export default function UserDelModal({
         </DialogTitle>
         <Divider />
         <DialogContent>
-          <Typography level="body-md">确定要删除该用户吗？</Typography>
+          <Typography level="body-md">{message}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant="solid" color="danger" onClick={handleDel}>
-            删除
+          <Button variant="solid" color="danger" onClick={handle}>
+            确定
           </Button>
           <Button
             variant="plain"

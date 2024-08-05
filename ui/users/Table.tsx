@@ -23,8 +23,8 @@ import {
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import ConfirmModal from '../ConfirmModal';
 import Pagination from '../Pagination';
-import UserDelModal from './DelModal';
 import UserEditModal from './EditModal';
 
 type TargetUser = {
@@ -279,10 +279,11 @@ export default function UserTable() {
           </tbody>
         </Table>
       </Box>
-      <UserDelModal
+      <ConfirmModal
         visible={delModalVisible}
         setVisible={setDelModalVisible}
-        handleDel={handleDelUser}
+        handle={handleDelUser}
+        message={`确定删除用户 ${targetUser?.username} 吗？`}
       />
       <UserEditModal
         visible={editModalVisible}

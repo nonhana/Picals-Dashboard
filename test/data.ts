@@ -168,3 +168,8 @@ export const CollectionTableData: Collection[] = Array.from(
     user_name: `user${index}`,
   })
 );
+
+export const TestImgList = Array.from(
+  { length: 23 },
+  (_, index) => `https://dummyimage.com/300/000000/fff&text=${index + 1}`
+);

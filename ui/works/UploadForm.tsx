@@ -1,7 +1,18 @@
 'use client';
+import { TestImgList } from '@/test/data';
 import type { IllustrationFormInfo } from '@/types';
+import type { DragEndEvent } from '@dnd-kit/core';
+import { DndContext, MouseSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { restrictToParentElement } from '@dnd-kit/modifiers';
+import {
+  arrayMove,
+  rectSortingStrategy,
+  SortableContext,
+} from '@dnd-kit/sortable';
+import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
 import {
   Box,
+  Button,
   Card,
   Divider,
   FormControl,
@@ -11,10 +22,14 @@ import {
   Radio,
   RadioGroup,
   Select,
+  Sheet,
   Stack,
+  styled,
+  Textarea,
   Typography,
 } from '@mui/joy';
 import * as React from 'react';
+import DraggableImg from './DraggableImg';
 
 const illustratorOptions = [
   { label: '插画家1', value: 0 },
@@ -34,13 +49,61 @@ const originForm: IllustrationFormInfo = {
   illustrator_id: null,
 };
 
+const VisuallyHiddenInput = styled('input')`
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  white-space: nowrap;
+  width: 1px;
+`;
+
 export default function UploadForm() {
   const [formInfo, setFormInfo] =
     React.useState<IllustrationFormInfo>(originForm);
+  const [imgList, setImgList] = React.useState<string[]>(TestImgList);
+
+  const onDelete = (url: string) => {
+    const newImgList = imgList.filter((src) => src !== url);
+    setImgList(newImgList);
+  };
+
+  /* ----------图片列表拖曳排序相关---------- */
+  //拖拽传感器，在移动像素5px范围内，不触发拖拽事件
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    })
+  );
+
+  // 拖拽结束后的操作
+  const dragEndEvent = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = imgList.findIndex((url) => url === active.id);
+      const newIndex = imgList.findIndex((url) => url === over.id);
+      const newImgList = arrayMove(imgList, oldIndex, newIndex);
+      setImgList(newImgList);
+    }
+  };
 
   return (
-    <>
-      <Card sx={{ maxWidth: '50%', mx: 'auto', my: 1 }}>
+    <Sheet
+      sx={{
+        maxWidth: { sm: '100%', md: '50%' },
+        mx: 'auto',
+        my: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
+      }}
+    >
+      <Card>
         <Box sx={{ mb: 1 }}>
           <Typography level="title-md">插画基本信息</Typography>
           <Typography level="body-sm">
@@ -64,7 +127,7 @@ export default function UploadForm() {
           </FormControl>
           <FormControl>
             <FormLabel>作品简介</FormLabel>
-            <Input
+            <Textarea
               size="sm"
               placeholder="请填写插画简介（可选）"
               defaultValue={formInfo.intro}
@@ -73,6 +136,8 @@ export default function UploadForm() {
                 setFormInfo({ ...formInfo, intro: e.target.value })
               }
               sx={{ flexGrow: 1 }}
+              minRows={3}
+              maxRows={6}
             />
           </FormControl>
           <FormControl sx={{ flexGrow: 1 }}>
@@ -89,6 +154,22 @@ export default function UploadForm() {
             >
               <Radio value={0} label="关闭" />
               <Radio value={1} label="开启" />
+            </RadioGroup>
+          </FormControl>
+          <FormControl sx={{ flexGrow: 1 }}>
+            <FormLabel>是否为AI生成</FormLabel>
+            <RadioGroup
+              orientation="horizontal"
+              defaultValue={formInfo.isAIGenerated}
+              onChange={(event) =>
+                setFormInfo({
+                  ...formInfo,
+                  isAIGenerated: Number(event.target.value),
+                })
+              }
+            >
+              <Radio value={0} label="否" />
+              <Radio value={1} label="是" />
             </RadioGroup>
           </FormControl>
           <FormControl sx={{ flexGrow: 1 }}>
@@ -147,6 +228,47 @@ export default function UploadForm() {
           )}
         </Stack>
       </Card>
-    </>
+      <Card>
+        <Box sx={{ mb: 1 }}>
+          <Typography level="title-md">图片列表</Typography>
+          <Typography level="body-sm">
+            请上传插画图片，支持多张图片上传并排序
+          </Typography>
+        </Box>
+        <Divider />
+        <Stack direction="column" spacing={3}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+            <DndContext
+              onDragEnd={dragEndEvent}
+              modifiers={[restrictToParentElement]}
+              sensors={sensors}
+            >
+              <SortableContext items={imgList} strategy={rectSortingStrategy}>
+                {imgList.map((url) => (
+                  <DraggableImg
+                    key={url}
+                    id={url}
+                    src={url}
+                    onDelete={onDelete}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          </Box>
+          <Button
+            component="label"
+            role={undefined}
+            tabIndex={-1}
+            variant="outlined"
+            color="neutral"
+            startDecorator={<UploadFileRoundedIcon />}
+            sx={{ width: '100%' }}
+          >
+            上传图片
+            <VisuallyHiddenInput type="file" />
+          </Button>
+        </Stack>
+      </Card>
+    </Sheet>
   );
 }

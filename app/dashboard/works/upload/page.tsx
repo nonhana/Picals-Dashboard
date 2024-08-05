@@ -4,7 +4,7 @@ import { Typography } from '@mui/joy';
 export default function Page() {
   return (
     <>
-      <Typography level="h2">作品管理</Typography>
+      <Typography level="h2">作品管理-上传作品</Typography>
       <UploadForm />
     </>
   );

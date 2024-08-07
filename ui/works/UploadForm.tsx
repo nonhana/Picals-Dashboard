@@ -28,6 +28,7 @@ import {
   Textarea,
   Typography,
 } from '@mui/joy';
+import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import DraggableImg from './DraggableImg';
 
@@ -62,6 +63,9 @@ const VisuallyHiddenInput = styled('input')`
 `;
 
 export default function UploadForm() {
+  const searchParams = useSearchParams();
+  const workId = searchParams.get('id');
+
   const [formInfo, setFormInfo] =
     React.useState<IllustrationFormInfo>(originForm);
   const [imgList, setImgList] = React.useState<string[]>(TestImgList);
@@ -96,6 +100,7 @@ export default function UploadForm() {
     <Sheet
       sx={{
         maxWidth: { sm: '100%', md: '50%' },
+        minWidth: { sm: '100%', md: '440px' },
         mx: 'auto',
         my: 2,
         display: 'flex',
@@ -237,7 +242,13 @@ export default function UploadForm() {
         </Box>
         <Divider />
         <Stack direction="column" spacing={3}>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 2,
+            }}
+          >
             <DndContext
               onDragEnd={dragEndEvent}
               modifiers={[restrictToParentElement]}
@@ -268,6 +279,9 @@ export default function UploadForm() {
             <VisuallyHiddenInput type="file" />
           </Button>
         </Stack>
+      </Card>
+      <Card>
+        <Button>提交</Button>
       </Card>
     </Sheet>
   );

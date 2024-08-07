@@ -79,6 +79,8 @@ export default function Sidebar() {
     <List
       size="sm"
       sx={{
+        position: 'sticky',
+        top: 80,
         '--ListItem-radius': '8px',
         '--List-gap': '6px',
         '--ListItem-paddingY': '6px',

@@ -25,9 +25,10 @@ export type IllustrationFormInfo = Omit<
 export type UserItem = Omit<
   users,
   | 'password'
+  | 'created_time'
   | 'updated_time'
   | 'little_avatar'
   | 'like_count'
   | 'collect_count'
   | 'favorite_count'
->;
+> & { created_time: string };

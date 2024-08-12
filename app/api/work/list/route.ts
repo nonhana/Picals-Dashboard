@@ -7,13 +7,15 @@ import { z } from 'zod';
 const QuerySchema = z.object({
   page: z.coerce.number().int().positive().optional().default(1),
   pageSize: z.coerce.number().int().positive().optional().default(PAGE_SIZE),
-  keywords: z.string().optional(),
-  deleted: z.union([z.literal('true'), z.literal('false')]).optional(),
-  fan_count: z.union([z.literal('asc'), z.literal('desc')]).optional(),
-  follow_count: z.union([z.literal('asc'), z.literal('desc')]).optional(),
-  original_count: z.union([z.literal('asc'), z.literal('desc')]).optional(),
-  reprinted_count: z.union([z.literal('asc'), z.literal('desc')]).optional(),
-  created_time: z.union([z.literal('asc'), z.literal('desc')]).optional(),
+  // keywords: z.string().optional(),
+  // deleted: z.union([z.literal('true'), z.literal('false')]).optional(),
+  // fan_count: z.union([z.literal('asc'), z.literal('desc')]).optional(),
+  // follow_count: z.union([z.literal('asc'), z.literal('desc')]).optional(),
+  // original_count: z.union([z.literal('asc'), z.literal('desc')]).optional(),
+  // reprinted_count: z.union([z.literal('asc'), z.literal('desc')]).optional(),
+  // created_time: z.union([z.literal('asc'), z.literal('desc')]).optional(),
+  status: z.union([z.literal(0), z.literal(1), z.literal(2)]).optional(),
+  reprintType: z.union([z.literal(0), z.literal(1), z.literal(2)]).optional(),
 });
 
 /**

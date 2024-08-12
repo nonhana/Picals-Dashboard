@@ -1,4 +1,8 @@
-import type { IGetUserListReq, IGetUserListRes } from '@/types/api';
+import type {
+  IGetUserCountReq,
+  IGetUserListReq,
+  IGetUserListRes,
+} from '@/types/api';
 import http from '..';
 
 /**
@@ -13,10 +17,32 @@ export const getUserListAPI = async (
     ).toString();
     const res = await http<IGetUserListRes>(`/api/user/list?${query}`);
     if (res.code === 200) {
-      console.log('User list:', res, res.data);
       return res.data || null;
     } else {
       console.error('Failed to fetch user list:', res.message);
+      return null;
+    }
+  } catch (error) {
+    console.error('Request error:', error);
+    return null;
+  }
+};
+
+/**
+ * @description 获取用户总数
+ */
+export const getUserCountAPI = async (
+  data: IGetUserCountReq
+): Promise<number | null> => {
+  try {
+    const query = new URLSearchParams(
+      data as Record<string, string>
+    ).toString();
+    const res = await http<number>(`/api/user/count?${query}`);
+    if (res.code === 200) {
+      return res.data || null;
+    } else {
+      console.error('Failed to fetch user count:', res.message);
       return null;
     }
   } catch (error) {

@@ -12,4 +12,10 @@ export type IGetUserListReq = {
   [key: string]: any;
 };
 
+export type IGetUserCountReq = {
+  keywords?: string;
+  deleted?: 'true' | 'false';
+  [key: string]: any;
+};
+
 export type IGetUserListRes = UserItem[];

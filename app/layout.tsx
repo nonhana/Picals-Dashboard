@@ -1,7 +1,8 @@
-import '@/styles/global.css';
 import ThemeRegistry from '@/ui/theme/ThemeRegistry';
+import { Toaster } from '@/ui/Toast';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import '../styles/globals.css';
 
 export const metadata: Metadata = {
   title: 'Picals Dashboard',
@@ -18,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="cn">
       <body className={`${inter.className} antialiased`}>
+        <Toaster />
         <ThemeRegistry>{children}</ThemeRegistry>
       </body>
     </html>

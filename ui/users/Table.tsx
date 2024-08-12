@@ -1,7 +1,8 @@
 'use client';
 
-import { getUserListAPI } from '@/services/client/user';
+import { getUserCountAPI, getUserListAPI } from '@/services/client/user';
 import type { UserItem } from '@/types';
+import { PAGE_SIZE } from '@/utils/constant';
 import { userTableHeads } from '@/utils/tableHeaders';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
@@ -43,18 +44,24 @@ export default function UserTable() {
   const { replace } = useRouter();
 
   const [userList, setUserList] = React.useState<UserItem[]>([]);
+  const [total, setTotal] = React.useState(0);
 
   const fetchUserList = React.useCallback(async () => {
     const params = Object.fromEntries(searchParams.entries());
     const data = await getUserListAPI(params);
-    console.log('123213123123', data);
-    // if (!data) return;
-    // setUserList(data);
+    setUserList(data ?? []);
+  }, [searchParams]);
+
+  const fetchUserCount = React.useCallback(async () => {
+    const params = Object.fromEntries(searchParams.entries());
+    const data = await getUserCountAPI(params);
+    setTotal(data ?? 0);
   }, [searchParams]);
 
   React.useEffect(() => {
     fetchUserList();
-  }, [fetchUserList]);
+    fetchUserCount();
+  }, [fetchUserList, fetchUserCount]);
 
   const handleSort = (field: string) => {
     const params = new URLSearchParams(searchParams);
@@ -113,7 +120,7 @@ export default function UserTable() {
         sx={{
           position: { xs: 'absolute', sm: 'relative' },
           width: '100%',
-          maxHeight: 'calc(100vh - 310px)',
+          height: 'calc(100vh - 310px)',
           overflow: 'auto',
         }}
       >
@@ -201,14 +208,19 @@ export default function UserTable() {
                 <td
                   style={{
                     width: 120,
+                    textAlign: 'center',
                   }}
                 >
-                  <Image
-                    src={row.background_img || 'https://dummyimage.com/120x60'}
-                    alt={row.username}
-                    width={120}
-                    height={60}
-                  />
+                  {row.background_img ? (
+                    <Image
+                      src={row.background_img}
+                      alt={row.username}
+                      width={120}
+                      height={60}
+                    />
+                  ) : (
+                    <Typography level="body-xs">暂无背景图</Typography>
+                  )}
                 </td>
                 <td style={{ textAlign: 'center', width: 150 }}>
                   <Typography level="body-xs">{row.signature}</Typography>
@@ -251,9 +263,7 @@ export default function UserTable() {
                   </Chip>
                 </td>
                 <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">
-                    {row.created_time.toLocaleDateString()}
-                  </Typography>
+                  <Typography level="body-xs">{row.created_time}</Typography>
                 </td>
                 <td style={{ textAlign: 'center', width: 60 }}>
                   <Dropdown>
@@ -305,7 +315,7 @@ export default function UserTable() {
         setVisible={setEditModalVisible}
         handleEdit={handleEditUser}
       />
-      <Pagination total={1000} pageSize={30} />
+      <Pagination total={total} pageSize={PAGE_SIZE} />
     </>
   );
 }

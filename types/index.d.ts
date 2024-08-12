@@ -1,4 +1,4 @@
-import type { illustrations } from '@prisma/client';
+import type { illustrations, users } from '@prisma/client';
 
 export interface SelectOption {
   label: string;
@@ -20,4 +20,14 @@ export type IllustrationFormInfo = Omit<
   | 'created_time'
   | 'updated_time'
   | 'cover'
+>;
+
+export type UserItem = Omit<
+  users,
+  | 'password'
+  | 'updated_time'
+  | 'little_avatar'
+  | 'like_count'
+  | 'collect_count'
+  | 'favorite_count'
 >;

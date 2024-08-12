@@ -8,7 +8,6 @@ import type {
   users,
 } from '@prisma/client';
 
-// TODO: status 为临时数据，后续需要从数据库获取类型
 type User = Omit<
   users,
   | 'password'
@@ -17,7 +16,7 @@ type User = Omit<
   | 'like_count'
   | 'collect_count'
   | 'favorite_count'
-> & { status: number };
+>;
 
 export const userTableData: User[] = Array.from({ length: 30 }, (_, index) => ({
   id: String(index),
@@ -45,7 +44,6 @@ type Illustration = Omit<
   | 'openComment'
   | 'isAIGenerated'
 > & {
-  status: number;
   imgList: string[];
   user_name: string;
   illustrator_name: string;
@@ -74,7 +72,6 @@ export const IllustrationTableData: Illustration[] = Array.from(
 );
 
 type Illustrator = Omit<illustrators, 'updated_time' | 'created_time'> & {
-  status: number;
   created_time: string;
 };
 
@@ -146,10 +143,6 @@ export const ImageTableData: Image[] = Array.from(
   })
 );
 
-// created_at: Date;
-// updated_at: Date;
-// user_id: string | null;
-
 type Collection = Omit<favorites, 'created_at' | 'updated_at' | 'user_id'> & {
   created_at: string;
   user_name: string;
@@ -166,6 +159,7 @@ export const CollectionTableData: Collection[] = Array.from(
     work_count: index,
     created_at: '2021-08-01',
     user_name: `user${index}`,
+    status: index % 2,
   })
 );
 

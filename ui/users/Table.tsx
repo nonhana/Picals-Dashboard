@@ -1,6 +1,7 @@
 'use client';
 
-import { userTableData } from '@/test/data';
+import { getUserListAPI } from '@/services/client/user';
+import type { UserItem } from '@/types';
 import { userTableHeads } from '@/utils/tableHeaders';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
@@ -40,6 +41,20 @@ export default function UserTable() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
+
+  const [userList, setUserList] = React.useState<UserItem[]>([]);
+
+  const fetchUserList = React.useCallback(async () => {
+    const params = Object.fromEntries(searchParams.entries());
+    const { data } = await getUserListAPI(params);
+    console.log('123213123123', data);
+    if (!data) return;
+    setUserList(data);
+  }, [searchParams]);
+
+  React.useEffect(() => {
+    fetchUserList();
+  }, [fetchUserList]);
 
   const handleSort = (field: string) => {
     const params = new URLSearchParams(searchParams);
@@ -164,7 +179,7 @@ export default function UserTable() {
             </tr>
           </thead>
           <tbody>
-            {userTableData.map((row) => (
+            {userList.map((row) => (
               <tr key={row.id}>
                 <td style={{ textAlign: 'center', width: 100 }}>
                   <Typography level="body-xs">{row.id}</Typography>

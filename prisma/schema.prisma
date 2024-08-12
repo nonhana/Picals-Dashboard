@@ -56,6 +56,7 @@ model favorites {
   created_at                        DateTime                            @default(now()) @db.Timestamp(6)
   updated_at                        DateTime                            @default(now()) @db.Timestamp(6)
   user_id                           String?                             @db.VarChar(36)
+  status                            Int                                 @default(0) @db.TinyInt
   collect_records                   collect_records[]
   users                             users?                              @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_35a6b05ee3b624d0de01ee50593")
   illustrations_favorites_favorites illustrations_favorites_favorites[]
@@ -95,6 +96,7 @@ model illustrations {
   updated_time                      DateTime                            @default(now()) @db.Timestamp(6)
   user_id                           String?                             @db.VarChar(36)
   illustrator_id                    String?                             @db.VarChar(36)
+  status                            Int                                 @default(0) @db.TinyInt
   collect_records                   collect_records[]
   comments                          comments[]
   history                           history[]
@@ -143,6 +145,7 @@ model illustrators {
   work_count    Int             @default(0)
   created_time  DateTime        @default(now()) @db.Timestamp(6)
   updated_time  DateTime        @default(now()) @db.Timestamp(6)
+  status        Int             @default(0) @db.TinyInt
   illustrations illustrations[]
 }
 
@@ -192,6 +195,7 @@ model users {
   created_time                                                    DateTime                         @default(now()) @db.Timestamp(6)
   updated_time                                                    DateTime                         @default(now()) @db.Timestamp(6)
   little_avatar                                                   String                           @default("https://moe.nonhana.pics/images/image-1718290795662-173119738-default-avatar.jpg") @db.VarChar(127)
+  status                                                          Int                              @default(0) @db.TinyInt
   collect_records                                                 collect_records[]
   comments_comments_user_idTousers                                comments[]                       @relation("comments_user_idTousers")
   comments_comments_res_to_user_idTousers                         comments[]                       @relation("comments_res_to_user_idTousers")

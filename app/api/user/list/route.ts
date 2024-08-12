@@ -18,10 +18,7 @@ export async function GET(req: NextRequest) {
   const verifyRes = QuerySchema.safeParse(queryParams);
 
   if (!verifyRes.success) {
-    return NextResponse.json(
-      { code: 400, message: 'Invalid query parameters' },
-      { status: 400 }
-    );
+    return NextResponse.json('Invalid query parameters', { status: 400 });
   }
 
   const { page, pageSize } = verifyRes.data;

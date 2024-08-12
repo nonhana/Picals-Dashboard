@@ -16,13 +16,13 @@ interface RequestOptions extends RequestInit {
   body?: any;
 }
 
-const request = async <T>(
+const http = async <T>(
   url: string,
   config?: RequestOptions
 ): Promise<BaseRes<T>> => {
-  const finalUrl: string = getApiUrl(url);
+  const finalUrl = getApiUrl(url);
 
-  const initial: RequestOptions = {
+  const initialConfig: RequestOptions = {
     method: 'GET',
     body: null,
     headers: {
@@ -36,12 +36,12 @@ const request = async <T>(
   };
 
   const configs: RequestOptions = {
-    ...initial,
+    ...initialConfig,
     ...config,
   };
   if (config && config.headers)
     configs.headers = {
-      ...initial.headers,
+      ...initialConfig.headers,
       Authorization: getCookie('token') ? 'Bearer ' + getCookie('token') : '',
       ...config.headers,
     };
@@ -56,26 +56,27 @@ const request = async <T>(
   };
 
   return fetch(`${finalUrl}`, finalConfig)
-    .then((response: Response) => {
+    .then(async (response: Response) => {
       const { status } = response;
 
       if (status >= 200 && status < 400) {
-        let result: any;
+        let result: T;
+
         switch (configs.responseType && configs.responseType.toUpperCase()) {
           case 'TEXT':
-            result = response.text();
+            result = (await response.text()) as unknown as T;
             break;
           case 'JSON':
-            result = response.json();
+            result = (await response.json()) as T;
             break;
           case 'BLOB':
-            result = response.blob();
+            result = (await response.blob()) as unknown as T;
             break;
           case 'ARRAYBUFFER':
-            result = response.arrayBuffer();
+            result = (await response.arrayBuffer()) as unknown as T;
             break;
           default:
-            result = response.json();
+            result = (await response.json()) as T;
         }
         return {
           code: status,
@@ -126,4 +127,4 @@ const request = async <T>(
     });
 };
 
-export default request;
+export default http;

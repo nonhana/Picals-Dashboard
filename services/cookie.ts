@@ -7,12 +7,12 @@ export const getCookie = (name: string): string | undefined => {
   const parts = value.split(`; ${name}=`);
 
   if (parts.length === 2) {
-    const ppop = parts.pop();
-    if (ppop) {
-      return ppop.split(';').shift();
+    const target = parts.pop();
+    if (target) {
+      return target.split(';').shift();
     }
   }
-  return '';
+  return undefined;
 };
 
 /**
@@ -30,7 +30,6 @@ export const deleteCookie = (name: string) => {
  * @param {String} name cookie name
  * @param {String} value cookie value
  */
-
 export const setCookie = (name: string, value: string) => {
   const Days = 30;
   const exp = new Date();

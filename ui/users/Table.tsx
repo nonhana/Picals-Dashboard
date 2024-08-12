@@ -46,10 +46,10 @@ export default function UserTable() {
 
   const fetchUserList = React.useCallback(async () => {
     const params = Object.fromEntries(searchParams.entries());
-    const { data } = await getUserListAPI(params);
+    const data = await getUserListAPI(params);
     console.log('123213123123', data);
-    if (!data) return;
-    setUserList(data);
+    // if (!data) return;
+    // setUserList(data);
   }, [searchParams]);
 
   React.useEffect(() => {

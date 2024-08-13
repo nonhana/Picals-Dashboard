@@ -50,18 +50,18 @@ export default function WorkMobileFilter() {
         />
         <Input
           size="sm"
-          placeholder="请输入发布者id"
+          placeholder="请输入发布者名称"
           startDecorator={<SearchIcon />}
-          onChange={(e) => handleInput('user_id', e.target.value)}
-          defaultValue={searchParams.get('user_id') || ''}
+          onChange={(e) => handleInput('user', e.target.value)}
+          defaultValue={searchParams.get('user') || ''}
           sx={{ flexGrow: 1 }}
         />
         <Input
           size="sm"
-          placeholder="请输入插画家id"
+          placeholder="请输入插画家名称"
           startDecorator={<SearchIcon />}
-          onChange={(e) => handleInput('illustrator_id', e.target.value)}
-          defaultValue={searchParams.get('illustrator_id') || ''}
+          onChange={(e) => handleInput('illustrator', e.target.value)}
+          defaultValue={searchParams.get('illustrator') || ''}
           sx={{ flexGrow: 1 }}
         />
         <IconButton

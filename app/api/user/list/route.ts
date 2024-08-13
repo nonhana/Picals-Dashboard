@@ -1,5 +1,5 @@
 import prisma from '@/prisma';
-import { PAGE_SIZE } from '@/utils/constant';
+import { PAGE_SIZE } from '@/utils/constants';
 import dayjs from 'dayjs';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';

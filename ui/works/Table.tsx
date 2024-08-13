@@ -1,6 +1,8 @@
 'use client';
 
-import { IllustrationTableData } from '@/test/data';
+import { getWorkCountAPI, getWorkListAPI } from '@/services/client/work';
+import { IllustrationItem } from '@/types';
+import { PAGE_SIZE } from '@/utils/constants';
 import { workTableHeads } from '@/utils/tableHeaders';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import BookmarkAddedRoundedIcon from '@mui/icons-material/BookmarkAddedRounded';
@@ -27,6 +29,7 @@ import {
 } from '@mui/joy';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import * as React from 'react';
 import Pagination from '../Pagination';
 
 function reprintedTypeChip(type: number) {
@@ -67,23 +70,23 @@ function statusChip(type: number) {
       size="sm"
       startDecorator={
         {
-          0: <IndeterminateCheckBoxRoundedIcon />,
-          1: <CheckRoundedIcon />,
+          0: <CheckRoundedIcon />,
+          1: <IndeterminateCheckBoxRoundedIcon />,
           2: <CloseRoundedIcon />,
         }[type]
       }
       color={
         {
-          0: 'neutral',
-          1: 'success',
+          0: 'success',
+          1: 'neutral',
           2: 'danger',
         }[type] as ColorPaletteProp
       }
     >
       {
         {
-          0: '审核中',
-          1: '已发布',
+          0: '已发布',
+          1: '审核中',
           2: '已删除',
         }[type]
       }
@@ -99,6 +102,26 @@ export default function WorkTable() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
+
+  const [workList, setWorkList] = React.useState<IllustrationItem[]>([]);
+  const [total, setTotal] = React.useState(0);
+
+  const fetchWorkList = React.useCallback(async () => {
+    const params = Object.fromEntries(searchParams.entries());
+    const data = await getWorkListAPI(params);
+    setWorkList(data ?? []);
+  }, [searchParams]);
+
+  const fetchWorkCount = React.useCallback(async () => {
+    const params = Object.fromEntries(searchParams.entries());
+    const data = await getWorkCountAPI(params);
+    setTotal(data ?? 0);
+  }, [searchParams]);
+
+  React.useEffect(() => {
+    fetchWorkList();
+    fetchWorkCount();
+  }, [fetchWorkList, fetchWorkCount]);
 
   const handleSort = (field: string) => {
     const params = new URLSearchParams(searchParams);
@@ -188,13 +211,13 @@ export default function WorkTable() {
             </tr>
           </thead>
           <tbody>
-            {IllustrationTableData.map((row) => (
+            {workList.map((row) => (
               <tr key={row.id}>
                 <td style={{ textAlign: 'center', width: 100 }}>
                   <Typography level="body-xs">{row.id}</Typography>
                 </td>
                 <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">{row.name}</Typography>
+                  <Typography level="body-xs">{row.name || '无题'}</Typography>
                 </td>
                 <td style={{ textAlign: 'center', width: 150 }}>
                   <Typography level="body-xs">
@@ -208,7 +231,7 @@ export default function WorkTable() {
                           whiteSpace: 'nowrap',
                         }}
                       >
-                        {row.intro}
+                        {row.intro || '暂无简介'}
                       </Typography>
                     </Tooltip>
                   </Typography>
@@ -221,8 +244,9 @@ export default function WorkTable() {
                     <Image
                       src={row.cover}
                       alt={row.name}
-                      width={32}
-                      height={32}
+                      width={60}
+                      height={60}
+                      style={{ objectFit: 'cover' }}
                     />
                   </Box>
                 </td>
@@ -293,7 +317,7 @@ export default function WorkTable() {
           </tbody>
         </Table>
       </Box>
-      <Pagination total={1000} pageSize={30} />
+      <Pagination total={total} pageSize={PAGE_SIZE} />
     </>
   );
 }

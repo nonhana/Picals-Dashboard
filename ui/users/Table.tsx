@@ -2,7 +2,7 @@
 
 import { getUserCountAPI, getUserListAPI } from '@/services/client/user';
 import type { UserItem } from '@/types';
-import { PAGE_SIZE } from '@/utils/constant';
+import { PAGE_SIZE } from '@/utils/constants';
 import { userTableHeads } from '@/utils/tableHeaders';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
@@ -203,6 +203,7 @@ export default function UserTable() {
                     alt={row.username}
                     width={60}
                     height={60}
+                    style={{ objectFit: 'cover' }}
                   />
                 </td>
                 <td
@@ -217,6 +218,7 @@ export default function UserTable() {
                       alt={row.username}
                       width={120}
                       height={60}
+                      style={{ objectFit: 'cover' }}
                     />
                   ) : (
                     <Typography level="body-xs">暂无背景图</Typography>

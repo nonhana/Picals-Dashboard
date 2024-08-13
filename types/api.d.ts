@@ -1,4 +1,4 @@
-import type { UserItem } from '.';
+import type { IllustrationItem, LabelItem, UserItem } from '.';
 
 export type BaseRes<T> = {
   code: number;
@@ -6,16 +6,8 @@ export type BaseRes<T> = {
   data?: T;
 };
 
-export type IGetUserListReq = {
-  page?: number;
-  pageSize?: number;
-  [key: string]: any;
-};
-
-export type IGetUserCountReq = {
-  keywords?: string;
-  deleted?: 'true' | 'false';
-  [key: string]: any;
-};
-
 export type IGetUserListRes = UserItem[];
+
+export type IGetWorkListRes = IllustrationItem[];
+
+export type IGetLabelListRes = LabelItem[];

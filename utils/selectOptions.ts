@@ -23,11 +23,11 @@ export const WorkOptions: SelectOption[] = [
     value: 'status',
     options: [
       {
-        label: '审核中',
+        label: '已发布',
         value: 0,
       },
       {
-        label: '已发布',
+        label: '审核中',
         value: 1,
       },
       {
@@ -58,28 +58,8 @@ export const WorkOptions: SelectOption[] = [
     label: '包含标签',
     value: 'label',
     multiple: true,
-    options: [
-      {
-        label: '插画',
-        value: '插画',
-      },
-      {
-        label: '人物',
-        value: '人物',
-      },
-      {
-        label: '风景',
-        value: '风景',
-      },
-      {
-        label: '动物',
-        value: '动物',
-      },
-      {
-        label: '科幻',
-        value: '科幻',
-      },
-    ],
+    loadable: true,
+    options: [],
   },
 ];
 

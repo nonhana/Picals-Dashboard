@@ -1,8 +1,17 @@
 import { SelectOption } from '@/types';
 import { FormControl, FormLabel, Option, Select } from '@mui/joy';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import * as React from 'react';
 
-export default function Selector({ options }: { options: SelectOption[] }) {
+export default function Selector({
+  options,
+  loadFunc,
+  loadOptions,
+}: {
+  options: SelectOption[];
+  loadFunc?: () => void;
+  loadOptions?: { label: string; value: string }[];
+}) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -10,9 +19,8 @@ export default function Selector({ options }: { options: SelectOption[] }) {
   const handleSelect = (key: string, value: string | string[] | null) => {
     const params = new URLSearchParams(searchParams);
     params.set('page', '1');
-    if (value) {
+    if (value !== null) {
       if (Array.isArray(value)) {
-        console.log(value);
         if (value.length === 0) {
           params.delete(key);
         } else {
@@ -27,6 +35,24 @@ export default function Selector({ options }: { options: SelectOption[] }) {
     replace(`${pathname}?${params.toString()}`);
   };
 
+  const selectorRef = React.useRef<HTMLUListElement>(null);
+
+  React.useEffect(() => {
+    const cur = selectorRef.current;
+    const handleScroll = () => {
+      if (cur) {
+        const bottom = cur.scrollHeight - cur.scrollTop === cur.clientHeight;
+        if (bottom && loadFunc) {
+          loadFunc();
+        }
+      }
+    };
+    cur?.addEventListener('scroll', handleScroll);
+    return () => {
+      cur?.removeEventListener('scroll', handleScroll);
+    };
+  }, [loadFunc]);
+
   return (
     <>
       {options.map((option) => (
@@ -36,7 +62,10 @@ export default function Selector({ options }: { options: SelectOption[] }) {
             multiple={option.multiple}
             placeholder="请选择"
             size="sm"
-            slotProps={{ button: { sx: { whiteSpace: 'nowrap' } } }}
+            slotProps={{
+              button: { sx: { whiteSpace: 'nowrap' } },
+              listbox: { ref: selectorRef },
+            }}
             onChange={(_, value) => handleSelect(option.value, value)}
             defaultValue={
               option.multiple && searchParams.get(option.value)
@@ -44,11 +73,17 @@ export default function Selector({ options }: { options: SelectOption[] }) {
                 : searchParams.get(option.value)
             }
           >
-            {option.options.map((o) => (
-              <Option key={o.value} value={o.value}>
-                {o.label}
-              </Option>
-            ))}
+            {option.loadable
+              ? loadOptions?.map((o) => (
+                  <Option key={o.value} value={o.value}>
+                    {o.label}
+                  </Option>
+                ))
+              : option.options.map((o) => (
+                  <Option key={o.value} value={o.value}>
+                    {o.label}
+                  </Option>
+                ))}
             {!option.multiple && <Option value={null}>不限</Option>}
           </Select>
         </FormControl>

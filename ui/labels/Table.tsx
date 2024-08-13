@@ -1,6 +1,8 @@
 'use client';
 
-import { LabelTableData } from '@/test/data';
+import { getLabelCountAPI, getLabelListAPI } from '@/services/client/label';
+import { LabelItem } from '@/types';
+import { PAGE_SIZE } from '@/utils/constants';
 import { labelTableHeads } from '@/utils/tableHeaders';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
@@ -19,6 +21,7 @@ import {
 } from '@mui/joy';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import * as React from 'react';
 import Pagination from '../Pagination';
 
 export default function LabelTable() {
@@ -29,6 +32,24 @@ export default function LabelTable() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
+
+  const [labelList, setLabelList] = React.useState<LabelItem[]>([]);
+  const [total, setTotal] = React.useState(0);
+
+  const fetchLabelList = React.useCallback(async () => {
+    const data = await getLabelListAPI(Object.fromEntries(searchParams));
+    setLabelList(data ?? []);
+  }, [searchParams]);
+
+  const fetchLabelCount = React.useCallback(async () => {
+    const count = await getLabelCountAPI(Object.fromEntries(searchParams));
+    setTotal(count ?? 0);
+  }, [searchParams]);
+
+  React.useEffect(() => {
+    fetchLabelList();
+    fetchLabelCount();
+  }, [fetchLabelList, fetchLabelCount]);
 
   const handleSort = (field: string) => {
     const params = new URLSearchParams(searchParams);
@@ -118,7 +139,7 @@ export default function LabelTable() {
             </tr>
           </thead>
           <tbody>
-            {LabelTableData.map((row) => (
+            {labelList.map((row) => (
               <tr key={row.id}>
                 <td style={{ textAlign: 'center', width: 100 }}>
                   <Typography level="body-xs">{row.id}</Typography>
@@ -183,7 +204,7 @@ export default function LabelTable() {
           </tbody>
         </Table>
       </Box>
-      <Pagination total={1000} pageSize={30} />
+      <Pagination total={total} pageSize={PAGE_SIZE} />
     </>
   );
 }

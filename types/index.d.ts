@@ -1,9 +1,10 @@
-import type { illustrations, users } from '@prisma/client';
+import type { illustrations, labels, users } from '@prisma/client';
 
 export interface SelectOption {
   label: string;
   value: string;
   multiple?: boolean;
+  loadable?: boolean;
   options: {
     label: string;
     value: number | string;
@@ -32,3 +33,21 @@ export type UserItem = Omit<
   | 'collect_count'
   | 'favorite_count'
 > & { created_time: string };
+
+export type IllustrationItem = Omit<
+  illustrations,
+  | 'imgList'
+  | 'created_time'
+  | 'updated_time'
+  | 'user_id'
+  | 'illustrator_id'
+  | 'openComment'
+  | 'isAIGenerated'
+> & {
+  imgList: string[];
+  user_name: string;
+  illustrator_name: string;
+  created_time: string;
+};
+
+export type LabelItem = labels;

@@ -1,21 +1,21 @@
-import type { IGetUserListRes } from '@/types/api';
+import type { IGetWorkListRes } from '@/types/api';
 import http from '..';
 
 /**
- * @description 分页获取用户列表
+ * @description 分页获取作品列表
  */
-export const getUserListAPI = async (
+export const getWorkListAPI = async (
   data: Record<string, string>
-): Promise<IGetUserListRes | null> => {
+): Promise<IGetWorkListRes | null> => {
   try {
     const query = new URLSearchParams(
       data as Record<string, string>
     ).toString();
-    const res = await http<IGetUserListRes>(`/api/user/list?${query}`);
+    const res = await http<IGetWorkListRes>(`/api/work/list?${query}`);
     if (res.code === 200) {
       return res.data || null;
     } else {
-      console.error('Failed to fetch user list:', res.message);
+      console.error('Failed to fetch work list:', res.message);
       return null;
     }
   } catch (error) {
@@ -25,20 +25,20 @@ export const getUserListAPI = async (
 };
 
 /**
- * @description 获取用户总数
+ * @description 获取作品总数
  */
-export const getUserCountAPI = async (
+export const getWorkCountAPI = async (
   data: Record<string, string>
 ): Promise<number | null> => {
   try {
     const query = new URLSearchParams(
       data as Record<string, string>
     ).toString();
-    const res = await http<number>(`/api/user/count?${query}`);
+    const res = await http<number>(`/api/work/count?${query}`);
     if (res.code === 200) {
       return res.data || null;
     } else {
-      console.error('Failed to fetch user count:', res.message);
+      console.error('Failed to fetch work count:', res.message);
       return null;
     }
   } catch (error) {

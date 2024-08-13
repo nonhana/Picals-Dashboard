@@ -46,6 +46,16 @@ export default function IllustratorFilter() {
           defaultValue={searchParams.get('id') || ''}
         />
       </FormControl>
+      <FormControl sx={{ flex: 1 }} size="sm">
+        <FormLabel>插画家名称</FormLabel>
+        <Input
+          size="sm"
+          placeholder="请输入插画家名称"
+          startDecorator={<SearchIcon />}
+          onChange={(e) => handleInput('name', e.target.value)}
+          defaultValue={searchParams.get('name') || ''}
+        />
+      </FormControl>
       <Selector options={IllustratorOptions} />
     </Box>
   );

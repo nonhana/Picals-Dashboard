@@ -145,7 +145,7 @@ export default function WorkTable() {
         sx={{
           position: { xs: 'absolute', sm: 'relative' },
           width: '100%',
-          maxHeight: 'calc(100vh - 310px)',
+          height: 'calc(100vh - 310px)',
           overflow: 'auto',
         }}
       >
@@ -214,7 +214,21 @@ export default function WorkTable() {
             {workList.map((row) => (
               <tr key={row.id}>
                 <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.id}</Typography>
+                  <Typography level="body-xs">
+                    <Tooltip title={row.id} placement="top" arrow>
+                      <Typography
+                        level="body-xs"
+                        sx={{
+                          display: 'block',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {row.id}
+                      </Typography>
+                    </Tooltip>
+                  </Typography>
                 </td>
                 <td style={{ textAlign: 'center', width: 120 }}>
                   <Typography level="body-xs">{row.name || '无题'}</Typography>

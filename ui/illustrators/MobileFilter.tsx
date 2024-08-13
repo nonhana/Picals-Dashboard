@@ -48,6 +48,14 @@ export default function IllustratorMobileFilter() {
           defaultValue={searchParams.get('id') || ''}
           sx={{ flexGrow: 1 }}
         />
+        <Input
+          size="sm"
+          placeholder="请输入插画家名称"
+          startDecorator={<SearchIcon />}
+          onChange={(e) => handleInput('name', e.target.value)}
+          defaultValue={searchParams.get('name') || ''}
+          sx={{ flexGrow: 1 }}
+        />
         <IconButton
           size="sm"
           variant="outlined"

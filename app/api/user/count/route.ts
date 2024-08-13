@@ -11,8 +11,6 @@ const QuerySchema = z.object({
  * @description 获取用户总数
  */
 export async function GET(req: NextRequest) {
-  // const count = await prisma.users.count();
-  // return NextResponse.json({ count }, { status: 200 });
   const { searchParams } = new URL(req.url);
   const queryParams = Object.fromEntries(searchParams.entries());
   const verifyRes = QuerySchema.safeParse(queryParams);

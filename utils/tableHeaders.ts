@@ -229,7 +229,7 @@ export const illustratorTableHeads: TableHead[] = [
     sortable: false,
   },
   {
-    name: '注册时间',
+    name: '创建时间',
     value: 'created_time',
     width: 120,
     sortable: true,

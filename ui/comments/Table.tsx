@@ -1,6 +1,11 @@
 'use client';
 
-import { CommentTableData } from '@/test/data';
+import {
+  getCommentCountAPI,
+  getCommentListAPI,
+} from '@/services/client/comment';
+import { CommentItem } from '@/types';
+import { PAGE_SIZE } from '@/utils/constants';
 import { commentTableHeads } from '@/utils/tableHeaders';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
@@ -20,6 +25,7 @@ import {
   Typography,
 } from '@mui/joy';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import * as React from 'react';
 import Pagination from '../Pagination';
 
 function levelChip(type: number) {
@@ -53,6 +59,26 @@ export default function CommentTable() {
   const pathname = usePathname();
   const { replace } = useRouter();
 
+  const [commentList, setCommentList] = React.useState<CommentItem[]>([]);
+  const [total, setTotal] = React.useState(0);
+
+  const fetchCommentList = React.useCallback(async () => {
+    const params = Object.fromEntries(searchParams.entries());
+    const data = await getCommentListAPI(params);
+    setCommentList(data ?? []);
+  }, [searchParams]);
+
+  const fetchCommentCount = React.useCallback(async () => {
+    const params = Object.fromEntries(searchParams.entries());
+    const count = await getCommentCountAPI(params);
+    setTotal(count ?? 0);
+  }, [searchParams]);
+
+  React.useEffect(() => {
+    fetchCommentList();
+    fetchCommentCount();
+  }, [fetchCommentList, fetchCommentCount]);
+
   const handleSort = (field: string) => {
     const params = new URLSearchParams(searchParams);
     sortableHeads.forEach((head) => {
@@ -75,7 +101,7 @@ export default function CommentTable() {
         sx={{
           position: { xs: 'absolute', sm: 'relative' },
           width: '100%',
-          maxHeight: 'calc(100vh - 310px)',
+          height: 'calc(100vh - 310px)',
           overflow: 'auto',
         }}
       >
@@ -141,10 +167,24 @@ export default function CommentTable() {
             </tr>
           </thead>
           <tbody>
-            {CommentTableData.map((row) => (
+            {commentList.map((row) => (
               <tr key={row.id}>
                 <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.id}</Typography>
+                  <Typography level="body-xs">
+                    <Tooltip title={row.id} placement="top" arrow>
+                      <Typography
+                        level="body-xs"
+                        sx={{
+                          display: 'block',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {row.id}
+                      </Typography>
+                    </Tooltip>
+                  </Typography>
                 </td>
                 <td style={{ textAlign: 'center', width: 150 }}>
                   <Typography level="body-xs">
@@ -198,7 +238,7 @@ export default function CommentTable() {
           </tbody>
         </Table>
       </Box>
-      <Pagination total={1000} pageSize={30} />
+      <Pagination total={total} pageSize={PAGE_SIZE} />
     </>
   );
 }

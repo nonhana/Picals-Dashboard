@@ -1,4 +1,9 @@
-import type { illustrations, labels, users } from '@prisma/client';
+import type {
+  illustrations,
+  illustrators,
+  labels,
+  users,
+} from '@prisma/client';
 
 export interface SelectOption {
   label: string;
@@ -51,3 +56,22 @@ export type IllustrationItem = Omit<
 };
 
 export type LabelItem = labels;
+
+export type IllustratorItem = Omit<
+  illustrators,
+  'updated_time' | 'created_time'
+> & {
+  created_time: string;
+};
+
+export type CommentItem = Omit<
+  comments,
+  | 'res_to_comment_id'
+  | 'res_to_user_id'
+  | 'createTime'
+  | 'user_id'
+  | 'illustration_id'
+> & {
+  createTime: string;
+  user_name: string;
+};

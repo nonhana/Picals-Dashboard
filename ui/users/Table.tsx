@@ -20,6 +20,7 @@ import {
   MenuButton,
   MenuItem,
   Table,
+  Tooltip,
   Typography,
 } from '@mui/joy';
 import Image from 'next/image';
@@ -189,7 +190,21 @@ export default function UserTable() {
             {userList.map((row) => (
               <tr key={row.id}>
                 <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.id}</Typography>
+                  <Typography level="body-xs">
+                    <Tooltip title={row.id} placement="top" arrow>
+                      <Typography
+                        level="body-xs"
+                        sx={{
+                          display: 'block',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {row.id}
+                      </Typography>
+                    </Tooltip>
+                  </Typography>
                 </td>
                 <td style={{ textAlign: 'center', width: 120 }}>
                   <Typography level="body-xs">{row.username}</Typography>

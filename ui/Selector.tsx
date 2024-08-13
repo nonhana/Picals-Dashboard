@@ -41,7 +41,7 @@ export default function Selector({
     const cur = selectorRef.current;
     const handleScroll = () => {
       if (cur) {
-        const bottom = cur.scrollHeight - cur.scrollTop === cur.clientHeight;
+        const bottom = cur.scrollHeight - cur.scrollTop - 10 < cur.clientHeight;
         if (bottom && loadFunc) {
           loadFunc();
         }
@@ -64,7 +64,7 @@ export default function Selector({
             size="sm"
             slotProps={{
               button: { sx: { whiteSpace: 'nowrap' } },
-              listbox: { ref: selectorRef },
+              listbox: { ref: selectorRef, sx: { maxHeight: 300 } },
             }}
             onChange={(_, value) => handleSelect(option.value, value)}
             defaultValue={

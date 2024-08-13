@@ -1,6 +1,11 @@
 'use client';
 
-import { IllustratorTableData } from '@/test/data';
+import {
+  getIllustratorCountAPI,
+  getIllustratorListAPI,
+} from '@/services/client/illustrator';
+import { IllustratorItem } from '@/types';
+import { PAGE_SIZE } from '@/utils/constants';
 import { illustratorTableHeads } from '@/utils/tableHeaders';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
@@ -23,6 +28,7 @@ import {
 } from '@mui/joy';
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import * as React from 'react';
 import Pagination from '../Pagination';
 
 function statusChip(type: number) {
@@ -62,6 +68,28 @@ export default function IllustratorTable() {
   const pathname = usePathname();
   const { replace } = useRouter();
 
+  const [illustratorList, setIllustratorList] = React.useState<
+    IllustratorItem[]
+  >([]);
+  const [total, setTotal] = React.useState(0);
+
+  const fetchIllustratorList = React.useCallback(async () => {
+    const params = Object.fromEntries(searchParams.entries());
+    const data = await getIllustratorListAPI(params);
+    setIllustratorList(data ?? []);
+  }, [searchParams]);
+
+  const fetchIllustratorCount = React.useCallback(async () => {
+    const params = Object.fromEntries(searchParams.entries());
+    const data = await getIllustratorCountAPI(params);
+    setTotal(data ?? 0);
+  }, [searchParams]);
+
+  React.useEffect(() => {
+    fetchIllustratorList();
+    fetchIllustratorCount();
+  }, [fetchIllustratorList, fetchIllustratorCount]);
+
   const handleSort = (field: string) => {
     const params = new URLSearchParams(searchParams);
     sortableHeads.forEach((head) => {
@@ -84,7 +112,7 @@ export default function IllustratorTable() {
         sx={{
           position: { xs: 'absolute', sm: 'relative' },
           width: '100%',
-          maxHeight: 'calc(100vh - 310px)',
+          height: 'calc(100vh - 310px)',
           overflow: 'auto',
         }}
       >
@@ -150,10 +178,24 @@ export default function IllustratorTable() {
             </tr>
           </thead>
           <tbody>
-            {IllustratorTableData.map((row) => (
+            {illustratorList.map((row) => (
               <tr key={row.id}>
                 <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.id}</Typography>
+                  <Typography level="body-xs">
+                    <Tooltip title={row.id} placement="top" arrow>
+                      <Typography
+                        level="body-xs"
+                        sx={{
+                          display: 'block',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {row.id}
+                      </Typography>
+                    </Tooltip>
+                  </Typography>
                 </td>
                 <td style={{ textAlign: 'center', width: 120 }}>
                   <Typography level="body-xs">{row.name}</Typography>
@@ -240,7 +282,7 @@ export default function IllustratorTable() {
           </tbody>
         </Table>
       </Box>
-      <Pagination total={1000} pageSize={30} />
+      <Pagination total={total} pageSize={PAGE_SIZE} />
     </>
   );
 }

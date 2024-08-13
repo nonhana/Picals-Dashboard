@@ -1,4 +1,10 @@
-import type { IllustrationItem, LabelItem, UserItem } from '.';
+import type {
+  CommentItem,
+  IllustrationItem,
+  IllustratorItem,
+  LabelItem,
+  UserItem,
+} from '.';
 
 export type BaseRes<T> = {
   code: number;
@@ -11,3 +17,7 @@ export type IGetUserListRes = UserItem[];
 export type IGetWorkListRes = IllustrationItem[];
 
 export type IGetLabelListRes = LabelItem[];
+
+export type IGetIllustratorListRes = IllustratorItem[];
+
+export type IGetCommentListRes = CommentItem[];

@@ -3,6 +3,7 @@ import type {
   IllustrationItem,
   IllustratorItem,
   LabelItem,
+  UserForm,
   UserItem,
 } from '.';
 
@@ -13,6 +14,8 @@ export type BaseRes<T> = {
 };
 
 export type IGetUserListRes = UserItem[];
+
+export type IGetUserDetailRes = UserForm;
 
 export type IGetWorkListRes = IllustrationItem[];
 

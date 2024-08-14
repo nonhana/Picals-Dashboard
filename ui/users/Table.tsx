@@ -331,6 +331,7 @@ export default function UserTable() {
         visible={editModalVisible}
         setVisible={setEditModalVisible}
         handleEdit={handleEditUser}
+        userId={targetUser?.id}
       />
       <Pagination total={total} pageSize={PAGE_SIZE} />
     </>

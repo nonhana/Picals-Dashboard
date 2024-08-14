@@ -1,48 +1,12 @@
 import type { IGetWorkListRes } from '@/types/api';
-import http from '..';
+import { getHandler } from './methods/GET';
 
 /**
  * @description 分页获取作品列表
  */
-export const getWorkListAPI = async (
-  data: Record<string, string>
-): Promise<IGetWorkListRes | null> => {
-  try {
-    const query = new URLSearchParams(
-      data as Record<string, string>
-    ).toString();
-    const res = await http<IGetWorkListRes>(`/api/work/list?${query}`);
-    if (res.code === 200) {
-      return res.data || null;
-    } else {
-      console.error('Failed to fetch work list:', res.message);
-      return null;
-    }
-  } catch (error) {
-    console.error('Request error:', error);
-    return null;
-  }
-};
+export const getWorkListAPI = getHandler<IGetWorkListRes>('/api/work/list');
 
 /**
  * @description 获取作品总数
  */
-export const getWorkCountAPI = async (
-  data: Record<string, string>
-): Promise<number | null> => {
-  try {
-    const query = new URLSearchParams(
-      data as Record<string, string>
-    ).toString();
-    const res = await http<number>(`/api/work/count?${query}`);
-    if (res.code === 200) {
-      return res.data || null;
-    } else {
-      console.error('Failed to fetch work count:', res.message);
-      return null;
-    }
-  } catch (error) {
-    console.error('Request error:', error);
-    return null;
-  }
-};
+export const getWorkCountAPI = getHandler<number>('/api/work/count');

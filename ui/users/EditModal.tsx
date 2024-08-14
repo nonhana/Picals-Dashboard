@@ -1,6 +1,6 @@
 'use client';
 
-// import { fileUploadAPI } from '@/services/client/tool';
+import { getUserDetailAPI } from '@/services/client/user';
 import type { UserForm } from '@/types';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
@@ -28,9 +28,9 @@ import toast from '../Toast';
 const originForm: UserForm = {
   username: '',
   email: '',
-  avatar: 'https://dummyimage.com/60x60',
+  avatar: '',
   signature: '',
-  background_img: 'https://dummyimage.com/120x60',
+  background_img: '',
   gender: 0,
   status: 0,
 };
@@ -49,14 +49,35 @@ const VisuallyHiddenInput = styled('input')`
 
 export default function UserEditModal({
   visible,
+  userId,
   setVisible,
   handleEdit,
 }: {
   visible: boolean;
+  userId: string | undefined;
   setVisible: (visible: boolean) => void;
   handleEdit: () => void;
 }) {
   const [form, setForm] = React.useState<UserForm>(originForm);
+
+  React.useEffect(() => {
+    if (!visible) setForm(originForm);
+  }, [visible]);
+
+  const fetchUserDetail = React.useCallback(async () => {
+    if (!userId) return;
+    const data = await getUserDetailAPI({ user_id: userId });
+    if (data) {
+      setForm(data);
+    }
+  }, [userId]);
+
+  React.useEffect(() => {
+    fetchUserDetail();
+  }, [fetchUserDetail]);
+
+  const [fileUploading, setFileUploading] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
   const handleClose = () => {
     setVisible(false);
@@ -64,6 +85,7 @@ export default function UserEditModal({
   };
 
   const fileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFileUploading(true);
     const targetFile = e.target.files?.[0];
     if (!targetFile) {
       toast.error('未检测到文件，请重新选择');
@@ -76,7 +98,8 @@ export default function UserEditModal({
       body: formData,
     });
     const data = await res.json();
-    console.log('上传文件返回的数据：', data);
+    setForm((prev) => ({ ...prev, avatar: data }));
+    setFileUploading(false);
   };
 
   return (
@@ -124,13 +147,16 @@ export default function UserEditModal({
                 gap: 1,
               }}
             >
-              <Image
-                src={form.avatar}
-                alt="background"
-                width={60}
-                height={60}
-              />
+              {form.avatar && (
+                <Image
+                  src={form.avatar}
+                  alt="background"
+                  width={60}
+                  height={60}
+                />
+              )}
               <Button
+                loading={fileUploading}
                 component="label"
                 role={undefined}
                 tabIndex={-1}
@@ -194,9 +220,9 @@ export default function UserEditModal({
                 setForm((prev) => ({ ...prev, gender: value as number }))
               }
             >
-              <Option value="0">男</Option>
-              <Option value="1">女</Option>
-              <Option value="2">未知</Option>
+              <Option value={0}>男</Option>
+              <Option value={1}>女</Option>
+              <Option value={2}>未知</Option>
             </Select>
           </FormControl>
           <FormControl>
@@ -207,8 +233,8 @@ export default function UserEditModal({
                 setForm((prev) => ({ ...prev, status: value as number }))
               }
             >
-              <Option value="0">正常</Option>
-              <Option value="1">已删除</Option>
+              <Option value={0}>正常</Option>
+              <Option value={1}>已删除</Option>
             </Select>
           </FormControl>
 

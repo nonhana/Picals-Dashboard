@@ -1,6 +1,6 @@
-import http from '..';
+import http from '../..';
 
-export const getHandler = async <T>(url: string) => {
+export const getHandler = <T>(url: string) => {
   return async (data: Record<string, string>): Promise<T | null> => {
     try {
       const query = new URLSearchParams(

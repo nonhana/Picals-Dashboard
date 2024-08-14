@@ -39,6 +39,16 @@ export type UserItem = Omit<
   | 'favorite_count'
 > & { created_time: string };
 
+export type UserForm = {
+  username: string;
+  email: string;
+  background_img: string;
+  avatar: string;
+  signature: string;
+  gender: number;
+  status: number;
+};
+
 export type IllustrationItem = Omit<
   illustrations,
   | 'imgList'

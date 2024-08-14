@@ -1,48 +1,17 @@
 import type { IGetUserListRes } from '@/types/api';
-import http from '..';
+import { getHandler } from './GET';
 
 /**
  * @description 分页获取用户列表
  */
-export const getUserListAPI = async (
-  data: Record<string, string>
-): Promise<IGetUserListRes | null> => {
-  try {
-    const query = new URLSearchParams(
-      data as Record<string, string>
-    ).toString();
-    const res = await http<IGetUserListRes>(`/api/user/list?${query}`);
-    if (res.code === 200) {
-      return res.data || null;
-    } else {
-      console.error('Failed to fetch user list:', res.message);
-      return null;
-    }
-  } catch (error) {
-    console.error('Request error:', error);
-    return null;
-  }
-};
+export const getUserListAPI = getHandler<IGetUserListRes>('/api/user/list');
 
 /**
  * @description 获取用户总数
  */
-export const getUserCountAPI = async (
-  data: Record<string, string>
-): Promise<number | null> => {
-  try {
-    const query = new URLSearchParams(
-      data as Record<string, string>
-    ).toString();
-    const res = await http<number>(`/api/user/count?${query}`);
-    if (res.code === 200) {
-      return res.data || null;
-    } else {
-      console.error('Failed to fetch user count:', res.message);
-      return null;
-    }
-  } catch (error) {
-    console.error('Request error:', error);
-    return null;
-  }
-};
+export const getUserCountAPI = getHandler<number>('/api/user/count');
+
+/**
+ * @description 获取用户详情
+ */
+export const getUserDetailAPI = getHandler<IGetUserListRes>('/api/user/detail');

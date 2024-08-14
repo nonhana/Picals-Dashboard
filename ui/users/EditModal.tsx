@@ -1,5 +1,7 @@
 'use client';
 
+// import { fileUploadAPI } from '@/services/client/tool';
+import type { UserForm } from '@/types';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
 import {
@@ -19,25 +21,9 @@ import {
   Stack,
   styled,
 } from '@mui/joy';
-import type { users } from '@prisma/client';
 import Image from 'next/image';
 import * as React from 'react';
-
-type UserForm = Omit<
-  users,
-  | 'id'
-  | 'password'
-  | 'created_time'
-  | 'updated_time'
-  | 'little_avatar'
-  | 'like_count'
-  | 'collect_count'
-  | 'favorite_count'
-  | 'origin_count'
-  | 'reprinted_count'
-  | 'fan_count'
-  | 'follow_count'
->;
+import toast from '../Toast';
 
 const originForm: UserForm = {
   username: '',
@@ -46,6 +32,7 @@ const originForm: UserForm = {
   signature: '',
   background_img: 'https://dummyimage.com/120x60',
   gender: 0,
+  status: 0,
 };
 
 const VisuallyHiddenInput = styled('input')`
@@ -74,6 +61,22 @@ export default function UserEditModal({
   const handleClose = () => {
     setVisible(false);
     setForm(originForm);
+  };
+
+  const fileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const targetFile = e.target.files?.[0];
+    if (!targetFile) {
+      toast.error('未检测到文件，请重新选择');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('image', targetFile);
+    const res = await fetch('/api/tool/file-upload', {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json();
+    console.log('上传文件返回的数据：', data);
   };
 
   return (
@@ -137,7 +140,7 @@ export default function UserEditModal({
                 sx={{ width: '100%' }}
               >
                 上传头像
-                <VisuallyHiddenInput type="file" />
+                <VisuallyHiddenInput type="file" onChange={fileSelected} />
               </Button>
             </Box>
           </FormControl>
@@ -194,6 +197,18 @@ export default function UserEditModal({
               <Option value="0">男</Option>
               <Option value="1">女</Option>
               <Option value="2">未知</Option>
+            </Select>
+          </FormControl>
+          <FormControl>
+            <FormLabel>删除状态</FormLabel>
+            <Select
+              defaultValue={form.status}
+              onChange={(_, value) =>
+                setForm((prev) => ({ ...prev, status: value as number }))
+              }
+            >
+              <Option value="0">正常</Option>
+              <Option value="1">已删除</Option>
             </Select>
           </FormControl>
 

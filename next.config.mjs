@@ -7,7 +7,10 @@ const nextConfig = {
     serverComponentsExternalPackages: ['@prisma/client'], // prisma support
   },
   images: {
-    domains: ['dummyimage.com', 'moe.nonhana.pics'],
+    remotePatterns: [
+      { hostname: 'dummyimage.com' },
+      { hostname: 'moe.nonhana.pics' },
+    ],
   },
 };
 

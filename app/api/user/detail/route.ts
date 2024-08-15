@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
       email: true,
       background_img: true,
       avatar: true,
+      little_avatar: true,
       signature: true,
       gender: true,
       status: true,

@@ -95,10 +95,6 @@ export default function UserTable() {
     }
   }, [editModalVisible]);
 
-  const handleEditUser = () => {
-    setEditModalVisible(false);
-  };
-
   const preDelUser = (target: TargetUser) => {
     setTargetUser(target);
     setDelModalVisible(true);
@@ -330,7 +326,6 @@ export default function UserTable() {
       <UserEditModal
         visible={editModalVisible}
         setVisible={setEditModalVisible}
-        handleEdit={handleEditUser}
         userId={targetUser?.id}
       />
       <Pagination total={total} pageSize={PAGE_SIZE} />

@@ -1,5 +1,10 @@
-import type { IGetUserDetailRes, IGetUserListRes } from '@/types/api';
+import type {
+  IGetUserDetailRes,
+  IGetUserListRes,
+  IUpdateUserReq,
+} from '@/types/api';
 import { getHandler } from './methods/GET';
+import { postHandler } from './methods/POST';
 
 /**
  * @description 分页获取用户列表
@@ -16,3 +21,10 @@ export const getUserCountAPI = getHandler<number>('/api/user/count');
  */
 export const getUserDetailAPI =
   getHandler<IGetUserDetailRes>('/api/user/detail');
+
+/**
+ * @description 更新用户信息
+ */
+export const updateUserAPI = postHandler<IUpdateUserReq, null>(
+  '/api/user/update'
+);

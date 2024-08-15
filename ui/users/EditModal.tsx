@@ -29,6 +29,7 @@ const originForm: UserForm = {
   username: '',
   email: '',
   avatar: '',
+  little_avatar: '',
   signature: '',
   background_img: '',
   gender: 0,
@@ -51,12 +52,10 @@ export default function UserEditModal({
   visible,
   userId,
   setVisible,
-  handleEdit,
 }: {
   visible: boolean;
   userId: string | undefined;
   setVisible: (visible: boolean) => void;
-  handleEdit: () => void;
 }) {
   const [form, setForm] = React.useState<UserForm>(originForm);
 
@@ -76,7 +75,8 @@ export default function UserEditModal({
     fetchUserDetail();
   }, [fetchUserDetail]);
 
-  const [fileUploading, setFileUploading] = React.useState(false);
+  const [avatarUploading, setAvatarUploading] = React.useState(false);
+  const [bgUploading, setBgUploading] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
   const handleClose = () => {
@@ -84,22 +84,56 @@ export default function UserEditModal({
     setForm(originForm);
   };
 
-  const fileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFileUploading(true);
-    const targetFile = e.target.files?.[0];
-    if (!targetFile) {
-      toast.error('未检测到文件，请重新选择');
-      return;
-    }
-    const formData = new FormData();
-    formData.append('image', targetFile);
-    const res = await fetch('/api/tool/file-upload', {
+  const fileSelected = (type: 'avatar' | 'background') => {
+    return async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const targetFile = e.target.files?.[0];
+      if (!targetFile) {
+        toast.error('未检测到文件，请重新选择');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('image', targetFile);
+      if (type === 'avatar') {
+        setAvatarUploading(true);
+        formData.append('imageType', 'avatar');
+        const res = await fetch('/api/tool/image-upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const { origin_url, thumbnail_url } = await res.json();
+        setForm((prev) => ({
+          ...prev,
+          avatar: origin_url,
+          little_avatar: thumbnail_url,
+        }));
+        setAvatarUploading(false);
+      } else {
+        setBgUploading(true);
+        formData.append('imageType', 'background');
+        const res = await fetch('/api/tool/image-upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const { thumbnail_url } = await res.json();
+        setForm((prev) => ({ ...prev, background_img: thumbnail_url }));
+        setBgUploading(false);
+      }
+    };
+  };
+
+  const handleEdit = async () => {
+    setLoading(true);
+    const res = await fetch('/api/user/update', {
       method: 'POST',
-      body: formData,
+      body: JSON.stringify({ id: userId, ...form }),
     });
-    const data = await res.json();
-    setForm((prev) => ({ ...prev, avatar: data }));
-    setFileUploading(false);
+    if (res.status === 204) {
+      toast.success('修改成功');
+      setVisible(false);
+    } else {
+      toast.error('修改失败');
+    }
+    setLoading(false);
   };
 
   return (
@@ -147,16 +181,17 @@ export default function UserEditModal({
                 gap: 1,
               }}
             >
-              {form.avatar && (
+              {form.little_avatar && (
                 <Image
-                  src={form.avatar}
+                  src={form.little_avatar}
                   alt="background"
                   width={60}
                   height={60}
+                  style={{ objectFit: 'cover' }}
                 />
               )}
               <Button
-                loading={fileUploading}
+                loading={avatarUploading}
                 component="label"
                 role={undefined}
                 tabIndex={-1}
@@ -166,7 +201,10 @@ export default function UserEditModal({
                 sx={{ width: '100%' }}
               >
                 上传头像
-                <VisuallyHiddenInput type="file" onChange={fileSelected} />
+                <VisuallyHiddenInput
+                  type="file"
+                  onChange={fileSelected('avatar')}
+                />
               </Button>
             </Box>
           </FormControl>
@@ -187,9 +225,11 @@ export default function UserEditModal({
                   alt="background"
                   width={120}
                   height={60}
+                  style={{ objectFit: 'cover' }}
                 />
               )}
               <Button
+                loading={bgUploading}
                 component="label"
                 role={undefined}
                 tabIndex={-1}
@@ -199,7 +239,10 @@ export default function UserEditModal({
                 sx={{ width: '100%' }}
               >
                 上传背景图
-                <VisuallyHiddenInput type="file" />
+                <VisuallyHiddenInput
+                  type="file"
+                  onChange={fileSelected('background')}
+                />
               </Button>
             </Box>
           </FormControl>

@@ -44,6 +44,7 @@ export type UserForm = {
   email: string;
   background_img: string;
   avatar: string;
+  little_avatar: string;
   signature: string;
   gender: number;
   status: number;

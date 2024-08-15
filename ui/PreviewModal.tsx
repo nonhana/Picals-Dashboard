@@ -44,7 +44,7 @@ export default function PreviewModal({
       <ModalDialog
         variant="outlined"
         role="dialog"
-        sx={{ minWidth: '480px', overflow: 'auto' }}
+        sx={{ minWidth: '480px', minHeight: '200px', overflow: 'auto' }}
       >
         <ModalClose />
         <DialogTitle>

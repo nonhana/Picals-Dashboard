@@ -6,7 +6,10 @@ const ObjSchema = z.object({
   id: z.string(),
   username: z.string().min(1).max(31),
   email: z.string().regex(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/),
-  background_img: z.string().regex(/https:\/\/moe\.nonhana\.pics\/images\/.+/),
+  background_img: z
+    .string()
+    .regex(/https:\/\/moe\.nonhana\.pics\/images\/.+/)
+    .nullable(),
   avatar: z.string().regex(/https:\/\/moe\.nonhana\.pics\/images\/.+/),
   little_avatar: z.string().regex(/https:\/\/moe\.nonhana\.pics\/images\/.+/),
   signature: z.string().min(1).max(255),
@@ -18,11 +21,11 @@ const ObjSchema = z.object({
  * @description 更新用户信息
  */
 export async function POST(req: NextRequest) {
-  const { body } = req;
+  const body = await req.json();
   const verifyRes = ObjSchema.safeParse(body);
 
   if (!verifyRes.success) {
-    return new NextResponse('Invalid body parameters', { status: 400 });
+    return NextResponse.json('Invalid body parameters', { status: 400 });
   }
 
   const { id, ...info } = verifyRes.data;
@@ -36,5 +39,5 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  return new NextResponse(null, { status: 204 });
+  return NextResponse.json(null, { status: 200 });
 }

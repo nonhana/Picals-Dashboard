@@ -64,6 +64,11 @@ export default function UserTable() {
     fetchUserCount();
   }, [fetchUserList, fetchUserCount]);
 
+  const refresh = async () => {
+    await fetchUserList();
+    await fetchUserCount();
+  };
+
   const handleSort = (field: string) => {
     const params = new URLSearchParams(searchParams);
     sortableHeads.forEach((head) => {
@@ -327,6 +332,7 @@ export default function UserTable() {
         visible={editModalVisible}
         setVisible={setEditModalVisible}
         userId={targetUser?.id}
+        refresh={refresh}
       />
       <Pagination total={total} pageSize={PAGE_SIZE} />
     </>

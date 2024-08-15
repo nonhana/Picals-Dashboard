@@ -7,7 +7,7 @@ const QuerySchema = z.object({
 });
 
 /**
- * @description 分页获取用户列表
+ * @description 获取单个用户信息
  */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);

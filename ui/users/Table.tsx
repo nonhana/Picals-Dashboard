@@ -219,7 +219,7 @@ export default function UserTable() {
                     alt={row.username}
                     width={60}
                     height={60}
-                    style={{ objectFit: 'cover' }}
+                    style={{ objectFit: 'cover', borderRadius: '50%' }}
                   />
                 </td>
                 <td

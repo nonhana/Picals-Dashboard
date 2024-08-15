@@ -1,5 +1,7 @@
 import type {
   CommentItem,
+  IllustrationForm,
+  IllustrationInfo,
   IllustrationItem,
   IllustratorItem,
   LabelItem,
@@ -20,6 +22,10 @@ export type IGetUserDetailRes = UserForm;
 export type IUpdateUserReq = UserForm;
 
 export type IGetWorkListRes = IllustrationItem[];
+
+export type IGetWorkDetailRes = IllustrationInfo;
+
+export type IUpdateWorkReq = IllustrationForm;
 
 export type IGetLabelListRes = LabelItem[];
 

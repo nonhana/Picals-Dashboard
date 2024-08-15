@@ -1,4 +1,4 @@
-import type { IGetWorkListRes } from '@/types/api';
+import type { IGetWorkDetailRes, IGetWorkListRes } from '@/types/api';
 import { getHandler } from './methods/GET';
 
 /**
@@ -10,3 +10,9 @@ export const getWorkListAPI = getHandler<IGetWorkListRes>('/api/work/list');
  * @description 获取作品总数
  */
 export const getWorkCountAPI = getHandler<number>('/api/work/count');
+
+/**
+ * @description 获取作品详情
+ */
+export const getWorkDetailAPI =
+  getHandler<IGetWorkDetailRes>('/api/work/detail');

@@ -16,18 +16,6 @@ export interface SelectOption {
   }[];
 }
 
-export type IllustrationFormInfo = Omit<
-  illustrations,
-  | 'id'
-  | 'like_count'
-  | 'view_count'
-  | 'collect_count'
-  | 'comment_count'
-  | 'created_time'
-  | 'updated_time'
-  | 'cover'
->;
-
 export type UserItem = Omit<
   users,
   | 'password'
@@ -64,6 +52,41 @@ export type IllustrationItem = Omit<
   user_name: string;
   illustrator_name: string;
   created_time: string;
+};
+
+export type IllustrationInfo = {
+  id: string;
+  name: string;
+  intro: string;
+  reprintType: number;
+  openComment: number;
+  isAIGenerated: number;
+  imgList: string;
+  cover: string;
+  original_url: string | null;
+  like_count: number;
+  view_count: number;
+  collect_count: number;
+  comment_count: number;
+  created_time: string;
+  updated_time: string;
+  user_id: string | null;
+  user_name: string | null;
+  illustrator_id: string | null;
+  illustrator_name: string | null;
+  status: number;
+};
+
+export type IllustrationForm = {
+  name: string;
+  intro: string;
+  reprintType: number;
+  openComment: number;
+  isAIGenerated: number;
+  imgList: string;
+  original_url: string | null;
+  illustrator_id: string | null;
+  status: number;
 };
 
 export type LabelItem = labels;

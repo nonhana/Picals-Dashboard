@@ -17,7 +17,6 @@ const successIcon = (
         clipRule="evenodd"
       ></path>
     </svg>
-    <span className="sr-only">Check icon</span>
   </div>
 );
 
@@ -36,7 +35,6 @@ const errorIcon = (
         clipRule="evenodd"
       ></path>
     </svg>
-    <span className="sr-only">Error icon</span>
   </div>
 );
 
@@ -55,7 +53,6 @@ const warningIcon = (
         clipRule="evenodd"
       ></path>
     </svg>
-    <span className="sr-only">Warning icon</span>
   </div>
 );
 

@@ -48,6 +48,7 @@ const originForm: IllustrationFormInfo = {
   original_url: null,
   user_id: null,
   illustrator_id: null,
+  status: 0,
 };
 
 const VisuallyHiddenInput = styled('input')`

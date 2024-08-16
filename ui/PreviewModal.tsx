@@ -28,7 +28,7 @@ export default function PreviewModal({
   const [imageSize, setImageSize] = React.useState<{
     width: number;
     height: number;
-  } | null>(null);
+  }>({ width: 0, height: 0 });
 
   React.useEffect(() => {
     if (!src) return;
@@ -40,12 +40,14 @@ export default function PreviewModal({
   }, [src]);
 
   return (
-    <Modal open={visible} onClose={() => setVisible(false)}>
-      <ModalDialog
-        variant="outlined"
-        role="dialog"
-        sx={{ minWidth: '480px', minHeight: '200px', overflow: 'auto' }}
-      >
+    <Modal
+      open={visible}
+      onClose={() => setVisible(false)}
+      sx={{
+        transition: 'all 0.3s',
+      }}
+    >
+      <ModalDialog variant="outlined" role="dialog" sx={{ overflow: 'auto' }}>
         <ModalClose />
         <DialogTitle>
           <PhotoRoundedIcon />
@@ -53,15 +55,13 @@ export default function PreviewModal({
         </DialogTitle>
         <Divider />
         <DialogContent>
-          {imageSize && (
-            <NextImg
-              src={src}
-              alt={src}
-              width={imageSize.width}
-              height={imageSize.height}
-              style={{ margin: '0 auto' }}
-            />
-          )}
+          <NextImg
+            src={src}
+            alt={src}
+            width={imageSize.width}
+            height={imageSize.height}
+            style={{ margin: '0 auto' }}
+          />
         </DialogContent>
         <DialogActions>
           <Button variant="solid" onClick={() => setVisible(false)}>

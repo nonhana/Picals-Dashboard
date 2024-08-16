@@ -1,5 +1,10 @@
-import type { IGetWorkDetailRes, IGetWorkListRes } from '@/types/api';
+import type {
+  IGetWorkDetailRes,
+  IGetWorkListRes,
+  IUploadWorkReq,
+} from '@/types/api';
 import { getHandler } from './methods/GET';
+import { postHandler } from './methods/POST';
 
 /**
  * @description 分页获取作品列表
@@ -16,3 +21,10 @@ export const getWorkCountAPI = getHandler<number>('/api/work/count');
  */
 export const getWorkDetailAPI =
   getHandler<IGetWorkDetailRes>('/api/work/detail');
+
+/**
+ * @description 上传/更新作品信息
+ */
+export const uploadWorkAPI = postHandler<IUploadWorkReq, null>(
+  '/api/work/upload'
+);

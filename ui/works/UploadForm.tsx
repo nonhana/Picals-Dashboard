@@ -1,6 +1,7 @@
 'use client';
-import { TestImgList } from '@/test/data';
-import type { IllustrationFormInfo } from '@/types';
+
+import { getWorkDetailAPI } from '@/services/client/work';
+import type { IllustrationForm } from '@/types';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { DndContext, MouseSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { restrictToParentElement } from '@dnd-kit/modifiers';
@@ -38,15 +39,14 @@ const illustratorOptions = [
   { label: '插画家3', value: 2 },
 ];
 
-const originForm: IllustrationFormInfo = {
+const originForm: IllustrationForm = {
   name: '',
   intro: '',
   reprintType: 0,
   openComment: 0,
   isAIGenerated: 0,
-  imgList: '',
+  imgList: [],
   original_url: null,
-  user_id: null,
   illustrator_id: null,
   status: 0,
 };
@@ -65,15 +65,32 @@ const VisuallyHiddenInput = styled('input')`
 
 export default function UploadForm() {
   const searchParams = useSearchParams();
-  const workId = searchParams.get('id');
+  const workId = searchParams.get('work_id');
 
-  const [formInfo, setFormInfo] =
-    React.useState<IllustrationFormInfo>(originForm);
-  const [imgList, setImgList] = React.useState<string[]>(TestImgList);
+  const [formInfo, setFormInfo] = React.useState<IllustrationForm>(originForm);
+  const [imgList, setImgList] = React.useState<string[]>([]);
+
+  const fetchWorkDetail = React.useCallback(async () => {
+    if (!workId) return;
+    const data = await getWorkDetailAPI({ work_id: workId });
+    if (data) {
+      setFormInfo(data);
+      setImgList(data.imgList);
+    }
+  }, [workId]);
+
+  React.useEffect(() => {
+    fetchWorkDetail();
+  }, [fetchWorkDetail]);
 
   const onDelete = (url: string) => {
     const newImgList = imgList.filter((src) => src !== url);
     setImgList(newImgList);
+  };
+
+  const handleUpload = async () => {
+    // await uploadWorkAPI(formInfo);
+    console.log(formInfo);
   };
 
   /* ----------图片列表拖曳排序相关---------- */
@@ -124,7 +141,6 @@ export default function UploadForm() {
               size="sm"
               placeholder="请填写插画名称（可选）"
               defaultValue={formInfo.name}
-              value={formInfo.name}
               onChange={(e) =>
                 setFormInfo({ ...formInfo, name: e.target.value })
               }
@@ -137,7 +153,6 @@ export default function UploadForm() {
               size="sm"
               placeholder="请填写插画简介（可选）"
               defaultValue={formInfo.intro}
-              value={formInfo.intro}
               onChange={(e) =>
                 setFormInfo({ ...formInfo, intro: e.target.value })
               }
@@ -150,7 +165,7 @@ export default function UploadForm() {
             <FormLabel>是否开启评论</FormLabel>
             <RadioGroup
               orientation="horizontal"
-              defaultValue={formInfo.openComment}
+              value={formInfo.openComment}
               onChange={(event) =>
                 setFormInfo({
                   ...formInfo,
@@ -166,7 +181,7 @@ export default function UploadForm() {
             <FormLabel>是否为AI生成</FormLabel>
             <RadioGroup
               orientation="horizontal"
-              defaultValue={formInfo.isAIGenerated}
+              value={formInfo.isAIGenerated}
               onChange={(event) =>
                 setFormInfo({
                   ...formInfo,
@@ -182,7 +197,7 @@ export default function UploadForm() {
             <FormLabel>转载状态</FormLabel>
             <RadioGroup
               orientation="horizontal"
-              defaultValue={formInfo.reprintType}
+              value={formInfo.reprintType}
               onChange={(event) =>
                 setFormInfo({
                   ...formInfo,
@@ -204,7 +219,6 @@ export default function UploadForm() {
                     size="sm"
                     placeholder="请填写原作URL地址"
                     defaultValue={formInfo.original_url ?? ''}
-                    value={formInfo.original_url ?? ''}
                     onChange={(e) =>
                       setFormInfo({ ...formInfo, original_url: e.target.value })
                     }
@@ -282,7 +296,7 @@ export default function UploadForm() {
         </Stack>
       </Card>
       <Card>
-        <Button>提交</Button>
+        <Button onClick={handleUpload}>提交</Button>
       </Card>
     </Sheet>
   );

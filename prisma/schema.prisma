@@ -9,7 +9,7 @@ datasource db {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model collect_records {
-  id              String         @id @db.VarChar(36)
+  id              String         @id @default(uuid()) @db.VarChar(36)
   created_at      DateTime       @default(now()) @db.Timestamp(6)
   user_id         String?        @db.VarChar(36)
   illustration_id String?        @db.VarChar(36)
@@ -25,7 +25,7 @@ model collect_records {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model comments {
-  id                                   String         @id @db.VarChar(36)
+  id                                   String         @id @default(uuid()) @db.VarChar(36)
   content                              String         @db.VarChar(2047)
   level                                Int
   createTime                           DateTime       @default(now()) @db.Timestamp(6)
@@ -47,7 +47,7 @@ model comments {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model favorites {
-  id                                String                              @id @db.VarChar(36)
+  id                                String                              @id @default(uuid()) @db.VarChar(36)
   name                              String                              @db.VarChar(31)
   introduce                         String                              @db.VarChar(255)
   cover                             String?                             @db.VarChar(255)
@@ -66,7 +66,7 @@ model favorites {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model history {
-  id              String         @id @db.VarChar(36)
+  id              String         @id @default(uuid()) @db.VarChar(36)
   last_time       DateTime       @default(now()) @db.Timestamp(6)
   user_id         String?        @db.VarChar(36)
   illustration_id String?        @db.VarChar(36)
@@ -79,7 +79,7 @@ model history {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model illustrations {
-  id                                String                              @id @db.VarChar(36)
+  id                                String                              @id @default(uuid()) @db.VarChar(36)
   name                              String                              @default("") @db.VarChar(63)
   intro                             String                              @default("") @db.VarChar(2047)
   reprintType                       Int                                 @db.TinyInt
@@ -137,7 +137,7 @@ model illustrations_labels_labels {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model illustrators {
-  id            String          @id @db.VarChar(36)
+  id            String          @id @default(uuid()) @db.VarChar(36)
   name          String          @db.VarChar(31)
   avatar        String?         @db.VarChar(255)
   intro         String          @default("暂无简介") @db.VarChar(255)
@@ -151,7 +151,7 @@ model illustrators {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model images {
-  id              String         @id @db.VarChar(36)
+  id              String         @id @default(uuid()) @db.VarChar(36)
   originUrl       String         @db.VarChar(255)
   originWidth     Int
   originHeight    Int
@@ -166,7 +166,7 @@ model images {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model labels {
-  id                          String                        @id @db.VarChar(36)
+  id                          String                        @id @default(uuid()) @db.VarChar(36)
   value                       String                        @db.VarChar(31)
   color                       String                        @db.VarChar(7)
   cover                       String?                       @db.VarChar(255)
@@ -177,7 +177,7 @@ model labels {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model users {
-  id                                                              String                           @id @db.VarChar(36)
+  id                                                              String                           @id @default(uuid()) @db.VarChar(36)
   username                                                        String                           @default("一只小萌新") @db.VarChar(31)
   email                                                           String                           @db.VarChar(125)
   password                                                        String                           @db.VarChar(255)
@@ -212,7 +212,7 @@ model users {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model users_following_users {
-  id                                              String   @id @db.VarChar(36)
+  id                                              String   @id @default(uuid()) @db.VarChar(36)
   followTime                                      DateTime @default(now()) @db.DateTime(6)
   follower_id                                     String?  @db.VarChar(36)
   following_id                                    String?  @db.VarChar(36)
@@ -225,7 +225,7 @@ model users_following_users {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model users_like_works_illustrations {
-  id              String         @id @db.VarChar(36)
+  id              String         @id @default(uuid()) @db.VarChar(36)
   likeTime        DateTime       @default(now()) @db.DateTime(6)
   user_id         String?        @db.VarChar(36)
   illustration_id String?        @db.VarChar(36)
@@ -249,7 +249,7 @@ model users_liked_labels_labels {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model work_push_temp {
-  id                                    String         @id @db.VarChar(36)
+  id                                    String         @id @default(uuid()) @db.VarChar(36)
   user_id                               String?        @db.VarChar(36)
   illustration_id                       String?        @db.VarChar(36)
   author_id                             String?        @db.VarChar(36)

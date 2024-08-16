@@ -25,7 +25,7 @@ export type IGetWorkListRes = IllustrationItem[];
 
 export type IGetWorkDetailRes = IllustrationInfo;
 
-export type IUpdateWorkReq = IllustrationForm;
+export type IUploadWorkReq = IllustrationForm;
 
 export type IGetLabelListRes = LabelItem[];
 

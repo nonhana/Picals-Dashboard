@@ -61,20 +61,20 @@ export type IllustrationInfo = {
   reprintType: number;
   openComment: number;
   isAIGenerated: number;
-  imgList: string;
   cover: string;
-  original_url: string | null;
+  imgList: string[];
   like_count: number;
   view_count: number;
   collect_count: number;
   comment_count: number;
-  created_time: string;
-  updated_time: string;
-  user_id: string | null;
-  user_name: string | null;
+  original_url: string | null;
   illustrator_id: string | null;
   illustrator_name: string | null;
+  user_id: string | null;
+  user_name: string | null;
   status: number;
+  created_time: string;
+  updated_time: string;
 };
 
 export type IllustrationForm = {
@@ -83,7 +83,7 @@ export type IllustrationForm = {
   reprintType: number;
   openComment: number;
   isAIGenerated: number;
-  imgList: string;
+  imgList: string[];
   original_url: string | null;
   illustrator_id: string | null;
   status: number;

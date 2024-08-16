@@ -31,6 +31,7 @@ import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import Pagination from '../Pagination';
+import WorkDisplayModal from './DisplayModal';
 
 function reprintedTypeChip(type: number) {
   return (
@@ -137,6 +138,14 @@ export default function WorkTable() {
       params.set(field, 'desc');
     }
     replace(`${pathname}?${params.toString()}`);
+  };
+
+  const [visible, setVisible] = React.useState(false);
+  const [chosenWorkId, setChosenWorkId] = React.useState<string | undefined>();
+
+  const handlePreview = (id: string) => {
+    setChosenWorkId(id);
+    setVisible(true);
   };
 
   return (
@@ -320,7 +329,9 @@ export default function WorkTable() {
                       <MoreHorizRoundedIcon />
                     </MenuButton>
                     <Menu size="sm" sx={{ minWidth: 140 }}>
-                      <MenuItem>查看完整信息</MenuItem>
+                      <MenuItem onClick={() => handlePreview(row.id)}>
+                        查看完整信息
+                      </MenuItem>
                       <Divider />
                       <MenuItem color="danger">删除作品</MenuItem>
                     </Menu>
@@ -332,6 +343,11 @@ export default function WorkTable() {
         </Table>
       </Box>
       <Pagination total={total} pageSize={PAGE_SIZE} />
+      <WorkDisplayModal
+        visible={visible}
+        workId={chosenWorkId}
+        setVisible={setVisible}
+      />
     </>
   );
 }

@@ -41,9 +41,7 @@ export async function GET(req: NextRequest) {
       created_time: true,
       updated_time: true,
       user_id: true,
-      // user_name: true,
       illustrator_id: true,
-      // illustrator_name: true,
       status: true,
     },
   });
@@ -54,6 +52,8 @@ export async function GET(req: NextRequest) {
 
   const result: Record<string, any> = { ...workInfo };
 
+  result.imgList = workInfo.imgList.split(',');
+
   if (workInfo.user_id) {
     const user_name = await prisma.users.findUnique({
       where: {
@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
         username: true,
       },
     });
-    result.user_name = user_name;
+    result.user_name = user_name?.username;
   }
 
   if (workInfo.illustrator_id) {
@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
         name: true,
       },
     });
-    result.illustrator_name = illustrator_name;
+    result.illustrator_name = illustrator_name?.name;
   }
 
   return NextResponse.json(result, { status: 200 });

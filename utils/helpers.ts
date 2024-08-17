@@ -120,10 +120,10 @@ export const getStringWidth = (val: string): number => {
 
 /**
  * base64 to blob
- * @param {String} dataurl base64
+ * @param {String} source base64
  */
-export const dataURLtoBlob = (dataurl: string) => {
-  const arr: any = dataurl.split(','),
+export const dataURLtoBlob = (source: string) => {
+  const arr: any = source.split(','),
     mime = arr[0].match(/:(.*?);/)[1],
     bstr = atob(arr[1]);
   let n = bstr.length;

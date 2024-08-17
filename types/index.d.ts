@@ -86,6 +86,7 @@ export type IllustrationForm = {
   imgList: string[];
   original_url: string | null;
   illustrator_id: string | null;
+  illustrator_name: string | null;
   status: number;
 };
 
@@ -96,6 +97,15 @@ export type IllustratorItem = Omit<
   'updated_time' | 'created_time'
 > & {
   created_time: string;
+};
+
+export type IllustratorForm = {
+  id?: string;
+  name: string;
+  avatar: string | null;
+  intro: string;
+  home_url: string;
+  status: number;
 };
 
 export type CommentItem = Omit<

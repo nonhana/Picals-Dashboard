@@ -1,6 +1,7 @@
 'use client';
 
-import { getWorkDetailAPI } from '@/services/client/work';
+import { getIllustratorListAPI } from '@/services/client/illustrator';
+import { getWorkDetailAPI, uploadWorkAPI } from '@/services/client/work';
 import type { IllustrationForm } from '@/types';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { DndContext, MouseSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -12,17 +13,17 @@ import {
 } from '@dnd-kit/sortable';
 import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
 import {
+  Autocomplete,
   Box,
   Button,
   Card,
+  CircularProgress,
   Divider,
   FormControl,
   FormLabel,
   Input,
-  Option,
   Radio,
   RadioGroup,
-  Select,
   Sheet,
   Stack,
   styled,
@@ -31,13 +32,8 @@ import {
 } from '@mui/joy';
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 import DraggableImg from './DraggableImg';
-
-const illustratorOptions = [
-  { label: '插画家1', value: 0 },
-  { label: '插画家2', value: 1 },
-  { label: '插画家3', value: 2 },
-];
 
 const originForm: IllustrationForm = {
   name: '',
@@ -48,6 +44,7 @@ const originForm: IllustrationForm = {
   imgList: [],
   original_url: null,
   illustrator_id: null,
+  illustrator_name: null,
   status: 0,
 };
 
@@ -67,16 +64,31 @@ export default function UploadForm() {
   const searchParams = useSearchParams();
   const workId = searchParams.get('work_id');
 
+  const [gettingInfo, setGettingInfo] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
   const [formInfo, setFormInfo] = React.useState<IllustrationForm>(originForm);
   const [imgList, setImgList] = React.useState<string[]>([]);
 
   const fetchWorkDetail = React.useCallback(async () => {
+    setGettingInfo(true);
     if (!workId) return;
     const data = await getWorkDetailAPI({ work_id: workId });
     if (data) {
-      setFormInfo(data);
+      setFormInfo({
+        name: data.name,
+        intro: data.intro,
+        reprintType: data.reprintType,
+        openComment: data.openComment,
+        isAIGenerated: data.isAIGenerated,
+        imgList: data.imgList,
+        original_url: data.original_url,
+        illustrator_id: data.illustrator_id,
+        illustrator_name: data.illustrator_name,
+        status: data.status,
+      });
       setImgList(data.imgList);
     }
+    setGettingInfo(false);
   }, [workId]);
 
   React.useEffect(() => {
@@ -89,8 +101,9 @@ export default function UploadForm() {
   };
 
   const handleUpload = async () => {
-    // await uploadWorkAPI(formInfo);
-    console.log(formInfo);
+    setLoading(true);
+    await uploadWorkAPI(formInfo);
+    setLoading(false);
   };
 
   /* ----------图片列表拖曳排序相关---------- */
@@ -114,11 +127,41 @@ export default function UploadForm() {
     }
   };
 
+  /* ----------插画家列表相关---------- */
+  const [illustratorOptions, setIllustratorOptions] = React.useState<
+    { label: string; value: string }[]
+  >([]);
+  const [keyword, setKeyword] = React.useState('');
+
+  const fetchIllustratorList = async (debouncedKeyword: string) => {
+    const data = await getIllustratorListAPI({ name: debouncedKeyword });
+    if (data) {
+      const options = data.map((item) => ({
+        label: item.name,
+        value: item.id,
+      }));
+      setIllustratorOptions(options);
+    }
+  };
+
+  const debouncedFetchIllustratorList = useDebouncedCallback(
+    (debouncedKeyword) => {
+      fetchIllustratorList(debouncedKeyword);
+    },
+    300
+  );
+
+  React.useEffect(() => {
+    if (keyword) {
+      debouncedFetchIllustratorList(keyword);
+    } else {
+      setIllustratorOptions([]);
+    }
+  }, [keyword, debouncedFetchIllustratorList]);
+
   return (
     <Sheet
       sx={{
-        maxWidth: { sm: '100%', md: '50%' },
-        minWidth: { sm: '100%', md: '440px' },
         mx: 'auto',
         my: 2,
         display: 'flex',
@@ -134,119 +177,124 @@ export default function UploadForm() {
           </Typography>
         </Box>
         <Divider />
-        <Stack direction="column" spacing={3}>
-          <FormControl>
-            <FormLabel>作品名称</FormLabel>
-            <Input
-              size="sm"
-              placeholder="请填写插画名称（可选）"
-              defaultValue={formInfo.name}
-              onChange={(e) =>
-                setFormInfo({ ...formInfo, name: e.target.value })
-              }
-              sx={{ flexGrow: 1 }}
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel>作品简介</FormLabel>
-            <Textarea
-              size="sm"
-              placeholder="请填写插画简介（可选）"
-              defaultValue={formInfo.intro}
-              onChange={(e) =>
-                setFormInfo({ ...formInfo, intro: e.target.value })
-              }
-              sx={{ flexGrow: 1 }}
-              minRows={3}
-              maxRows={6}
-            />
-          </FormControl>
-          <FormControl sx={{ flexGrow: 1 }}>
-            <FormLabel>是否开启评论</FormLabel>
-            <RadioGroup
-              orientation="horizontal"
-              value={formInfo.openComment}
-              onChange={(event) =>
-                setFormInfo({
-                  ...formInfo,
-                  openComment: Number(event.target.value),
-                })
-              }
-            >
-              <Radio value={0} label="关闭" />
-              <Radio value={1} label="开启" />
-            </RadioGroup>
-          </FormControl>
-          <FormControl sx={{ flexGrow: 1 }}>
-            <FormLabel>是否为AI生成</FormLabel>
-            <RadioGroup
-              orientation="horizontal"
-              value={formInfo.isAIGenerated}
-              onChange={(event) =>
-                setFormInfo({
-                  ...formInfo,
-                  isAIGenerated: Number(event.target.value),
-                })
-              }
-            >
-              <Radio value={0} label="否" />
-              <Radio value={1} label="是" />
-            </RadioGroup>
-          </FormControl>
-          <FormControl sx={{ flexGrow: 1 }}>
-            <FormLabel>转载状态</FormLabel>
-            <RadioGroup
-              orientation="horizontal"
-              value={formInfo.reprintType}
-              onChange={(event) =>
-                setFormInfo({
-                  ...formInfo,
-                  reprintType: Number(event.target.value),
-                })
-              }
-            >
-              <Radio value={0} label="原创作品" />
-              <Radio value={1} label="转载作品" />
-              <Radio value={2} label="合集作品" />
-            </RadioGroup>
-          </FormControl>
-          {formInfo.reprintType !== 0 && (
-            <Stack direction="row" spacing={3}>
-              {formInfo.reprintType === 1 && (
+        {!gettingInfo ? (
+          <Stack direction="column" spacing={3}>
+            <FormControl>
+              <FormLabel>作品名称</FormLabel>
+              <Input
+                size="sm"
+                placeholder="请填写插画名称（可选）"
+                defaultValue={formInfo.name}
+                onChange={(e) =>
+                  setFormInfo({ ...formInfo, name: e.target.value })
+                }
+                sx={{ flexGrow: 1 }}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>作品简介</FormLabel>
+              <Textarea
+                size="sm"
+                placeholder="请填写插画简介（可选）"
+                defaultValue={formInfo.intro}
+                onChange={(e) =>
+                  setFormInfo({ ...formInfo, intro: e.target.value })
+                }
+                sx={{ flexGrow: 1 }}
+                minRows={3}
+                maxRows={6}
+              />
+            </FormControl>
+            <FormControl sx={{ flexGrow: 1 }}>
+              <FormLabel>是否开启评论</FormLabel>
+              <RadioGroup
+                orientation="horizontal"
+                value={formInfo.openComment}
+                onChange={(event) =>
+                  setFormInfo({
+                    ...formInfo,
+                    openComment: Number(event.target.value),
+                  })
+                }
+              >
+                <Radio value={0} label="关闭" />
+                <Radio value={1} label="开启" />
+              </RadioGroup>
+            </FormControl>
+            <FormControl sx={{ flexGrow: 1 }}>
+              <FormLabel>是否为AI生成</FormLabel>
+              <RadioGroup
+                orientation="horizontal"
+                value={formInfo.isAIGenerated}
+                onChange={(event) =>
+                  setFormInfo({
+                    ...formInfo,
+                    isAIGenerated: Number(event.target.value),
+                  })
+                }
+              >
+                <Radio value={0} label="否" />
+                <Radio value={1} label="是" />
+              </RadioGroup>
+            </FormControl>
+            <FormControl sx={{ flexGrow: 1 }}>
+              <FormLabel>转载状态</FormLabel>
+              <RadioGroup
+                orientation="horizontal"
+                value={formInfo.reprintType}
+                onChange={(event) =>
+                  setFormInfo({
+                    ...formInfo,
+                    reprintType: Number(event.target.value),
+                  })
+                }
+              >
+                <Radio value={0} label="原创作品" />
+                <Radio value={1} label="转载作品" />
+                <Radio value={2} label="合集作品" />
+              </RadioGroup>
+            </FormControl>
+            {formInfo.reprintType !== 0 && (
+              <Stack direction="row" spacing={3}>
+                {formInfo.reprintType === 1 && (
+                  <FormControl sx={{ flexGrow: 1 }}>
+                    <FormLabel>作品URL</FormLabel>
+                    <Input
+                      size="sm"
+                      placeholder="请填写原作URL地址"
+                      defaultValue={formInfo.original_url ?? ''}
+                      onChange={(e) =>
+                        setFormInfo({
+                          ...formInfo,
+                          original_url: e.target.value,
+                        })
+                      }
+                      sx={{ flexGrow: 1 }}
+                    />
+                  </FormControl>
+                )}
                 <FormControl sx={{ flexGrow: 1 }}>
-                  <FormLabel>作品URL</FormLabel>
-                  <Input
-                    size="sm"
-                    placeholder="请填写原作URL地址"
-                    defaultValue={formInfo.original_url ?? ''}
-                    onChange={(e) =>
-                      setFormInfo({ ...formInfo, original_url: e.target.value })
-                    }
-                    sx={{ flexGrow: 1 }}
+                  <FormLabel>原作者</FormLabel>
+                  <Autocomplete
+                    placeholder="请搜索原作者"
+                    type="search"
+                    freeSolo
+                    disableClearable
+                    options={illustratorOptions}
+                    defaultValue={{
+                      value: formInfo.illustrator_id ?? '',
+                      label: formInfo.illustrator_name ?? '',
+                    }}
+                    inputValue={keyword}
+                    onInputChange={(_, value) => setKeyword(value)}
                   />
                 </FormControl>
-              )}
-              <FormControl sx={{ flexGrow: 1 }}>
-                <FormLabel>原作者</FormLabel>
-                <Select
-                  placeholder="请选择原作者"
-                  size="sm"
-                  slotProps={{ button: { sx: { whiteSpace: 'nowrap' } } }}
-                  onChange={(_, value) =>
-                    setFormInfo({ ...formInfo, illustrator_id: value })
-                  }
-                  defaultValue={formInfo.illustrator_id}
-                >
-                  {illustratorOptions.map((o) => (
-                    <Option key={o.value} value={o.value}>
-                      {o.label}
-                    </Option>
-                  ))}
-                </Select>
-              </FormControl>
-            </Stack>
-          )}
-        </Stack>
+              </Stack>
+            )}
+          </Stack>
+        ) : (
+          <CircularProgress sx={{ margin: '0 auto' }} />
+        )}
       </Card>
       <Card>
         <Box sx={{ mb: 1 }}>
@@ -256,47 +304,53 @@ export default function UploadForm() {
           </Typography>
         </Box>
         <Divider />
-        <Stack direction="column" spacing={3}>
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 2,
-            }}
-          >
-            <DndContext
-              onDragEnd={dragEndEvent}
-              modifiers={[restrictToParentElement]}
-              sensors={sensors}
+        {!gettingInfo ? (
+          <Stack direction="column" spacing={3}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 2,
+              }}
             >
-              <SortableContext items={imgList} strategy={rectSortingStrategy}>
-                {imgList.map((url) => (
-                  <DraggableImg
-                    key={url}
-                    id={url}
-                    src={url}
-                    onDelete={onDelete}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
-          </Box>
-          <Button
-            component="label"
-            role={undefined}
-            tabIndex={-1}
-            variant="outlined"
-            color="neutral"
-            startDecorator={<UploadFileRoundedIcon />}
-            sx={{ width: '100%' }}
-          >
-            上传图片
-            <VisuallyHiddenInput type="file" />
-          </Button>
-        </Stack>
+              <DndContext
+                onDragEnd={dragEndEvent}
+                modifiers={[restrictToParentElement]}
+                sensors={sensors}
+              >
+                <SortableContext items={imgList} strategy={rectSortingStrategy}>
+                  {imgList.map((url) => (
+                    <DraggableImg
+                      key={url}
+                      id={url}
+                      src={url}
+                      onDelete={onDelete}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
+            </Box>
+            <Button
+              component="label"
+              role={undefined}
+              tabIndex={-1}
+              variant="outlined"
+              color="neutral"
+              startDecorator={<UploadFileRoundedIcon />}
+              sx={{ width: '100%' }}
+            >
+              上传图片
+              <VisuallyHiddenInput type="file" />
+            </Button>
+          </Stack>
+        ) : (
+          <CircularProgress sx={{ margin: '0 auto' }} />
+        )}
       </Card>
       <Card>
-        <Button onClick={handleUpload}>提交</Button>
+        <Button loading={loading} onClick={handleUpload}>
+          提交
+        </Button>
       </Card>
     </Sheet>
   );

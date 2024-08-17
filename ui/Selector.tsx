@@ -41,7 +41,7 @@ export default function Selector({
     const cur = selectorRef.current;
     const handleScroll = () => {
       if (cur) {
-        const bottom = cur.scrollHeight - cur.scrollTop - 10 < cur.clientHeight;
+        const bottom = cur.scrollHeight - cur.scrollTop - 1 < cur.clientHeight;
         if (bottom && loadFunc) {
           loadFunc();
         }

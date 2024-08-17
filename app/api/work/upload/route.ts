@@ -25,7 +25,11 @@ const ObjSchema = z.object({
  */
 export async function POST(req: NextRequest) {
   const body = await req.json();
+
+  console.log('body', body);
   const verifyRes = ObjSchema.safeParse(body);
+
+  console.log('verifyRes', verifyRes);
 
   if (!verifyRes.success) {
     return NextResponse.json('Invalid body parameters', { status: 400 });
@@ -35,9 +39,7 @@ export async function POST(req: NextRequest) {
 
   if (id) {
     await prisma.illustrations.update({
-      where: {
-        id,
-      },
+      where: { id },
       data: {
         ...info,
         imgList: info.imgList.join(','),

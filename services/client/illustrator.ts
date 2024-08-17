@@ -1,4 +1,7 @@
-import type { IGetIllustratorListRes } from '@/types/api';
+import type {
+  IGetIllustratorDetailRes,
+  IGetIllustratorListRes,
+} from '@/types/api';
 import { getHandler } from './methods/GET';
 
 /**
@@ -13,4 +16,11 @@ export const getIllustratorListAPI = getHandler<IGetIllustratorListRes>(
  */
 export const getIllustratorCountAPI = getHandler<number>(
   '/api/illustrator/count'
+);
+
+/**
+ * @description 获取插画家详情
+ */
+export const getIllustratorDetailAPI = getHandler<IGetIllustratorDetailRes>(
+  '/api/illustrator/detail'
 );

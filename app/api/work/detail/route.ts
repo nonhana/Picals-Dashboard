@@ -43,6 +43,16 @@ export async function GET(req: NextRequest) {
       user_id: true,
       illustrator_id: true,
       status: true,
+      illustrations_labels_labels: {
+        select: {
+          labels: {
+            select: {
+              id: true,
+              value: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -51,6 +61,12 @@ export async function GET(req: NextRequest) {
   }
 
   const result: Record<string, any> = { ...workInfo };
+
+  result.labels = workInfo.illustrations_labels_labels.map((label) => ({
+    label: label.labels.value,
+    value: label.labels.id,
+  }));
+  delete result.illustrations_labels_labels;
 
   result.imgList = workInfo.imgList.split(',');
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { getIllustratorListAPI } from '@/services/client/illustrator';
+import { getLabelListAPI } from '@/services/client/label';
 import { getWorkDetailAPI, uploadWorkAPI } from '@/services/client/work';
 import type { IllustrationForm } from '@/types';
 import type { DragEndEvent } from '@dnd-kit/core';
@@ -46,6 +47,7 @@ const originForm: IllustrationForm = {
   illustrator_id: null,
   illustrator_name: null,
   status: 0,
+  labels: [],
 };
 
 const VisuallyHiddenInput = styled('input')`
@@ -69,41 +71,9 @@ export default function UploadForm() {
   const [formInfo, setFormInfo] = React.useState<IllustrationForm>(originForm);
   const [imgList, setImgList] = React.useState<string[]>([]);
 
-  const fetchWorkDetail = React.useCallback(async () => {
-    setGettingInfo(true);
-    if (!workId) return;
-    const data = await getWorkDetailAPI({ work_id: workId });
-    if (data) {
-      setFormInfo({
-        name: data.name,
-        intro: data.intro,
-        reprintType: data.reprintType,
-        openComment: data.openComment,
-        isAIGenerated: data.isAIGenerated,
-        imgList: data.imgList,
-        original_url: data.original_url,
-        illustrator_id: data.illustrator_id,
-        illustrator_name: data.illustrator_name,
-        status: data.status,
-      });
-      setImgList(data.imgList);
-    }
-    setGettingInfo(false);
-  }, [workId]);
-
-  React.useEffect(() => {
-    fetchWorkDetail();
-  }, [fetchWorkDetail]);
-
   const onDelete = (url: string) => {
     const newImgList = imgList.filter((src) => src !== url);
     setImgList(newImgList);
-  };
-
-  const handleUpload = async () => {
-    setLoading(true);
-    await uploadWorkAPI(formInfo);
-    setLoading(false);
   };
 
   /* ----------图片列表拖曳排序相关---------- */
@@ -129,9 +99,16 @@ export default function UploadForm() {
 
   /* ----------插画家列表相关---------- */
   const [illustratorOptions, setIllustratorOptions] = React.useState<
-    { label: string; value: string }[]
+    {
+      label: string;
+      value: string;
+    }[]
   >([]);
-  const [keyword, setKeyword] = React.useState('');
+  const [illustratorKeyword, setIllustratorKeyword] = React.useState('');
+  const [selectedIllustrator, setSelectedIllustrator] = React.useState<{
+    label: string;
+    value: string;
+  } | null>(null);
 
   const fetchIllustratorList = async (debouncedKeyword: string) => {
     const data = await getIllustratorListAPI({ name: debouncedKeyword });
@@ -152,12 +129,100 @@ export default function UploadForm() {
   );
 
   React.useEffect(() => {
-    if (keyword) {
-      debouncedFetchIllustratorList(keyword);
+    if (illustratorKeyword) {
+      debouncedFetchIllustratorList(illustratorKeyword);
     } else {
       setIllustratorOptions([]);
     }
-  }, [keyword, debouncedFetchIllustratorList]);
+  }, [illustratorKeyword, debouncedFetchIllustratorList]);
+
+  /* ----------标签列表相关---------- */
+  const [labelOptions, setLabelOptions] = React.useState<
+    {
+      label: string;
+      value: string;
+    }[]
+  >([]);
+  const [labelKeyword, setLabelKeyword] = React.useState('');
+  const [selectedLabels, setSelectedLabels] = React.useState<
+    {
+      label: string;
+      value: string;
+    }[]
+  >([]);
+
+  const fetchLabelList = async (debouncedKeyword: string) => {
+    const data = await getLabelListAPI({ value: debouncedKeyword });
+    if (data) {
+      const options = data
+        .map((item) => ({
+          label: item.value,
+          value: item.id,
+        }))
+        .filter(
+          (item) => !selectedLabels.some((label) => label.value === item.value)
+        );
+      setLabelOptions(options);
+    }
+  };
+
+  const debouncedFetchLabelList = useDebouncedCallback((debouncedKeyword) => {
+    fetchLabelList(debouncedKeyword);
+  }, 300);
+
+  React.useEffect(() => {
+    if (labelKeyword) {
+      debouncedFetchLabelList(labelKeyword);
+    } else {
+      setLabelOptions([]);
+    }
+  }, [labelKeyword, debouncedFetchLabelList]);
+
+  const fetchWorkDetail = React.useCallback(async () => {
+    setGettingInfo(true);
+    if (!workId) return;
+    const data = await getWorkDetailAPI({ work_id: workId });
+    if (data) {
+      setFormInfo({
+        name: data.name,
+        intro: data.intro,
+        reprintType: data.reprintType,
+        openComment: data.openComment,
+        isAIGenerated: data.isAIGenerated,
+        imgList: data.imgList,
+        original_url: data.original_url,
+        illustrator_id: data.illustrator_id,
+        illustrator_name: data.illustrator_name,
+        status: data.status,
+        labels: data.labels,
+      });
+      setImgList(data.imgList);
+      setSelectedLabels(data.labels);
+      setSelectedIllustrator({
+        label: data.illustrator_name ?? '',
+        value: data.illustrator_id ?? '',
+      });
+    }
+    setGettingInfo(false);
+  }, [workId]);
+
+  React.useEffect(() => {
+    fetchWorkDetail();
+  }, [fetchWorkDetail]);
+
+  const handleUpload = async () => {
+    setLoading(true);
+    const result = {
+      ...formInfo,
+      id: workId!,
+      imgList,
+      illustrator_id: selectedIllustrator?.value ?? null,
+      illustrator_name: selectedIllustrator?.label ?? null,
+      labels: selectedLabels,
+    };
+    await uploadWorkAPI(result);
+    setLoading(false);
+  };
 
   return (
     <Sheet
@@ -203,6 +268,23 @@ export default function UploadForm() {
                 sx={{ flexGrow: 1 }}
                 minRows={3}
                 maxRows={6}
+              />
+            </FormControl>
+            <FormControl sx={{ flexGrow: 1 }}>
+              <FormLabel>插画标签</FormLabel>
+              <Autocomplete
+                multiple
+                placeholder="请搜索想要添加的标签"
+                type="search"
+                freeSolo
+                disableClearable
+                options={labelOptions}
+                defaultValue={formInfo.labels}
+                onChange={(_, v) =>
+                  setSelectedLabels(v as { label: string; value: string }[])
+                }
+                inputValue={labelKeyword}
+                onInputChange={(_, v) => setLabelKeyword(v)}
               />
             </FormControl>
             <FormControl sx={{ flexGrow: 1 }}>
@@ -285,8 +367,13 @@ export default function UploadForm() {
                       value: formInfo.illustrator_id ?? '',
                       label: formInfo.illustrator_name ?? '',
                     }}
-                    inputValue={keyword}
-                    onInputChange={(_, value) => setKeyword(value)}
+                    onChange={(_, v) =>
+                      setSelectedIllustrator(
+                        v as { label: string; value: string }
+                      )
+                    }
+                    inputValue={illustratorKeyword}
+                    onInputChange={(_, value) => setIllustratorKeyword(value)}
                   />
                 </FormControl>
               </Stack>

@@ -75,9 +75,14 @@ export type IllustrationInfo = {
   status: number;
   created_time: string;
   updated_time: string;
+  labels: {
+    label: string;
+    value: string;
+  }[];
 };
 
 export type IllustrationForm = {
+  id?: string;
   name: string;
   intro: string;
   reprintType: number;
@@ -88,6 +93,10 @@ export type IllustrationForm = {
   illustrator_id: string | null;
   illustrator_name: string | null;
   status: number;
+  labels: {
+    label: string;
+    value: string;
+  }[];
 };
 
 export type LabelItem = labels;

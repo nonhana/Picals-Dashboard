@@ -34,6 +34,7 @@ import {
 import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
+import toast from '../Toast';
 import DraggableImg from './DraggableImg';
 
 const originForm: IllustrationForm = {
@@ -69,6 +70,8 @@ export default function UploadForm() {
   const [gettingInfo, setGettingInfo] = React.useState(true);
   const [loading, setLoading] = React.useState(false);
   const [formInfo, setFormInfo] = React.useState<IllustrationForm>(originForm);
+
+  /* ----------图片列表相关---------- */
   const [imgList, setImgList] = React.useState<string[]>([]);
 
   const onDelete = (url: string) => {
@@ -76,7 +79,6 @@ export default function UploadForm() {
     setImgList(newImgList);
   };
 
-  /* ----------图片列表拖曳排序相关---------- */
   //拖拽传感器，在移动像素5px范围内，不触发拖拽事件
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -178,9 +180,19 @@ export default function UploadForm() {
     }
   }, [labelKeyword, debouncedFetchLabelList]);
 
+  const fileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const targetFile = e.target.files?.[0];
+    if (!targetFile) {
+      toast.error('未检测到文件，请重新选择');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('image', targetFile);
+  };
+
   const fetchWorkDetail = React.useCallback(async () => {
-    setGettingInfo(true);
     if (!workId) return;
+    setGettingInfo(true);
     const data = await getWorkDetailAPI({ work_id: workId });
     if (data) {
       setFormInfo({
@@ -212,15 +224,20 @@ export default function UploadForm() {
 
   const handleUpload = async () => {
     setLoading(true);
-    const result = {
+    const result: IllustrationForm = {
       ...formInfo,
-      id: workId!,
       imgList,
       illustrator_id: selectedIllustrator?.value ?? null,
       illustrator_name: selectedIllustrator?.label ?? null,
       labels: selectedLabels,
     };
-    await uploadWorkAPI(result);
+    if (workId) result.id = workId;
+    const data = await uploadWorkAPI(result);
+    if (data) {
+      if (data === 'success') {
+        toast.success(workId ? '更新作品信息成功' : '上传成功');
+      }
+    }
     setLoading(false);
   };
 
@@ -427,7 +444,7 @@ export default function UploadForm() {
               sx={{ width: '100%' }}
             >
               上传图片
-              <VisuallyHiddenInput type="file" />
+              <VisuallyHiddenInput type="file" onChange={fileSelected} />
             </Button>
           </Stack>
         ) : (

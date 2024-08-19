@@ -25,6 +25,6 @@ export const getWorkDetailAPI =
 /**
  * @description 上传/更新作品信息
  */
-export const uploadWorkAPI = postHandler<IUploadWorkReq, null>(
+export const uploadWorkAPI = postHandler<IUploadWorkReq, string>(
   '/api/work/upload'
 );

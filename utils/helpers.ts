@@ -179,3 +179,9 @@ export const uniqueArray = (arr: any[], uniId: string) => {
   const res = new Map();
   return arr.filter((item) => !res.has(item[uniId]) && res.set(item[uniId], 1));
 };
+
+/**
+ * @description 生成唯一后缀
+ */
+export const suffixGenerator = (origin: string) =>
+  Date.now() + '-' + Math.round(Math.random() * 1e9) + '-' + origin;

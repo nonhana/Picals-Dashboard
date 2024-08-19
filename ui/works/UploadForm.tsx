@@ -2,6 +2,7 @@
 
 import { getIllustratorListAPI } from '@/services/client/illustrator';
 import { getLabelListAPI } from '@/services/client/label';
+import { getUserListAPI } from '@/services/client/user';
 import { getWorkDetailAPI, uploadWorkAPI } from '@/services/client/work';
 import type { IllustrationForm } from '@/types';
 import type { DragEndEvent } from '@dnd-kit/core';
@@ -49,6 +50,8 @@ const originForm: IllustrationForm = {
   illustrator_name: null,
   status: 0,
   labels: [],
+  author_id: '',
+  author_name: '',
 };
 
 const VisuallyHiddenInput = styled('input')`
@@ -180,6 +183,42 @@ export default function UploadForm() {
     }
   }, [labelKeyword, debouncedFetchLabelList]);
 
+  /* ----------用户列表相关---------- */
+  const [userOptions, setUserOptions] = React.useState<
+    {
+      label: string;
+      value: string;
+    }[]
+  >([]);
+  const [userKeyword, setUserKeyword] = React.useState('');
+  const [selectedUser, setSelectedUser] = React.useState<{
+    label: string;
+    value: string;
+  } | null>(null);
+
+  const fetchUserList = async (debouncedKeyword: string) => {
+    const data = await getUserListAPI({ name: debouncedKeyword });
+    if (data) {
+      const options = data.map((item) => ({
+        label: item.username,
+        value: item.id,
+      }));
+      setUserOptions(options);
+    }
+  };
+
+  const debouncedFetchUserList = useDebouncedCallback((debouncedKeyword) => {
+    fetchUserList(debouncedKeyword);
+  }, 300);
+
+  React.useEffect(() => {
+    if (userKeyword) {
+      debouncedFetchUserList(userKeyword);
+    } else {
+      setUserOptions([]);
+    }
+  }, [userKeyword, debouncedFetchUserList]);
+
   const fileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const targetFile = e.target.files?.[0];
     if (!targetFile) {
@@ -207,6 +246,8 @@ export default function UploadForm() {
         illustrator_name: data.illustrator_name,
         status: data.status,
         labels: data.labels,
+        author_id: data.user_id!,
+        author_name: data.user_name!,
       });
       setImgList(data.imgList);
       setSelectedLabels(data.labels);
@@ -302,6 +343,25 @@ export default function UploadForm() {
                 }
                 inputValue={labelKeyword}
                 onInputChange={(_, v) => setLabelKeyword(v)}
+              />
+            </FormControl>
+            <FormControl sx={{ flexGrow: 1 }}>
+              <FormLabel>发布者</FormLabel>
+              <Autocomplete
+                placeholder="请搜索该作品的发布者"
+                type="search"
+                freeSolo
+                disableClearable
+                options={userOptions}
+                defaultValue={{
+                  value: formInfo.author_id,
+                  label: formInfo.author_name,
+                }}
+                onChange={(_, v) =>
+                  setSelectedUser(v as { label: string; value: string })
+                }
+                inputValue={userKeyword}
+                onInputChange={(_, v) => setUserKeyword(v)}
               />
             </FormControl>
             <FormControl sx={{ flexGrow: 1 }}>

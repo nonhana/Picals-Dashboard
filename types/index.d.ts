@@ -97,6 +97,8 @@ export type IllustrationForm = {
     label: string;
     value: string;
   }[];
+  author_id: string;
+  author_name: string;
 };
 
 export type LabelItem = labels;

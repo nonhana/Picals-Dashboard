@@ -1,4 +1,6 @@
 import prisma from '@/prisma';
+import generateThumbnail from '@/utils/img-handler/thumbnail';
+import urlToImage from '@/utils/img-handler/urlToImage';
 import * as p from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -21,6 +23,8 @@ const ObjSchema = z.object({
       value: z.string(),
     })
   ),
+  author_id: z.string(),
+  author_name: z.string(),
 });
 
 /**
@@ -43,6 +47,19 @@ export async function POST(req: NextRequest) {
       imgList: info.imgList.join(','),
     };
 
+    const prevWork = await prisma.illustrations.findUnique({
+      where: { id },
+      select: {
+        imgList: true,
+        reprintType: true,
+        illustrators: { select: { id: true, work_count: true } },
+      },
+    });
+    if (!prevWork) {
+      return NextResponse.json('Work Not found', { status: 404 });
+    }
+
+    //#region 更新标签
     const existingLabelIds = await prisma.illustrations_labels_labels.findMany({
       where: { illustrationsId: id },
       select: { labelsId: true },
@@ -75,23 +92,150 @@ export async function POST(req: NextRequest) {
         })),
       };
     }
+    //#endregion
 
-    if (info.illustrator_id) {
-      data.illustrators = { connect: { id: info.illustrator_id } };
+    //#region 更新图片
+    const prevImgList = prevWork.imgList.split(',');
+
+    // 1. 处理封面
+    if (prevImgList[0] !== info.imgList[0]) {
+      const coverSourceUrl = info.imgList[0];
+      const fileName = coverSourceUrl.split('/').pop()!.split('.')[0];
+      const imgBuffer = await fetch(coverSourceUrl).then((res) =>
+        res.arrayBuffer()
+      );
+      const coverUrl = await generateThumbnail(imgBuffer, fileName, 'cover');
+      data.cover = coverUrl as string;
     }
 
+    // 2. 处理变更后的图片列表
+    const newImgList = info.imgList.filter((img) => !prevImgList.includes(img));
+    const delImgList = prevImgList.filter((img) => !info.imgList.includes(img));
+
+    // 将新的图片存入Image表中
+    for (const imgUrl of newImgList) {
+      await urlToImage(imgUrl, id);
+    }
+    // 删除不再使用的图片
+    for (const imgUrl of delImgList) {
+      await prisma.images.deleteMany({
+        where: { originUrl: imgUrl },
+      });
+    }
+    //#endregion
+
+    //#region 更新插画师
+    if (info.illustrator_id) {
+      const illustratorEntity = await prisma.illustrators.findUnique({
+        where: { id: info.illustrator_id },
+        select: { id: true, work_count: true },
+      });
+      if (!prevWork.illustrators) {
+        illustratorEntity!.work_count++;
+      } else if (prevWork.illustrators.id !== illustratorEntity!.id) {
+        prevWork.illustrators.work_count--;
+        await prisma.illustrators.update({
+          where: { id: prevWork.illustrators.id },
+          data: { work_count: prevWork.illustrators.work_count },
+        });
+        illustratorEntity!.work_count++;
+      }
+      await prisma.illustrators.update({
+        where: { id: info.illustrator_id },
+        data: { work_count: illustratorEntity!.work_count },
+      });
+      data.illustrators = { connect: { id: info.illustrator_id } };
+    }
+    //#endregion
+
+    //#region 更新用户数据
+    if (data.reprintType !== 0) {
+      if (prevWork.reprintType === 0) {
+        await prisma.users.update({
+          where: { id: info.author_id },
+          data: {
+            origin_count: { decrement: 1 },
+            reprinted_count: { increment: 1 },
+          },
+        });
+      }
+    } else {
+      if (prevWork.reprintType !== 0) {
+        await prisma.users.update({
+          where: { id: info.author_id },
+          data: {
+            origin_count: { increment: 1 },
+            reprinted_count: { decrement: 1 },
+          },
+        });
+      }
+    }
+    data.users = { connect: { id: info.author_id } };
+    //#endregion
+
+    // 删除不必要的字段
     delete (data as any).labels;
     delete (data as any).illustrator_id;
     delete (data as any).illustrator_name;
+    delete (data as any).author_id;
+    delete (data as any).author_name;
 
     await prisma.illustrations.update({ where: { id }, data });
   } else {
-    // await prisma.illustrations.create({
-    //   data: {
-    //     ...info,
-    //     imgList: info.imgList.join(','),
-    //   },
-    // });
+    // 新增插画
+    const data: p.Prisma.illustrationsCreateInput = {
+      ...info,
+      cover: '',
+      imgList: info.imgList.join(','),
+    };
+
+    // 处理标签
+    data.illustrations_labels_labels = {
+      create: info.labels.map((label) => ({
+        labels: { connect: { id: label.value } },
+      })),
+    };
+
+    // 处理图片
+    const coverSourceUrl = info.imgList[0];
+    const fileName = coverSourceUrl.split('/').pop()!.split('.')[0];
+    const imgBuffer = await fetch(coverSourceUrl).then((res) =>
+      res.arrayBuffer()
+    );
+    const coverUrl = await generateThumbnail(imgBuffer, fileName, 'cover');
+    data.cover = coverUrl as string;
+
+    // 处理插画师
+    if (info.illustrator_id) {
+      data.illustrators = { connect: { id: info.illustrator_id } };
+      await prisma.illustrators.update({
+        where: { id: info.illustrator_id },
+        data: { work_count: { increment: 1 } },
+      });
+    }
+
+    // 处理用户数据
+    await prisma.users.update({
+      where: { id: info.author_id },
+      data:
+        info.reprintType !== 0
+          ? {
+              reprinted_count: { increment: 1 },
+            }
+          : {
+              origin_count: { increment: 1 },
+            },
+    });
+    data.users = { connect: { id: info.author_id } };
+
+    // 删除不必要的字段
+    delete (data as any).labels;
+    delete (data as any).illustrator_id;
+    delete (data as any).illustrator_name;
+    delete (data as any).author_id;
+    delete (data as any).author_name;
+
+    await prisma.illustrations.create({ data });
   }
 
   return NextResponse.json('success', { status: 200 });

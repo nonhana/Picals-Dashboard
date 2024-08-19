@@ -42,6 +42,7 @@ const originInfo: IllustrationInfo = {
   illustrator_id: '',
   illustrator_name: '',
   status: 0,
+  labels: [],
 };
 
 export default function WorkDisplayModal({

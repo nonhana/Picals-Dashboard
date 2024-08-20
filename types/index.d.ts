@@ -78,6 +78,7 @@ export type IllustrationInfo = {
   labels: {
     label: string;
     value: string;
+    color: string;
   }[];
 };
 
@@ -96,6 +97,7 @@ export type IllustrationForm = {
   labels: {
     label: string;
     value: string;
+    color: string;
   }[];
   author_id: string;
   author_name: string;

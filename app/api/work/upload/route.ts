@@ -21,6 +21,7 @@ const ObjSchema = z.object({
     z.object({
       label: z.string(),
       value: z.string(),
+      color: z.string(),
     })
   ),
   author_id: z.string(),

@@ -7,6 +7,7 @@ import PhotoRoundedIcon from '@mui/icons-material/PhotoRounded';
 import {
   Box,
   Button,
+  CircularProgress,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -19,6 +20,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
+import LabelItem from '../LabelItem';
 import PreviewModal from '../PreviewModal';
 
 const originInfo: IllustrationInfo = {
@@ -55,6 +57,7 @@ export default function WorkDisplayModal({
   workId: string | undefined;
 }) {
   const [info, setInfo] = React.useState<IllustrationInfo>(originInfo);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     if (!visible) setInfo(originInfo);
@@ -62,8 +65,10 @@ export default function WorkDisplayModal({
 
   const fetchWorkInfo = React.useCallback(async () => {
     if (!workId) return;
+    setLoading(true);
     const data = await getWorkDetailAPI({ work_id: workId });
     if (data) setInfo(data);
+    setLoading(false);
   }, [workId]);
 
   React.useEffect(() => {
@@ -93,70 +98,56 @@ export default function WorkDisplayModal({
           <DialogContent>
             罗列当前插画的详细信息，可点击进入编辑页进行修改。
           </DialogContent>
-          <Stack spacing={2}>
-            <Stack spacing={1}>
-              <Typography level="h4">插画id</Typography>
-              <Typography level="body-sm">{info.id}</Typography>
-            </Stack>
-            <Stack spacing={1}>
-              <Typography level="h4">插画名</Typography>
-              <Typography level="body-sm">{info.name}</Typography>
-            </Stack>
-            <Stack spacing={1}>
-              <Typography level="h4">插画简介</Typography>
-              <Typography level="body-sm">{info.intro}</Typography>
-            </Stack>
-            <Divider />
-            <Stack spacing={1}>
-              <Typography level="h4">转载类型</Typography>
-              <Typography level="body-sm">
-                {REPRINT_TYPE[info.reprintType]}
-              </Typography>
-            </Stack>
-            <Stack spacing={1}>
-              <Typography level="h4">是否开启评论</Typography>
-              <Typography level="body-sm">
-                {info.openComment === 1 ? '开启' : '关闭'}
-              </Typography>
-            </Stack>
-            <Stack spacing={1}>
-              <Typography level="h4">是否为AI生成</Typography>
-              <Typography level="body-sm">
-                {info.isAIGenerated === 1 ? '是' : '否'}
-              </Typography>
-            </Stack>
-            <Divider />
-            <Stack spacing={1}>
-              <Typography level="h4">封面</Typography>
-              {info.cover && (
-                <Box
-                  sx={{
-                    width: '100px',
-                    height: '100px',
-                    overflow: 'hidden',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <Image
-                    src={info.cover}
-                    alt={info.cover}
-                    width={100}
-                    height={100}
-                    style={{
-                      objectFit: 'cover',
-                    }}
-                    onClick={() => setPreviewSrc(info.cover)}
-                  />
-                </Box>
-              )}
-            </Stack>
-            <Stack spacing={1}>
-              <Typography level="h4">图片列表</Typography>
-              <Stack spacing={2} display="flex" direction="row">
-                {info.imgList.map((src) => (
+          {!loading ? (
+            <Stack spacing={2}>
+              <Stack spacing={1}>
+                <Typography level="h4">插画id</Typography>
+                <Typography level="body-sm">{info.id}</Typography>
+              </Stack>
+              <Stack spacing={1}>
+                <Typography level="h4">插画名</Typography>
+                <Typography level="body-sm">{info.name}</Typography>
+              </Stack>
+              <Stack spacing={1}>
+                <Typography level="h4">插画简介</Typography>
+                <Typography level="body-sm">{info.intro}</Typography>
+              </Stack>
+              <Stack spacing={1}>
+                <Typography level="h4">标签列表</Typography>
+                <Stack spacing={1} display="flex" direction="row">
+                  {info.labels.map((label) => (
+                    <LabelItem
+                      key={label.value}
+                      label={label.label}
+                      color={label.color}
+                    />
+                  ))}
+                </Stack>
+              </Stack>
+              <Divider />
+              <Stack spacing={1}>
+                <Typography level="h4">转载类型</Typography>
+                <Typography level="body-sm">
+                  {REPRINT_TYPE[info.reprintType]}
+                </Typography>
+              </Stack>
+              <Stack spacing={1}>
+                <Typography level="h4">是否开启评论</Typography>
+                <Typography level="body-sm">
+                  {info.openComment === 1 ? '开启' : '关闭'}
+                </Typography>
+              </Stack>
+              <Stack spacing={1}>
+                <Typography level="h4">是否为AI生成</Typography>
+                <Typography level="body-sm">
+                  {info.isAIGenerated === 1 ? '是' : '否'}
+                </Typography>
+              </Stack>
+              <Divider />
+              <Stack spacing={1}>
+                <Typography level="h4">封面</Typography>
+                {info.cover && (
                   <Box
-                    key={src}
                     sx={{
                       width: '100px',
                       height: '100px',
@@ -166,86 +157,118 @@ export default function WorkDisplayModal({
                     }}
                   >
                     <Image
-                      src={src}
-                      alt={src}
+                      src={info.cover}
+                      alt={info.cover}
                       width={100}
                       height={100}
                       style={{
                         objectFit: 'cover',
                       }}
-                      onClick={() => setPreviewSrc(src)}
+                      onClick={() => setPreviewSrc(info.cover)}
                     />
                   </Box>
-                ))}
+                )}
               </Stack>
-            </Stack>
-            <Divider />
-            <Stack
-              display="flex"
-              direction="row"
-              justifyContent="space-between"
-            >
-              <Stack spacing={1} alignItems="center">
-                <Typography level="h4">点赞数</Typography>
-                <Typography level="body-sm">{info.like_count}</Typography>
-              </Stack>
-              <Stack spacing={1} alignItems="center">
-                <Typography level="h4">浏览量</Typography>
-                <Typography level="body-sm">{info.view_count}</Typography>
-              </Stack>
-              <Stack spacing={1} alignItems="center">
-                <Typography level="h4">收藏量</Typography>
-                <Typography level="body-sm">{info.collect_count}</Typography>
-              </Stack>
-              <Stack spacing={1} alignItems="center">
-                <Typography level="h4">评论数</Typography>
-                <Typography level="body-sm">{info.comment_count}</Typography>
-              </Stack>
-            </Stack>
-            <Divider />
-            {info.reprintType === 1 && (
-              <>
-                <Stack spacing={1}>
-                  <Typography level="h4">原作地址</Typography>
-                  <Link href={info.original_url!} target="_blank">
-                    <Typography level="body-sm">
-                      {info.original_url!}
-                    </Typography>
-                  </Link>
+              <Stack spacing={1}>
+                <Typography level="h4">图片列表</Typography>
+                <Stack spacing={2} display="flex" direction="row">
+                  {info.imgList.map((src) => (
+                    <Box
+                      key={src}
+                      sx={{
+                        width: '100px',
+                        height: '100px',
+                        overflow: 'hidden',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Image
+                        src={src}
+                        alt={src}
+                        width={100}
+                        height={100}
+                        style={{
+                          objectFit: 'cover',
+                        }}
+                        onClick={() => setPreviewSrc(src)}
+                      />
+                    </Box>
+                  ))}
                 </Stack>
-                <Stack spacing={1}>
-                  <Typography level="h4">原作者</Typography>
-                  <Typography level="body-sm">
-                    {info.illustrator_name!}
-                  </Typography>
-                </Stack>
-              </>
-            )}
-            <Stack spacing={1}>
-              <Typography level="h4">转载者</Typography>
-              <Typography level="body-sm">{info.user_name!}</Typography>
-            </Stack>
-            <Divider />
-            <Stack spacing={1}>
-              <Typography level="h4">作品状态</Typography>
-              <Typography level="body-sm">
-                {WORK_STATUS[info.status]}
-              </Typography>
-            </Stack>
-
-            <DialogActions>
-              <Link href={`/dashboard/works/upload?work_id=${workId}`}>
-                <Button>编辑</Button>
-              </Link>
-              <Button
-                variant="plain"
-                color="neutral"
-                onClick={() => setVisible(false)}
+              </Stack>
+              <Divider />
+              <Stack
+                display="flex"
+                direction="row"
+                justifyContent="space-between"
               >
-                关闭
-              </Button>
-            </DialogActions>
-          </Stack>
+                <Stack spacing={1} alignItems="center">
+                  <Typography level="h4">点赞数</Typography>
+                  <Typography level="body-sm">{info.like_count}</Typography>
+                </Stack>
+                <Stack spacing={1} alignItems="center">
+                  <Typography level="h4">浏览量</Typography>
+                  <Typography level="body-sm">{info.view_count}</Typography>
+                </Stack>
+                <Stack spacing={1} alignItems="center">
+                  <Typography level="h4">收藏量</Typography>
+                  <Typography level="body-sm">{info.collect_count}</Typography>
+                </Stack>
+                <Stack spacing={1} alignItems="center">
+                  <Typography level="h4">评论数</Typography>
+                  <Typography level="body-sm">{info.comment_count}</Typography>
+                </Stack>
+              </Stack>
+              <Divider />
+              {info.reprintType === 1 && (
+                <>
+                  <Stack spacing={1}>
+                    <Typography level="h4">原作地址</Typography>
+                    <Link href={info.original_url!} target="_blank">
+                      <Typography level="body-sm">
+                        {info.original_url!}
+                      </Typography>
+                    </Link>
+                  </Stack>
+                  <Stack spacing={1}>
+                    <Typography level="h4">原作者</Typography>
+                    <Typography level="body-sm">
+                      {info.illustrator_name!}
+                    </Typography>
+                  </Stack>
+                </>
+              )}
+              <Stack spacing={1}>
+                <Typography level="h4">转载者</Typography>
+                <Typography level="body-sm">{info.user_name!}</Typography>
+              </Stack>
+              <Divider />
+              <Stack spacing={1}>
+                <Typography level="h4">作品状态</Typography>
+                <Typography level="body-sm">
+                  {WORK_STATUS[info.status]}
+                </Typography>
+              </Stack>
+
+              <DialogActions>
+                <Link href={`/dashboard/works/upload?work_id=${workId}`}>
+                  <Button>编辑</Button>
+                </Link>
+                <Button
+                  variant="plain"
+                  color="neutral"
+                  onClick={() => setVisible(false)}
+                >
+                  关闭
+                </Button>
+              </DialogActions>
+            </Stack>
+          ) : (
+            <Box display="flex" justifyContent="center" alignItems="center">
+              <CircularProgress />
+            </Box>
+          )}
         </ModalDialog>
       </Modal>
       <PreviewModal

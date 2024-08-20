@@ -13,6 +13,7 @@ import {
   rectSortingStrategy,
   SortableContext,
 } from '@dnd-kit/sortable';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
 import {
   Autocomplete,
@@ -22,6 +23,7 @@ import {
   CircularProgress,
   Divider,
   FormControl,
+  FormHelperText,
   FormLabel,
   Input,
   Radio,
@@ -42,13 +44,13 @@ const originForm: IllustrationForm = {
   name: '',
   intro: '',
   reprintType: 0,
-  openComment: 0,
+  openComment: 1,
   isAIGenerated: 0,
   imgList: [],
   original_url: null,
   illustrator_id: null,
   illustrator_name: null,
-  status: 0,
+  status: 1,
   labels: [],
   author_id: '',
   author_name: '',
@@ -70,7 +72,7 @@ export default function UploadForm() {
   const searchParams = useSearchParams();
   const workId = searchParams.get('work_id');
 
-  const [gettingInfo, setGettingInfo] = React.useState(true);
+  const [gettingInfo, setGettingInfo] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [formInfo, setFormInfo] = React.useState<IllustrationForm>(originForm);
 
@@ -146,6 +148,7 @@ export default function UploadForm() {
     {
       label: string;
       value: string;
+      color: string;
     }[]
   >([]);
   const [labelKeyword, setLabelKeyword] = React.useState('');
@@ -153,6 +156,7 @@ export default function UploadForm() {
     {
       label: string;
       value: string;
+      color: string;
     }[]
   >([]);
 
@@ -163,6 +167,7 @@ export default function UploadForm() {
         .map((item) => ({
           label: item.value,
           value: item.id,
+          color: item.color,
         }))
         .filter(
           (item) => !selectedLabels.some((label) => label.value === item.value)
@@ -219,7 +224,9 @@ export default function UploadForm() {
     }
   }, [userKeyword, debouncedFetchUserList]);
 
-  const fileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [uploading, setUploading] = React.useState(false);
+
+  const fileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const targetFile = e.target.files?.[0];
     if (!targetFile) {
       toast.error('未检测到文件，请重新选择');
@@ -227,6 +234,14 @@ export default function UploadForm() {
     }
     const formData = new FormData();
     formData.append('image', targetFile);
+    setUploading(true);
+    const res = await fetch('/api/tool/image-upload', {
+      method: 'POST',
+      body: formData,
+    });
+    const { origin_url } = await res.json();
+    setImgList([...imgList, origin_url]);
+    setUploading(false);
   };
 
   const fetchWorkDetail = React.useCallback(async () => {
@@ -255,6 +270,10 @@ export default function UploadForm() {
         label: data.illustrator_name ?? '',
         value: data.illustrator_id ?? '',
       });
+      setSelectedUser({
+        label: data.user_name ?? '',
+        value: data.user_id ?? '',
+      });
     }
     setGettingInfo(false);
   }, [workId]);
@@ -263,7 +282,62 @@ export default function UploadForm() {
     fetchWorkDetail();
   }, [fetchWorkDetail]);
 
+  // 校验必填项
+  const [checkFailedFields, setCheckFailedFields] = React.useState<
+    { label: string; value: string }[]
+  >([]);
+
+  const validateSubmit = () => {
+    const checkedValue: { label: string; value: string }[] = [];
+    if (!imgList.length) {
+      checkFailedFields.push({
+        label: 'imgList',
+        value: '必须上传至少一张图片！！',
+      });
+    }
+    if (!selectedUser) {
+      checkFailedFields.push({
+        label: 'selectedUser',
+        value: '必须选择发布者！！',
+      });
+    }
+    if (!selectedLabels.length) {
+      checkFailedFields.push({
+        label: 'selectedLabels',
+        value: '必须选择至少一个标签！！',
+      });
+    }
+    if (formInfo.reprintType === 1) {
+      if (!formInfo.original_url) {
+        checkFailedFields.push({
+          label: 'original_url',
+          value: '必须填写原作URL地址！！',
+        });
+      }
+      if (!selectedIllustrator) {
+        checkFailedFields.push({
+          label: 'selectedIllustrator',
+          value: '必须选择原作者！！',
+        });
+      }
+    }
+    if (formInfo.reprintType === 2) {
+      if (!selectedIllustrator) {
+        checkFailedFields.push({
+          label: 'selectedIllustrator',
+          value: '必须选择合集作者！！',
+        });
+      }
+    }
+    if (checkedValue.length) {
+      setCheckFailedFields(checkedValue);
+      return false;
+    }
+    return true;
+  };
+
   const handleUpload = async () => {
+    if (!validateSubmit()) return;
     setLoading(true);
     const result: IllustrationForm = {
       ...formInfo,
@@ -271,6 +345,8 @@ export default function UploadForm() {
       illustrator_id: selectedIllustrator?.value ?? null,
       illustrator_name: selectedIllustrator?.label ?? null,
       labels: selectedLabels,
+      author_id: selectedUser?.value ?? '',
+      author_name: selectedUser?.label ?? '',
     };
     if (workId) result.id = workId;
     const data = await uploadWorkAPI(result);
@@ -328,7 +404,12 @@ export default function UploadForm() {
                 maxRows={6}
               />
             </FormControl>
-            <FormControl sx={{ flexGrow: 1 }}>
+            <FormControl
+              sx={{ flexGrow: 1 }}
+              error={checkFailedFields.some(
+                (item) => item.label === 'selectedLabels'
+              )}
+            >
               <FormLabel>插画标签</FormLabel>
               <Autocomplete
                 multiple
@@ -339,11 +420,17 @@ export default function UploadForm() {
                 options={labelOptions}
                 defaultValue={formInfo.labels}
                 onChange={(_, v) =>
-                  setSelectedLabels(v as { label: string; value: string }[])
+                  setSelectedLabels(
+                    v as { label: string; value: string; color: string }[]
+                  )
                 }
                 inputValue={labelKeyword}
                 onInputChange={(_, v) => setLabelKeyword(v)}
               />
+              <FormHelperText>
+                <InfoOutlinedIcon />
+                {}
+              </FormHelperText>
             </FormControl>
             <FormControl sx={{ flexGrow: 1 }}>
               <FormLabel>发布者</FormLabel>
@@ -495,6 +582,7 @@ export default function UploadForm() {
               </DndContext>
             </Box>
             <Button
+              loading={uploading}
               component="label"
               role={undefined}
               tabIndex={-1}

@@ -49,6 +49,7 @@ export async function GET(req: NextRequest) {
             select: {
               id: true,
               value: true,
+              color: true,
             },
           },
         },
@@ -65,6 +66,7 @@ export async function GET(req: NextRequest) {
   result.labels = workInfo.illustrations_labels_labels.map((label) => ({
     label: label.labels.value,
     value: label.labels.id,
+    color: label.labels.color,
   }));
   delete result.illustrations_labels_labels;
 

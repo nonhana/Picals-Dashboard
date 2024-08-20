@@ -114,7 +114,7 @@ export default function WorkDisplayModal({
               </Stack>
               <Stack spacing={1}>
                 <Typography level="h4">标签列表</Typography>
-                <Stack spacing={1} display="flex" direction="row">
+                <Stack gap={1} display="flex" direction="row" flexWrap="wrap">
                   {info.labels.map((label) => (
                     <LabelItem
                       key={label.value}
@@ -240,7 +240,9 @@ export default function WorkDisplayModal({
                 </>
               )}
               <Stack spacing={1}>
-                <Typography level="h4">转载者</Typography>
+                <Typography level="h4">
+                  {info.reprintType === 0 ? '原创者' : '转载者'}
+                </Typography>
                 <Typography level="body-sm">{info.user_name!}</Typography>
               </Stack>
               <Divider />

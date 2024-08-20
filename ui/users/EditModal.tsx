@@ -19,12 +19,12 @@ import {
   Option,
   Select,
   Stack,
-  styled,
 } from '@mui/joy';
 import Image from 'next/image';
 import * as React from 'react';
 import PreviewModal from '../PreviewModal';
 import toast from '../Toast';
+import VisuallyHiddenInput from '../VisuallyHiddenInput';
 
 const originForm: UserForm = {
   username: '',
@@ -36,18 +36,6 @@ const originForm: UserForm = {
   gender: 0,
   status: 0,
 };
-
-const VisuallyHiddenInput = styled('input')`
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  height: 1px;
-  overflow: hidden;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  white-space: nowrap;
-  width: 1px;
-`;
 
 export default function UserEditModal({
   visible,

@@ -1,5 +1,6 @@
 'use client';
 
+import { useHash } from '@/hooks';
 import LabelRoundedIcon from '@mui/icons-material/LabelRounded';
 import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded';
 import {
@@ -11,16 +12,27 @@ import {
   ModalClose,
   ModalDialog,
 } from '@mui/joy';
+import * as React from 'react';
 
-export default function ChooseCrawler({
-  visible,
-  setVisible,
-}: {
-  visible: boolean;
-  setVisible: (visible: boolean) => void;
-}) {
+export default function ChooseCrawler() {
+  const [visible, setVisible] = React.useState(false);
+
+  const [hash, _, cleanHash] = useHash();
+  React.useEffect(() => {
+    console.log('hash:', hash);
+    if (hash === '#chooseCrawler') {
+      setVisible(true);
+    } else {
+      setVisible(false);
+    }
+  }, [hash]);
+
+  const handleClose = () => {
+    cleanHash();
+  };
+
   return (
-    <Modal open={visible} onClose={() => setVisible(false)}>
+    <Modal open={visible} onClose={handleClose}>
       <ModalDialog
         variant="outlined"
         role="dialog"
@@ -29,7 +41,7 @@ export default function ChooseCrawler({
         <ModalClose />
         <DialogTitle>选择爬取方式</DialogTitle>
         <Divider />
-        <DialogContent sx={{ gap: 2 }}>
+        <DialogContent sx={{ gap: 4, padding: 2 }}>
           <Button
             component="a"
             startDecorator={<SchoolRoundedIcon />}

@@ -32,6 +32,8 @@ export type IGetLabelListRes = LabelItem[];
 
 export type IGetIllustratorListRes = IllustratorItem[];
 
+export type IUploadIllustratorReq = IllustratorForm;
+
 export type IGetIllustratorDetailRes = IllustratorForm;
 
 export type IGetCommentListRes = CommentItem[];

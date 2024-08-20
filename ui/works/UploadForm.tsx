@@ -16,6 +16,7 @@ import {
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
 import {
+  Alert,
   Autocomplete,
   Box,
   Button,
@@ -30,7 +31,6 @@ import {
   RadioGroup,
   Sheet,
   Stack,
-  styled,
   Textarea,
   Typography,
 } from '@mui/joy';
@@ -38,6 +38,7 @@ import { useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import toast from '../Toast';
+import VisuallyHiddenInput from '../VisuallyHiddenInput';
 import DraggableImg from './DraggableImg';
 
 const originForm: IllustrationForm = {
@@ -55,18 +56,6 @@ const originForm: IllustrationForm = {
   author_id: '',
   author_name: '',
 };
-
-const VisuallyHiddenInput = styled('input')`
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  height: 1px;
-  overflow: hidden;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  white-space: nowrap;
-  width: 1px;
-`;
 
 export default function UploadForm() {
   const searchParams = useSearchParams();
@@ -282,59 +271,77 @@ export default function UploadForm() {
     fetchWorkDetail();
   }, [fetchWorkDetail]);
 
-  // 校验必填项
+  /* ----------校验必填项---------- */
   const [checkFailedFields, setCheckFailedFields] = React.useState<
-    { label: string; value: string }[]
-  >([]);
+    Record<string, string>
+  >({});
 
   const validateSubmit = () => {
-    const checkedValue: { label: string; value: string }[] = [];
+    const errors: Record<string, string> = {};
     if (!imgList.length) {
-      checkFailedFields.push({
-        label: 'imgList',
-        value: '必须上传至少一张图片！！',
-      });
+      errors.imgList = '必须上传至少一张图片！！';
     }
     if (!selectedUser) {
-      checkFailedFields.push({
-        label: 'selectedUser',
-        value: '必须选择发布者！！',
-      });
+      errors.selectedUser = '必须选择发布者！！';
     }
     if (!selectedLabels.length) {
-      checkFailedFields.push({
-        label: 'selectedLabels',
-        value: '必须选择至少一个标签！！',
-      });
+      errors.selectedLabels = '必须选择至少一个标签！！';
     }
     if (formInfo.reprintType === 1) {
       if (!formInfo.original_url) {
-        checkFailedFields.push({
-          label: 'original_url',
-          value: '必须填写原作URL地址！！',
-        });
+        errors.original_url = '必须填写原作URL地址！！';
       }
       if (!selectedIllustrator) {
-        checkFailedFields.push({
-          label: 'selectedIllustrator',
-          value: '必须选择原作者！！',
-        });
+        errors.selectedIllustrator = '必须选择原作者！！';
       }
     }
     if (formInfo.reprintType === 2) {
       if (!selectedIllustrator) {
-        checkFailedFields.push({
-          label: 'selectedIllustrator',
-          value: '必须选择合集作者！！',
-        });
+        errors.selectedIllustrator = '必须选择合集作者！！';
       }
     }
-    if (checkedValue.length) {
-      setCheckFailedFields(checkedValue);
-      return false;
-    }
+    setCheckFailedFields(errors);
+    if (Object.keys(errors).length) return false;
     return true;
   };
+
+  // 当用户变更表单信息时，清除修复好的错误信息
+  const removeError = (field: string) => {
+    setCheckFailedFields((prev) => {
+      const result = { ...prev };
+      delete result[field];
+      return result;
+    });
+  };
+
+  React.useEffect(() => {
+    if (imgList.length) {
+      removeError('imgList');
+    }
+    if (selectedUser) {
+      removeError('selectedUser');
+    }
+    if (selectedLabels.length) {
+      removeError('selectedLabels');
+    }
+    if (formInfo.reprintType === 1) {
+      if (formInfo.original_url) {
+        removeError('original_url');
+      }
+      if (selectedIllustrator) {
+        removeError('selectedIllustrator');
+      }
+    }
+    if (formInfo.reprintType === 2 && selectedIllustrator) {
+      removeError('selectedIllustrator');
+    }
+  }, [
+    formInfo,
+    imgList,
+    selectedIllustrator,
+    selectedLabels.length,
+    selectedUser,
+  ]);
 
   const handleUpload = async () => {
     if (!validateSubmit()) return;
@@ -406,9 +413,7 @@ export default function UploadForm() {
             </FormControl>
             <FormControl
               sx={{ flexGrow: 1 }}
-              error={checkFailedFields.some(
-                (item) => item.label === 'selectedLabels'
-              )}
+              error={!!checkFailedFields.selectedLabels}
             >
               <FormLabel>插画标签</FormLabel>
               <Autocomplete
@@ -427,12 +432,17 @@ export default function UploadForm() {
                 inputValue={labelKeyword}
                 onInputChange={(_, v) => setLabelKeyword(v)}
               />
-              <FormHelperText>
-                <InfoOutlinedIcon />
-                {}
-              </FormHelperText>
+              {checkFailedFields.selectedLabels && (
+                <FormHelperText>
+                  <InfoOutlinedIcon />
+                  {checkFailedFields.selectedLabels}
+                </FormHelperText>
+              )}
             </FormControl>
-            <FormControl sx={{ flexGrow: 1 }}>
+            <FormControl
+              sx={{ flexGrow: 1 }}
+              error={!!checkFailedFields.selectedUser}
+            >
               <FormLabel>发布者</FormLabel>
               <Autocomplete
                 placeholder="请搜索该作品的发布者"
@@ -450,6 +460,12 @@ export default function UploadForm() {
                 inputValue={userKeyword}
                 onInputChange={(_, v) => setUserKeyword(v)}
               />
+              {checkFailedFields.selectedUser && (
+                <FormHelperText>
+                  <InfoOutlinedIcon />
+                  {checkFailedFields.selectedUser}
+                </FormHelperText>
+              )}
             </FormControl>
             <FormControl sx={{ flexGrow: 1 }}>
               <FormLabel>是否开启评论</FormLabel>
@@ -503,7 +519,10 @@ export default function UploadForm() {
             {formInfo.reprintType !== 0 && (
               <Stack direction="row" spacing={3}>
                 {formInfo.reprintType === 1 && (
-                  <FormControl sx={{ flexGrow: 1 }}>
+                  <FormControl
+                    sx={{ flexGrow: 1 }}
+                    error={!!checkFailedFields.original_url}
+                  >
                     <FormLabel>作品URL</FormLabel>
                     <Input
                       size="sm"
@@ -517,9 +536,18 @@ export default function UploadForm() {
                       }
                       sx={{ flexGrow: 1 }}
                     />
+                    {checkFailedFields.original_url && (
+                      <FormHelperText>
+                        <InfoOutlinedIcon />
+                        {checkFailedFields.original_url}
+                      </FormHelperText>
+                    )}
                   </FormControl>
                 )}
-                <FormControl sx={{ flexGrow: 1 }}>
+                <FormControl
+                  sx={{ flexGrow: 1 }}
+                  error={!!checkFailedFields.selectedIllustrator}
+                >
                   <FormLabel>原作者</FormLabel>
                   <Autocomplete
                     placeholder="请搜索原作者"
@@ -539,6 +567,12 @@ export default function UploadForm() {
                     inputValue={illustratorKeyword}
                     onInputChange={(_, value) => setIllustratorKeyword(value)}
                   />
+                  {checkFailedFields.selectedIllustrator && (
+                    <FormHelperText>
+                      <InfoOutlinedIcon />
+                      {checkFailedFields.selectedIllustrator}
+                    </FormHelperText>
+                  )}
                 </FormControl>
               </Stack>
             )}
@@ -597,6 +631,11 @@ export default function UploadForm() {
           </Stack>
         ) : (
           <CircularProgress sx={{ margin: '0 auto' }} />
+        )}
+        {checkFailedFields.imgList && (
+          <Alert variant="soft" color="danger">
+            {checkFailedFields.imgList}
+          </Alert>
         )}
       </Card>
       <Card>

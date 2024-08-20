@@ -1,20 +1,33 @@
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export const useHash = () => {
-  const [hash, setHash] = useState('');
-  const router = useRouter();
+  const [hash, setHash] = useState<string>(() => window.location.hash);
+
   useEffect(() => {
     const handleHashChange = () => {
       setHash(window.location.hash);
     };
-    handleHashChange();
+
+    handleHashChange(); // Set the initial hash value
+
     window.addEventListener('hashchange', handleHashChange);
-    router.events.on('routeChangeComplete', handleHashChange);
+
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
-      router.events.off('routeChangeComplete', handleHashChange);
     };
-  }, [router.events]);
-  return hash;
+  }, []);
+
+  const updateHash = useCallback((newHash: string) => {
+    if (newHash.startsWith('#')) {
+      window.location.hash = newHash;
+    } else {
+      window.location.hash = `#${newHash}`;
+    }
+  }, []);
+
+  const cleanHash = useCallback(() => {
+    window.location.hash = '';
+  }, []);
+
+  return [hash, updateHash, cleanHash] as const;
 };

@@ -115,8 +115,9 @@ export type IllustratorItem = Omit<
 export type IllustratorForm = {
   id?: string;
   name: string;
-  avatar: string | null;
   intro: string;
+  avatar: string | null;
+  little_avatar: string | null;
   home_url: string;
   status: number;
 };

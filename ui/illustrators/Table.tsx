@@ -30,6 +30,7 @@ import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import Pagination from '../Pagination';
+import IllustratorEditModal from './EditModal';
 
 function statusChip(type: number) {
   return (
@@ -104,6 +105,25 @@ export default function IllustratorTable() {
       params.set(field, 'desc');
     }
     replace(`${pathname}?${params.toString()}`);
+  };
+
+  const [editModalVisible, setEditModalVisible] = React.useState(false);
+  const [targetId, setTargetId] = React.useState<string | undefined>();
+
+  const preEdit = (id: string) => {
+    setTargetId(id);
+    setEditModalVisible(true);
+  };
+
+  React.useEffect(() => {
+    if (!editModalVisible) {
+      setTargetId(undefined);
+    }
+  }, [editModalVisible]);
+
+  const refresh = async () => {
+    await fetchIllustratorList();
+    await fetchIllustratorCount();
   };
 
   return (
@@ -270,8 +290,15 @@ export default function IllustratorTable() {
                       <MoreHorizRoundedIcon />
                     </MenuButton>
                     <Menu size="sm" sx={{ minWidth: 140 }}>
-                      <MenuItem>编辑信息</MenuItem>
-                      <MenuItem>查看作品</MenuItem>
+                      <MenuItem onClick={() => preEdit(row.id)}>
+                        编辑信息
+                      </MenuItem>
+                      <MenuItem
+                        component="a"
+                        href={`/dashboard/works?page=1&illustrator=${row.name}`}
+                      >
+                        查看作品
+                      </MenuItem>
                       <Divider />
                       <MenuItem color="danger">删除插画家</MenuItem>
                     </Menu>
@@ -282,6 +309,12 @@ export default function IllustratorTable() {
           </tbody>
         </Table>
       </Box>
+      <IllustratorEditModal
+        visible={editModalVisible}
+        setVisible={setEditModalVisible}
+        illustratorId={targetId}
+        refresh={refresh}
+      />
       <Pagination total={total} pageSize={PAGE_SIZE} />
     </>
   );

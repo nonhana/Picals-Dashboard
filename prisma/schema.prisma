@@ -146,6 +146,7 @@ model illustrators {
   created_time  DateTime        @default(now()) @db.Timestamp(6)
   updated_time  DateTime        @default(now()) @db.Timestamp(6)
   status        Int             @default(0) @db.TinyInt
+  little_avatar String?         @db.VarChar(255)
   illustrations illustrations[]
 }
 

@@ -1,8 +1,10 @@
 import type {
   IGetIllustratorDetailRes,
   IGetIllustratorListRes,
+  IUploadIllustratorReq,
 } from '@/types/api';
 import { getHandler } from './methods/GET';
+import { postHandler } from './methods/POST';
 
 /**
  * @description 分页获取插画家列表
@@ -23,4 +25,11 @@ export const getIllustratorCountAPI = getHandler<number>(
  */
 export const getIllustratorDetailAPI = getHandler<IGetIllustratorDetailRes>(
   '/api/illustrator/detail'
+);
+
+/**
+ * @description 更新/新增插画家
+ */
+export const uploadIllustratorAPI = postHandler<IUploadIllustratorReq, string>(
+  '/api/illustrator/upload'
 );

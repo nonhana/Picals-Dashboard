@@ -5,6 +5,7 @@ import type {
   IllustrationItem,
   IllustratorForm,
   IllustratorItem,
+  LabelForm,
   LabelItem,
   UserForm,
   UserItem,
@@ -29,6 +30,10 @@ export type IGetWorkDetailRes = IllustrationInfo;
 export type IUploadWorkReq = IllustrationForm;
 
 export type IGetLabelListRes = LabelItem[];
+
+export type IGetLabelDetailRes = LabelForm;
+
+export type IUploadLabelReq = LabelForm;
 
 export type IGetIllustratorListRes = IllustratorItem[];
 

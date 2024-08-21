@@ -19,7 +19,6 @@ export default function ChooseCrawler() {
 
   const [hash, _, cleanHash] = useHash();
   React.useEffect(() => {
-    console.log('hash:', hash);
     if (hash === '#chooseCrawler') {
       setVisible(true);
     } else {

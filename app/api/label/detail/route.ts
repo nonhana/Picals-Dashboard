@@ -3,11 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 const QuerySchema = z.object({
-  illustrator_id: z.string(),
+  label_id: z.string(),
 });
 
 /**
- * @description 获取单个插画家信息
+ * @description 获取单个用户信息
  */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -18,22 +18,20 @@ export async function GET(req: NextRequest) {
     return NextResponse.json('Invalid query parameters', { status: 400 });
   }
 
-  const { illustrator_id } = verifyRes.data;
+  const { label_id } = verifyRes.data;
 
-  const illustratorInfo = await prisma.illustrators.findUnique({
+  const userInfo = await prisma.labels.findUnique({
     where: {
-      id: illustrator_id,
+      id: label_id,
     },
     select: {
       id: true,
-      name: true,
-      avatar: true,
-      little_avatar: true,
-      intro: true,
-      home_url: true,
-      status: true,
+      value: true,
+      color: true,
+      cover: true,
+      work_count: true,
     },
   });
 
-  return NextResponse.json(illustratorInfo, { status: 200 });
+  return NextResponse.json(userInfo, { status: 200 });
 }

@@ -263,7 +263,7 @@ export const labelTableHeads: TableHead[] = [
   },
   {
     name: '标签封面',
-    value: 'color',
+    value: 'cover',
     width: 60,
     sortable: false,
   },

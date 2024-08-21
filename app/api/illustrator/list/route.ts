@@ -52,6 +52,7 @@ export async function GET(req: NextRequest) {
       id: true,
       name: true,
       avatar: true,
+      little_avatar: true,
       intro: true,
       home_url: true,
       work_count: true,

@@ -239,12 +239,13 @@ export default function IllustratorTable() {
                 </td>
                 <td style={{ textAlign: 'center', width: 60 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    {row.avatar ? (
+                    {row.little_avatar ? (
                       <Image
-                        src={row.avatar}
+                        src={row.little_avatar}
                         alt={row.name}
                         width={32}
                         height={32}
+                        style={{ borderRadius: '50%' }}
                       />
                     ) : (
                       <Typography level="body-xs">暂无</Typography>

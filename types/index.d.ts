@@ -105,6 +105,13 @@ export type IllustrationForm = {
 
 export type LabelItem = labels;
 
+export type LabelForm = {
+  id?: string;
+  value: string;
+  color: string;
+  cover: string | null;
+};
+
 export type IllustratorItem = Omit<
   illustrators,
   'updated_time' | 'created_time'

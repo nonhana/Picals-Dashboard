@@ -23,6 +23,7 @@ import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import Pagination from '../Pagination';
+import LabelEditModal from './EditModal';
 
 export default function LabelTable() {
   const sortableHeads = labelTableHeads
@@ -65,6 +66,25 @@ export default function LabelTable() {
       params.set(field, 'desc');
     }
     replace(`${pathname}?${params.toString()}`);
+  };
+
+  const [editModalVisible, setEditModalVisible] = React.useState(false);
+  const [targetId, setTargetId] = React.useState<string | undefined>();
+
+  const preEdit = (id: string) => {
+    setTargetId(id);
+    setEditModalVisible(true);
+  };
+
+  React.useEffect(() => {
+    if (!editModalVisible) {
+      setTargetId(undefined);
+    }
+  }, [editModalVisible]);
+
+  const refresh = async () => {
+    await fetchLabelList();
+    await fetchLabelCount();
   };
 
   return (
@@ -206,8 +226,12 @@ export default function LabelTable() {
                       <MoreHorizRoundedIcon />
                     </MenuButton>
                     <Menu size="sm" sx={{ minWidth: 140 }}>
-                      <MenuItem>编辑信息</MenuItem>
-                      <MenuItem>查看作品</MenuItem>
+                      <MenuItem onClick={() => preEdit(row.id)}>
+                        编辑信息
+                      </MenuItem>
+                      <Link href={`/dashboard/works?page=1&label=${row.value}`}>
+                        <MenuItem>查看作品</MenuItem>
+                      </Link>
                       <Divider />
                       <MenuItem color="danger">删除标签</MenuItem>
                     </Menu>
@@ -218,6 +242,12 @@ export default function LabelTable() {
           </tbody>
         </Table>
       </Box>
+      <LabelEditModal
+        visible={editModalVisible}
+        setVisible={setEditModalVisible}
+        labelId={targetId}
+        refresh={refresh}
+      />
       <Pagination total={total} pageSize={PAGE_SIZE} />
     </>
   );

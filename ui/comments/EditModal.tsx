@@ -1,7 +1,10 @@
 'use client';
 
-import { getLabelDetailAPI, uploadLabelAPI } from '@/services/client/label';
-import type { LabelForm } from '@/types';
+import {
+  getIllustratorDetailAPI,
+  uploadIllustratorAPI,
+} from '@/services/client/illustrator';
+import type { IllustratorForm } from '@/types';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
 import {
@@ -17,56 +20,60 @@ import {
   Input,
   Modal,
   ModalDialog,
+  Option,
+  Select,
   Stack,
 } from '@mui/joy';
-import { Sketch } from '@uiw/react-color';
 import Image from 'next/image';
 import * as React from 'react';
 import PreviewModal from '../PreviewModal';
 import toast from '../Toast';
 import VisuallyHiddenInput from '../VisuallyHiddenInput';
 
-const originForm: LabelForm = {
-  value: '',
-  color: '',
-  cover: null,
+const originForm: IllustratorForm = {
+  name: '',
+  intro: '',
+  avatar: null,
+  little_avatar: null,
+  home_url: '',
+  status: 0,
 };
 
-export default function LabelEditModal({
-  labelId,
+export default function IllustratorEditModal({
+  illustratorId,
   visible,
   setVisible,
   refresh,
 }: {
-  labelId?: string;
+  illustratorId?: string;
   visible: boolean;
   setVisible: (visible: boolean) => void;
   refresh: () => void;
 }) {
-  const [form, setForm] = React.useState<LabelForm>(originForm);
+  const [form, setForm] = React.useState<IllustratorForm>(originForm);
   const [gettingInfo, setGettingInfo] = React.useState(false);
 
   React.useEffect(() => {
     if (!visible) setForm(originForm);
   }, [visible]);
 
-  const fetchLabelDetail = React.useCallback(async () => {
-    if (!labelId) return;
+  const fetchIllustratorDetail = React.useCallback(async () => {
+    if (!illustratorId) return;
     setGettingInfo(true);
-    const data = await getLabelDetailAPI({
-      label_id: labelId,
+    const data = await getIllustratorDetailAPI({
+      illustrator_id: illustratorId,
     });
     if (data) {
       setForm(data);
     }
     setGettingInfo(false);
-  }, [labelId]);
+  }, [illustratorId]);
 
   React.useEffect(() => {
-    fetchLabelDetail();
-  }, [fetchLabelDetail]);
+    fetchIllustratorDetail();
+  }, [fetchIllustratorDetail]);
 
-  const [coverUploading, setCoverUploading] = React.useState(false);
+  const [avatarUploading, setAvatarUploading] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
   const handleClose = () => {
@@ -82,23 +89,25 @@ export default function LabelEditModal({
     }
     const formData = new FormData();
     formData.append('image', targetFile);
-    setCoverUploading(true);
+    setAvatarUploading(true);
+    formData.append('imageType', 'avatar');
     const res = await fetch('/api/tool/image-upload', {
       method: 'POST',
       body: formData,
     });
-    const { origin_url } = await res.json();
+    const { origin_url, thumbnail_url } = await res.json();
     setForm((prev) => ({
       ...prev,
-      cover: origin_url,
+      avatar: origin_url,
+      little_avatar: thumbnail_url,
     }));
-    setCoverUploading(false);
+    setAvatarUploading(false);
   };
 
   const handleEdit = async () => {
     setLoading(true);
-    await uploadLabelAPI(form);
-    toast.success('标签信息修改成功');
+    await uploadIllustratorAPI(form);
+    toast.success('插画家信息修改成功');
     refresh();
     setVisible(false);
     setLoading(false);
@@ -108,7 +117,7 @@ export default function LabelEditModal({
   const [previewSrc, setPreviewSrc] = React.useState('');
 
   const handlePreview = () => {
-    setPreviewSrc(form.cover!);
+    setPreviewSrc(form.avatar!);
     setPreviewVisible(true);
   };
 
@@ -122,40 +131,35 @@ export default function LabelEditModal({
         >
           <DialogTitle>
             <EditRoundedIcon />
-            编辑标签信息
+            编辑插画家信息
           </DialogTitle>
           <Divider />
-          <DialogContent>请修改该标签的相关信息。</DialogContent>
+          <DialogContent>请修改该插画家的相关信息。</DialogContent>
           {!gettingInfo ? (
             <Stack spacing={2}>
               <FormControl>
-                <FormLabel>标签名</FormLabel>
+                <FormLabel>插画家用户名</FormLabel>
                 <Input
+                  autoFocus
                   required
-                  value={form.value}
+                  value={form.name}
                   onChange={(e) =>
-                    setForm((prev) => ({ ...prev, value: e.target.value }))
+                    setForm((prev) => ({ ...prev, name: e.target.value }))
                   }
                 />
               </FormControl>
               <FormControl>
-                <FormLabel>标签颜色</FormLabel>
+                <FormLabel>插画家简介</FormLabel>
                 <Input
-                  sx={{ backgroundColor: form.color }}
-                  disabled
                   required
-                  value={form.color}
-                />
-                <Sketch
-                  style={{ margin: '20px auto 0' }}
-                  color={form.color}
-                  onChange={(color) => {
-                    setForm((prev) => ({ ...prev, color: color.hex }));
-                  }}
+                  value={form.intro}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, intro: e.target.value }))
+                  }
                 />
               </FormControl>
               <FormControl>
-                <FormLabel>标签封面</FormLabel>
+                <FormLabel>插画家头像</FormLabel>
                 <Box
                   sx={{
                     display: 'flex',
@@ -164,32 +168,22 @@ export default function LabelEditModal({
                     gap: 1,
                   }}
                 >
-                  {form.cover && (
-                    <Stack
+                  {form.little_avatar && (
+                    <Image
+                      src={form.little_avatar}
+                      alt="background"
                       width={60}
                       height={60}
-                      justifyContent="center"
-                      alignItems="center"
-                      sx={{
+                      style={{
+                        objectFit: 'cover',
                         cursor: 'pointer',
                         borderRadius: '50%',
-                        overflow: 'hidden',
                       }}
-                    >
-                      <Image
-                        src={form.cover}
-                        alt="background"
-                        width={60}
-                        height={60}
-                        style={{
-                          objectFit: 'cover',
-                        }}
-                        onClick={handlePreview}
-                      />
-                    </Stack>
+                      onClick={handlePreview}
+                    />
                   )}
                   <Button
-                    loading={coverUploading}
+                    loading={avatarUploading}
                     component="label"
                     role={undefined}
                     tabIndex={-1}
@@ -198,11 +192,33 @@ export default function LabelEditModal({
                     startDecorator={<UploadFileRoundedIcon />}
                     sx={{ width: '100%' }}
                   >
-                    上传封面
+                    上传头像
                     <VisuallyHiddenInput type="file" onChange={fileSelected} />
                   </Button>
                 </Box>
               </FormControl>
+              <FormControl>
+                <FormLabel>个人主页（如Pixiv）</FormLabel>
+                <Input
+                  value={form.home_url}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, home_url: e.target.value }))
+                  }
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>删除状态</FormLabel>
+                <Select
+                  defaultValue={form.status}
+                  onChange={(_, value) =>
+                    setForm((prev) => ({ ...prev, status: value as number }))
+                  }
+                >
+                  <Option value={0}>正常</Option>
+                  <Option value={1}>已删除</Option>
+                </Select>
+              </FormControl>
+
               <DialogActions>
                 <Button loading={loading} onClick={handleEdit}>
                   提交修改

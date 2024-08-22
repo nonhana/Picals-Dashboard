@@ -12,7 +12,7 @@ import S3 from './S3';
 export default async function generateThumbnail(
   imageBuffer: ArrayBuffer,
   fileName: string,
-  type: 'cover' | 'detail' | 'avatar' | 'background',
+  type: 'cover' | 'detail' | 'avatar' | 'background' | 'label_cover',
   returnObj = false
 ) {
   const metadata = await sharp(imageBuffer).metadata();

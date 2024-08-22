@@ -1,4 +1,5 @@
 import type {
+  CommentForm,
   CommentItem,
   IllustrationForm,
   IllustrationInfo,
@@ -42,3 +43,5 @@ export type IUploadIllustratorReq = IllustratorForm;
 export type IGetIllustratorDetailRes = IllustratorForm;
 
 export type IGetCommentListRes = CommentItem[];
+
+export type IUpdateCommentReq = CommentForm;

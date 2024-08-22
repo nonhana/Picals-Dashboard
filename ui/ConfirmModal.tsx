@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@mui/joy';
 
-export default function UserDelModal({
+export default function ConfirmModal({
   visible,
   setVisible,
   handle,

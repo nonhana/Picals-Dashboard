@@ -1,6 +1,10 @@
 'use client';
 
-import { getLabelCountAPI, getLabelListAPI } from '@/services/client/label';
+import {
+  deleteLabelAPI,
+  getLabelCountAPI,
+  getLabelListAPI,
+} from '@/services/client/label';
 import { LabelItem } from '@/types';
 import { PAGE_SIZE } from '@/utils/constants';
 import { labelTableHeads } from '@/utils/tableHeaders';
@@ -22,7 +26,9 @@ import {
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import ConfirmModal from '../ConfirmModal';
 import Pagination from '../Pagination';
+import toast from '../Toast';
 import LabelEditModal from './EditModal';
 
 export default function LabelTable() {
@@ -85,6 +91,24 @@ export default function LabelTable() {
   const refresh = async () => {
     await fetchLabelList();
     await fetchLabelCount();
+  };
+
+  const [delModalVisible, setDelModalVisible] = React.useState(false);
+
+  const preDel = (id: string) => {
+    setTargetId(id);
+    setDelModalVisible(true);
+  };
+
+  const handleDelUser = async () => {
+    if (targetId) {
+      const data = await deleteLabelAPI({ label_id: targetId });
+      if (data === 'success') {
+        toast.success('删除成功');
+        setDelModalVisible(false);
+        refresh();
+      }
+    }
   };
 
   return (
@@ -233,7 +257,9 @@ export default function LabelTable() {
                         <MenuItem>查看作品</MenuItem>
                       </Link>
                       <Divider />
-                      <MenuItem color="danger">删除标签</MenuItem>
+                      <MenuItem color="danger" onClick={() => preDel(row.id)}>
+                        删除标签
+                      </MenuItem>
                     </Menu>
                   </Dropdown>
                 </td>
@@ -247,6 +273,12 @@ export default function LabelTable() {
         setVisible={setEditModalVisible}
         labelId={targetId}
         refresh={refresh}
+      />
+      <ConfirmModal
+        visible={delModalVisible}
+        setVisible={setDelModalVisible}
+        handle={handleDelUser}
+        message="确定删除该标签吗？"
       />
       <Pagination total={total} pageSize={PAGE_SIZE} />
     </>

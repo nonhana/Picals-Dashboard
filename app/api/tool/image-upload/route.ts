@@ -1,12 +1,12 @@
-// /api/tool/image-upload/route.ts
-// 上传图片至 CF R2 图床并返回图片链接。根据条件生成缩略图。
-
 import { suffixGenerator } from '@/utils/helpers';
 import S3 from '@/utils/img-handler/S3';
 import generateThumbnail from '@/utils/img-handler/thumbnail';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { NextRequest, NextResponse } from 'next/server';
 
+/**
+ * @description 上传图片，返回原图 & 缩略图链接
+ */
 export async function POST(req: NextRequest) {
   const result: { origin_url?: string; thumbnail_url?: string } = {};
 
@@ -16,7 +16,8 @@ export async function POST(req: NextRequest) {
     | 'cover'
     | 'detail'
     | 'avatar'
-    | 'background';
+    | 'background'
+    | 'label_cover';
 
   if (!file) {
     return NextResponse.json('Cannot detect file, please reselect', {
@@ -36,7 +37,10 @@ export async function POST(req: NextRequest) {
     Body: buffer,
   });
 
-  if (!imageType || (imageType && imageType !== 'background')) {
+  if (
+    !imageType ||
+    (imageType && imageType !== 'background' && imageType !== 'label_cover')
+  ) {
     await S3.send(putCommand);
     result.origin_url = `https://${process.env.R2_DOMAIN}/${targetPath}`;
   }

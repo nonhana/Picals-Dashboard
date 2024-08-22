@@ -9,7 +9,7 @@ const QuerySchema = z.object({
   page: z.coerce.number().int().positive().optional().default(1),
   pageSize: z.coerce.number().int().positive().optional().default(PAGE_SIZE),
   content: z.string().optional(),
-  user_id: z.string().optional(),
+  user_name: z.string().optional(),
   work_id: z.string().optional(),
   level: z.enum(['0', '1']).optional(),
   createTime: z.enum(['asc', 'desc']).optional(),
@@ -27,13 +27,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json('Invalid query parameters', { status: 400 });
   }
 
-  const { page, pageSize, user_id, work_id, content, level, createTime } =
+  const { page, pageSize, user_name, work_id, content, level, createTime } =
     verifyRes.data;
 
   // 构建过滤条件
   const where: p.Prisma.commentsWhereInput = {};
   if (content) where.content = { contains: content };
-  if (user_id) where.user_id = user_id;
+  if (user_name)
+    where.users_comments_user_idTousers = {
+      username: { contains: user_name },
+    };
   if (work_id) where.illustration_id = work_id;
   if (level) where.level = Number(level);
 
@@ -51,25 +54,18 @@ export async function GET(req: NextRequest) {
       content: true,
       level: true,
       createTime: true,
-      user_id: true,
+      users_comments_user_idTousers: { select: { username: true } },
     },
   });
-
-  const result = await Promise.all(
-    commentList.map(async (comment) => {
-      const user = await prisma.users.findUnique({
-        where: { id: comment.user_id! },
-        select: { username: true },
-      });
-      const obj: { [key: string]: number | string | null } = {
-        ...comment,
-        createTime: dayjs(comment.createTime).format('YYYY/MM/DD'),
-        user_name: user?.username || null,
-      };
-      delete obj.user_id;
-      return obj;
-    })
-  );
+  const result = commentList.map((comment) => ({
+    id: comment.id,
+    content: comment.content,
+    level: comment.level,
+    createTime: dayjs(comment.createTime).format('YYYY/MM/DD'),
+    user_name: comment.users_comments_user_idTousers
+      ? comment.users_comments_user_idTousers.username
+      : '',
+  }));
 
   return NextResponse.json(result, { status: 200 });
 }

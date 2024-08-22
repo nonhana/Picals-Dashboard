@@ -50,10 +50,10 @@ export default function CommentFilter() {
         <FormLabel>用户id</FormLabel>
         <Input
           size="sm"
-          placeholder="请输入发布评论的用户id"
+          placeholder="请输入发布评论的用户名"
           startDecorator={<SearchIcon />}
-          onChange={(e) => handleInput('user_id', e.target.value)}
-          defaultValue={searchParams.get('user_id') || ''}
+          onChange={(e) => handleInput('user_name', e.target.value)}
+          defaultValue={searchParams.get('user_name') || ''}
         />
       </FormControl>
       <FormControl sx={{ flex: 1 }} size="sm">

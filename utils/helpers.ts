@@ -185,3 +185,12 @@ export const uniqueArray = (arr: any[], uniId: string) => {
  */
 export const suffixGenerator = (origin: string) =>
   Date.now() + '-' + Math.round(Math.random() * 1e9) + '-' + origin;
+
+/**
+ * @description 生成随机 HEX 颜色值，如 #f0f0f0
+ */
+export const randomHexColor = () =>
+  '#' +
+  Math.floor(Math.random() * 0xffffff)
+    .toString(16)
+    .padStart(6, '0');

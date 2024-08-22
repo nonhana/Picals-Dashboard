@@ -140,3 +140,8 @@ export type CommentItem = Omit<
   createTime: string;
   user_name: string;
 };
+
+export type CommentForm = {
+  id: string;
+  content: string;
+};

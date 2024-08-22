@@ -25,6 +25,13 @@ export const getLabelDetailAPI =
 /**
  * @description 更新/新增标签
  */
-export const uploadLabelAPI = postHandler<IUploadLabelReq, null>(
+export const uploadLabelAPI = postHandler<IUploadLabelReq, string>(
   '/api/label/upload'
+);
+
+/**
+ * @description 删除标签
+ */
+export const deleteLabelAPI = postHandler<{ label_id: string }, string>(
+  '/api/label/delete'
 );

@@ -1,3 +1,4 @@
+import LabelCreateModal from '@/ui/labels/CreateModal';
 import LabelFilter from '@/ui/labels/Filter';
 import LabelMobileFilter from '@/ui/labels/MobileFilter';
 import LabelTable from '@/ui/labels/Table';
@@ -18,6 +19,7 @@ export default function Page() {
         <LabelFilter />
         <LabelTable />
       </Suspense>
+      <LabelCreateModal />
     </>
   );
 }

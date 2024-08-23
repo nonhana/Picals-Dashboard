@@ -12,6 +12,7 @@ import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
 import {
   Box,
   Chip,
+  CircularProgress,
   ColorPaletteProp,
   Divider,
   Dropdown,
@@ -61,11 +62,14 @@ export default function CommentTable() {
 
   const [commentList, setCommentList] = React.useState<CommentItem[]>([]);
   const [total, setTotal] = React.useState(0);
+  const [fetching, setFetching] = React.useState(false);
 
   const fetchCommentList = React.useCallback(async () => {
+    setFetching(true);
     const params = Object.fromEntries(searchParams.entries());
     const data = await getCommentListAPI(params);
     setCommentList(data ?? []);
+    setFetching(false);
   }, [searchParams]);
 
   const fetchCommentCount = React.useCallback(async () => {
@@ -167,74 +171,78 @@ export default function CommentTable() {
             </tr>
           </thead>
           <tbody>
-            {commentList.map((row) => (
-              <tr key={row.id}>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">
-                    <Tooltip title={row.id} placement="top" arrow>
-                      <Typography
-                        level="body-xs"
-                        sx={{
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
+            {!fetching ? (
+              commentList.map((row) => (
+                <tr key={row.id}>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">
+                      <Tooltip title={row.id} placement="top" arrow>
+                        <Typography
+                          level="body-xs"
+                          sx={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {row.id}
+                        </Typography>
+                      </Tooltip>
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 150 }}>
+                    <Typography level="body-xs">
+                      <Tooltip title={row.content} placement="top" arrow>
+                        <Typography
+                          level="body-xs"
+                          sx={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {row.content}
+                        </Typography>
+                      </Tooltip>
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    {levelChip(row.level)}
+                  </td>
+                  <td style={{ textAlign: 'center', width: 120 }}>
+                    <Typography level="body-xs">{row.user_name}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 120 }}>
+                    <Typography level="body-xs">{row.createTime}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 60 }}>
+                    <Dropdown>
+                      <MenuButton
+                        slots={{ root: IconButton }}
+                        slotProps={{
+                          root: {
+                            variant: 'plain',
+                            color: 'neutral',
+                            size: 'sm',
+                          },
                         }}
                       >
-                        {row.id}
-                      </Typography>
-                    </Tooltip>
-                  </Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 150 }}>
-                  <Typography level="body-xs">
-                    <Tooltip title={row.content} placement="top" arrow>
-                      <Typography
-                        level="body-xs"
-                        sx={{
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {row.content}
-                      </Typography>
-                    </Tooltip>
-                  </Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  {levelChip(row.level)}
-                </td>
-                <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">{row.user_name}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">{row.createTime}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 60 }}>
-                  <Dropdown>
-                    <MenuButton
-                      slots={{ root: IconButton }}
-                      slotProps={{
-                        root: {
-                          variant: 'plain',
-                          color: 'neutral',
-                          size: 'sm',
-                        },
-                      }}
-                    >
-                      <MoreHorizRoundedIcon />
-                    </MenuButton>
-                    <Menu size="sm" sx={{ minWidth: 140 }}>
-                      <MenuItem>编辑信息</MenuItem>
-                      <Divider />
-                      <MenuItem color="danger">删除评论</MenuItem>
-                    </Menu>
-                  </Dropdown>
-                </td>
-              </tr>
-            ))}
+                        <MoreHorizRoundedIcon />
+                      </MenuButton>
+                      <Menu size="sm" sx={{ minWidth: 140 }}>
+                        <MenuItem>编辑信息</MenuItem>
+                        <Divider />
+                        <MenuItem color="danger">删除评论</MenuItem>
+                      </Menu>
+                    </Dropdown>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <CircularProgress />
+            )}
           </tbody>
         </Table>
       </Box>

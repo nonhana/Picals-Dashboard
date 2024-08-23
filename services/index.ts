@@ -55,8 +55,6 @@ const http = async <T>(
     body: configs.body,
   };
 
-  console.log('fetch 的配置：', finalUrl, finalConfig);
-
   return fetch(`${finalUrl}`, finalConfig)
     .then(async (response: Response) => {
       const { status } = response;

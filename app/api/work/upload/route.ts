@@ -236,7 +236,11 @@ export async function POST(req: NextRequest) {
     delete (data as any).author_id;
     delete (data as any).author_name;
 
-    await prisma.illustrations.create({ data });
+    const { id: newWorkId } = await prisma.illustrations.create({ data });
+
+    for (const imgUrl of info.imgList) {
+      await urlToImage(imgUrl, newWorkId);
+    }
   }
 
   return NextResponse.json('success', { status: 200 });

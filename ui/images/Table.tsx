@@ -1,6 +1,10 @@
 'use client';
 
-import { getImageCountAPI, getImageListAPI } from '@/services/client/image';
+import {
+  deleteImageAPI,
+  getImageCountAPI,
+  getImageListAPI,
+} from '@/services/client/image';
 import { ImageItem } from '@/types';
 import { PAGE_SIZE } from '@/utils/constants';
 import { imageTableHeads } from '@/utils/tableHeaders';
@@ -8,6 +12,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
 import {
   Box,
+  CircularProgress,
   Divider,
   Dropdown,
   IconButton,
@@ -22,8 +27,10 @@ import {
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import ConfirmModal from '../ConfirmModal';
 import Pagination from '../Pagination';
 import PreviewModal from '../PreviewModal';
+import toast from '../Toast';
 
 export default function ImageTable() {
   const sortableHeads = imageTableHeads
@@ -36,11 +43,14 @@ export default function ImageTable() {
 
   const [imageList, setImageList] = React.useState<ImageItem[]>([]);
   const [total, setTotal] = React.useState(0);
+  const [fetching, setFetching] = React.useState(false);
 
   const fetchImageList = React.useCallback(async () => {
+    setFetching(true);
     const params = Object.fromEntries(searchParams.entries());
     const data = await getImageListAPI(params);
     setImageList(data ?? []);
+    setFetching(false);
   }, [searchParams]);
 
   const fetchImageCount = React.useCallback(async () => {
@@ -78,13 +88,37 @@ export default function ImageTable() {
     setPreviewVisible(true);
   };
 
+  const refresh = async () => {
+    await fetchImageList();
+    await fetchImageCount();
+  };
+
+  const [delModalVisible, setDelModalVisible] = React.useState(false);
+  const [targetId, setTargetId] = React.useState<string | undefined>();
+
+  const preDel = (id: string) => {
+    setTargetId(id);
+    setDelModalVisible(true);
+  };
+
+  const handleDel = async () => {
+    if (targetId) {
+      const data = await deleteImageAPI({ image_id: targetId });
+      if (data === 'success') {
+        toast.success('删除成功');
+        setDelModalVisible(false);
+        refresh();
+      }
+    }
+  };
+
   return (
     <>
       <Box
         sx={{
           position: { xs: 'absolute', sm: 'relative' },
           width: '100%',
-          maxHeight: 'calc(100vh - 310px)',
+          height: 'calc(100vh - 310px)',
           overflow: 'auto',
         }}
       >
@@ -150,124 +184,140 @@ export default function ImageTable() {
             </tr>
           </thead>
           <tbody>
-            {imageList.map((row) => (
-              <tr key={row.id}>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">
-                    <Tooltip title={row.id} placement="top" arrow>
-                      <Typography
-                        level="body-xs"
-                        sx={{
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {row.id}
-                      </Typography>
-                    </Tooltip>
-                  </Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 150 }}>
-                  <Typography level="body-xs">
-                    <Tooltip title={row.originUrl} placement="top" arrow>
-                      <Typography
-                        level="body-xs"
-                        sx={{
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {row.originUrl}
-                      </Typography>
-                    </Tooltip>
-                  </Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.originWidth}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.originHeight}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.originSize}kb</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 150 }}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      width: 60,
-                      height: 60,
-                      overflow: 'hidden',
-                      margin: '0 auto',
-                    }}
-                  >
-                    <Image
-                      src={row.thumbnailUrl}
-                      alt={row.thumbnailUrl}
-                      width={60}
-                      height={60}
-                      style={{ objectFit: 'cover' }}
-                    />
-                  </Box>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.thumbnailWidth}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.thumbnailHeight}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.thumbnailSize}kb</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">
-                    <Tooltip title={row.illustration_id} placement="top" arrow>
-                      <Typography
-                        level="body-xs"
-                        sx={{
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {row.illustration_id}
-                      </Typography>
-                    </Tooltip>
-                  </Typography>
-                </td>
-
-                <td style={{ textAlign: 'center', width: 60 }}>
-                  <Dropdown>
-                    <MenuButton
-                      slots={{ root: IconButton }}
-                      slotProps={{
-                        root: {
-                          variant: 'plain',
-                          color: 'neutral',
-                          size: 'sm',
-                        },
+            {!fetching ? (
+              imageList.map((row) => (
+                <tr key={row.id}>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">
+                      <Tooltip title={row.id} placement="top" arrow>
+                        <Typography
+                          level="body-xs"
+                          sx={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {row.id}
+                        </Typography>
+                      </Tooltip>
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 150 }}>
+                    <Typography level="body-xs">
+                      <Tooltip title={row.originUrl} placement="top" arrow>
+                        <Typography
+                          level="body-xs"
+                          sx={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {row.originUrl}
+                        </Typography>
+                      </Tooltip>
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">{row.originWidth}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">{row.originHeight}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">{row.originSize}kb</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 150 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: 60,
+                        height: 60,
+                        overflow: 'hidden',
+                        margin: '0 auto',
                       }}
                     >
-                      <MoreHorizRoundedIcon />
-                    </MenuButton>
-                    <Menu size="sm" sx={{ minWidth: 140 }}>
-                      <MenuItem onClick={() => handlePreview(row.originUrl)}>
-                        查看原图
-                      </MenuItem>
-                      <Divider />
-                      <MenuItem color="danger">删除图片</MenuItem>
-                    </Menu>
-                  </Dropdown>
-                </td>
-              </tr>
-            ))}
+                      <Image
+                        src={row.thumbnailUrl}
+                        alt={row.thumbnailUrl}
+                        width={60}
+                        height={60}
+                        style={{ objectFit: 'cover' }}
+                      />
+                    </Box>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">
+                      {row.thumbnailWidth}
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">
+                      {row.thumbnailHeight}
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">
+                      {row.thumbnailSize}kb
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">
+                      <Tooltip
+                        title={row.illustration_id}
+                        placement="top"
+                        arrow
+                      >
+                        <Typography
+                          level="body-xs"
+                          sx={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {row.illustration_id}
+                        </Typography>
+                      </Tooltip>
+                    </Typography>
+                  </td>
+
+                  <td style={{ textAlign: 'center', width: 60 }}>
+                    <Dropdown>
+                      <MenuButton
+                        slots={{ root: IconButton }}
+                        slotProps={{
+                          root: {
+                            variant: 'plain',
+                            color: 'neutral',
+                            size: 'sm',
+                          },
+                        }}
+                      >
+                        <MoreHorizRoundedIcon />
+                      </MenuButton>
+                      <Menu size="sm" sx={{ minWidth: 140 }}>
+                        <MenuItem onClick={() => handlePreview(row.originUrl)}>
+                          查看原图
+                        </MenuItem>
+                        <Divider />
+                        <MenuItem color="danger" onClick={() => preDel(row.id)}>
+                          删除图片
+                        </MenuItem>
+                      </Menu>
+                    </Dropdown>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <CircularProgress />
+            )}
           </tbody>
         </Table>
       </Box>
@@ -276,6 +326,12 @@ export default function ImageTable() {
         visible={previewVisible}
         setVisible={setPreviewVisible}
         src={previewSrc}
+      />
+      <ConfirmModal
+        visible={delModalVisible}
+        setVisible={setDelModalVisible}
+        handle={handleDel}
+        message="确定删除该图片吗？只有确定不需要的图片才能删除哦！！"
       />
     </>
   );

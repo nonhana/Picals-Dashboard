@@ -14,6 +14,7 @@ import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
 import {
   Box,
   Chip,
+  CircularProgress,
   ColorPaletteProp,
   Divider,
   Dropdown,
@@ -73,11 +74,14 @@ export default function IllustratorTable() {
     IllustratorItem[]
   >([]);
   const [total, setTotal] = React.useState(0);
+  const [fetching, setFetching] = React.useState(false);
 
   const fetchIllustratorList = React.useCallback(async () => {
+    setFetching(true);
     const params = Object.fromEntries(searchParams.entries());
     const data = await getIllustratorListAPI(params);
     setIllustratorList(data ?? []);
+    setFetching(false);
   }, [searchParams]);
 
   const fetchIllustratorCount = React.useCallback(async () => {
@@ -198,115 +202,119 @@ export default function IllustratorTable() {
             </tr>
           </thead>
           <tbody>
-            {illustratorList.map((row) => (
-              <tr key={row.id}>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">
-                    <Tooltip title={row.id} placement="top" arrow>
-                      <Typography
-                        level="body-xs"
-                        sx={{
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {row.id}
-                      </Typography>
-                    </Tooltip>
-                  </Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">{row.name}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 150 }}>
-                  <Typography level="body-xs">
-                    <Tooltip title={row.intro} placement="top" arrow>
-                      <Typography
-                        level="body-xs"
-                        sx={{
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {row.intro}
-                      </Typography>
-                    </Tooltip>
-                  </Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 60 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    {row.little_avatar ? (
-                      <Image
-                        src={row.little_avatar}
-                        alt={row.name}
-                        width={32}
-                        height={32}
-                        style={{ borderRadius: '50%' }}
-                      />
-                    ) : (
-                      <Typography level="body-xs">暂无</Typography>
-                    )}
-                  </Box>
-                </td>
-                <td style={{ textAlign: 'center', width: 150 }}>
-                  <Tooltip title={row.home_url} placement="top" arrow>
-                    <Typography
-                      level="body-xs"
-                      sx={{
-                        display: 'block',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {row.home_url}
+            {!fetching ? (
+              illustratorList.map((row) => (
+                <tr key={row.id}>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">
+                      <Tooltip title={row.id} placement="top" arrow>
+                        <Typography
+                          level="body-xs"
+                          sx={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {row.id}
+                        </Typography>
+                      </Tooltip>
                     </Typography>
-                  </Tooltip>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.work_count}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  {statusChip(row.status)}
-                </td>
-                <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">{row.created_time}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 60 }}>
-                  <Dropdown>
-                    <MenuButton
-                      slots={{ root: IconButton }}
-                      slotProps={{
-                        root: {
-                          variant: 'plain',
-                          color: 'neutral',
-                          size: 'sm',
-                        },
-                      }}
-                    >
-                      <MoreHorizRoundedIcon />
-                    </MenuButton>
-                    <Menu size="sm" sx={{ minWidth: 140 }}>
-                      <MenuItem onClick={() => preEdit(row.id)}>
-                        编辑信息
-                      </MenuItem>
-                      <MenuItem
-                        component="a"
-                        href={`/dashboard/works?page=1&illustrator=${row.name}`}
+                  </td>
+                  <td style={{ textAlign: 'center', width: 120 }}>
+                    <Typography level="body-xs">{row.name}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 150 }}>
+                    <Typography level="body-xs">
+                      <Tooltip title={row.intro} placement="top" arrow>
+                        <Typography
+                          level="body-xs"
+                          sx={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {row.intro}
+                        </Typography>
+                      </Tooltip>
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 60 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      {row.little_avatar ? (
+                        <Image
+                          src={row.little_avatar}
+                          alt={row.name}
+                          width={32}
+                          height={32}
+                          style={{ borderRadius: '50%' }}
+                        />
+                      ) : (
+                        <Typography level="body-xs">暂无</Typography>
+                      )}
+                    </Box>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 150 }}>
+                    <Tooltip title={row.home_url} placement="top" arrow>
+                      <Typography
+                        level="body-xs"
+                        sx={{
+                          display: 'block',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
                       >
-                        查看作品
-                      </MenuItem>
-                      <Divider />
-                      <MenuItem color="danger">删除插画家</MenuItem>
-                    </Menu>
-                  </Dropdown>
-                </td>
-              </tr>
-            ))}
+                        {row.home_url}
+                      </Typography>
+                    </Tooltip>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">{row.work_count}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    {statusChip(row.status)}
+                  </td>
+                  <td style={{ textAlign: 'center', width: 120 }}>
+                    <Typography level="body-xs">{row.created_time}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 60 }}>
+                    <Dropdown>
+                      <MenuButton
+                        slots={{ root: IconButton }}
+                        slotProps={{
+                          root: {
+                            variant: 'plain',
+                            color: 'neutral',
+                            size: 'sm',
+                          },
+                        }}
+                      >
+                        <MoreHorizRoundedIcon />
+                      </MenuButton>
+                      <Menu size="sm" sx={{ minWidth: 140 }}>
+                        <MenuItem onClick={() => preEdit(row.id)}>
+                          编辑信息
+                        </MenuItem>
+                        <MenuItem
+                          component="a"
+                          href={`/dashboard/works?page=1&illustrator=${row.name}`}
+                        >
+                          查看作品
+                        </MenuItem>
+                        <Divider />
+                        <MenuItem color="danger">删除插画家</MenuItem>
+                      </Menu>
+                    </Dropdown>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <CircularProgress />
+            )}
           </tbody>
         </Table>
       </Box>

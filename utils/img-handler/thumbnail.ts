@@ -4,10 +4,6 @@ import S3 from './S3';
 
 /**
  * 压缩图片为缩略图，返回缩略图的URL
- * @param imageBuffer - 图片的Buffer
- * @param fileName - 文件名
- * @param type - 缩略图类型
- * @returns 缩略图的URL
  */
 export default async function generateThumbnail(
   imageBuffer: ArrayBuffer,
@@ -54,10 +50,14 @@ export default async function generateThumbnail(
   const resultUrl = `https://${process.env.R2_DOMAIN}/${targetPath}`;
 
   if (returnObj) {
+    const thumbnailMetadata = await sharp(fileBuffer).metadata();
+    if (!thumbnailMetadata.width || !thumbnailMetadata.height) {
+      throw new Error('Cannot get thumbnail size');
+    }
     return {
       url: resultUrl,
-      width: newWidth,
-      height: newHeight,
+      width: thumbnailMetadata.width,
+      height: thumbnailMetadata.height,
     };
   } else {
     return resultUrl;

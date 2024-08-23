@@ -33,11 +33,17 @@ export default async function urlToImage(url: string, illustrationId: string) {
     throw new Error('Cannot get image size');
   }
 
+  newImage.originUrl = url;
   newImage.originWidth = metadata.width;
   newImage.originHeight = metadata.height;
 
   const fileName = url.split('/').pop()!.split('.')[0];
-  const result = (await generateThumbnail(buffer, fileName, 'detail')) as {
+  const result = (await generateThumbnail(
+    buffer,
+    fileName,
+    'detail',
+    true
+  )) as {
     url: string;
     width: number;
     height: number;

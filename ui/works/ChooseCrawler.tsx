@@ -16,7 +16,6 @@ import * as React from 'react';
 
 export default function ChooseCrawler() {
   const [visible, setVisible] = React.useState(false);
-
   const [hash, _, cleanHash] = useHash();
   React.useEffect(() => {
     if (hash === '#chooseCrawler') {

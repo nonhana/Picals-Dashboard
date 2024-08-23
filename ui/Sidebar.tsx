@@ -5,7 +5,6 @@ import AssignmentIndRoundedIcon from '@mui/icons-material/AssignmentIndRounded';
 import CollectionsRoundedIcon from '@mui/icons-material/CollectionsRounded';
 import CommentRoundedIcon from '@mui/icons-material/CommentRounded';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
-import FolderRoundedIcon from '@mui/icons-material/FolderRounded';
 import HistoryEduRoundedIcon from '@mui/icons-material/HistoryEduRounded';
 import LabelRoundedIcon from '@mui/icons-material/LabelRounded';
 import SchoolRoundedIcon from '@mui/icons-material/SchoolRounded';
@@ -64,11 +63,6 @@ const links: {
     name: '图片管理',
     icon: <CollectionsRoundedIcon fontSize="small" />,
     href: '/dashboard/images',
-  },
-  {
-    name: '收藏夹管理',
-    icon: <FolderRoundedIcon fontSize="small" />,
-    href: '/dashboard/collections',
   },
 ];
 

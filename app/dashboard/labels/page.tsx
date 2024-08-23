@@ -2,6 +2,7 @@ import LabelCreateModal from '@/ui/labels/CreateModal';
 import LabelFilter from '@/ui/labels/Filter';
 import LabelMobileFilter from '@/ui/labels/MobileFilter';
 import LabelTable from '@/ui/labels/Table';
+import PageLoading from '@/ui/PageLoading';
 import { Box, Button, Typography } from '@mui/joy';
 import { Suspense } from 'react';
 
@@ -14,7 +15,7 @@ export default function Page() {
           新增标签
         </Button>
       </Box>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<PageLoading />}>
         <LabelMobileFilter />
         <LabelFilter />
         <LabelTable />

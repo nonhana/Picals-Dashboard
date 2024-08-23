@@ -1,6 +1,10 @@
 'use client';
 
-import { getWorkCountAPI, getWorkListAPI } from '@/services/client/work';
+import {
+  deleteWorkAPI,
+  getWorkCountAPI,
+  getWorkListAPI,
+} from '@/services/client/work';
 import { IllustrationItem } from '@/types';
 import { PAGE_SIZE } from '@/utils/constants';
 import { workTableHeads } from '@/utils/tableHeaders';
@@ -15,6 +19,7 @@ import TripOriginRoundedIcon from '@mui/icons-material/TripOriginRounded';
 import {
   Box,
   Chip,
+  CircularProgress,
   ColorPaletteProp,
   Divider,
   Dropdown,
@@ -30,7 +35,9 @@ import {
 import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
+import ConfirmModal from '../ConfirmModal';
 import Pagination from '../Pagination';
+import toast from '../Toast';
 import WorkDisplayModal from './DisplayModal';
 
 function reprintedTypeChip(type: number) {
@@ -106,11 +113,14 @@ export default function WorkTable() {
 
   const [workList, setWorkList] = React.useState<IllustrationItem[]>([]);
   const [total, setTotal] = React.useState(0);
+  const [fetching, setFetching] = React.useState(false);
 
   const fetchWorkList = React.useCallback(async () => {
+    setFetching(true);
     const params = Object.fromEntries(searchParams.entries());
     const data = await getWorkListAPI(params);
     setWorkList(data ?? []);
+    setFetching(false);
   }, [searchParams]);
 
   const fetchWorkCount = React.useCallback(async () => {
@@ -140,12 +150,35 @@ export default function WorkTable() {
     replace(`${pathname}?${params.toString()}`);
   };
 
+  const refresh = async () => {
+    await fetchWorkList();
+    await fetchWorkCount();
+  };
+
   const [visible, setVisible] = React.useState(false);
   const [chosenWorkId, setChosenWorkId] = React.useState<string | undefined>();
 
   const handlePreview = (id: string) => {
     setChosenWorkId(id);
     setVisible(true);
+  };
+
+  const [delModalVisible, setDelModalVisible] = React.useState(false);
+
+  const preDel = (id: string) => {
+    setChosenWorkId(id);
+    setDelModalVisible(true);
+  };
+
+  const handleDel = async () => {
+    if (chosenWorkId) {
+      const data = await deleteWorkAPI({ work_id: chosenWorkId });
+      if (data === 'success') {
+        toast.success('删除成功');
+        setDelModalVisible(false);
+        refresh();
+      }
+    }
   };
 
   return (
@@ -220,125 +253,133 @@ export default function WorkTable() {
             </tr>
           </thead>
           <tbody>
-            {workList.map((row) => (
-              <tr key={row.id}>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">
-                    <Tooltip title={row.id} placement="top" arrow>
-                      <Typography
-                        level="body-xs"
-                        sx={{
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {row.id}
-                      </Typography>
-                    </Tooltip>
-                  </Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">{row.name || '无题'}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 150 }}>
-                  <Typography level="body-xs">
-                    <Tooltip title={row.intro} placement="top" arrow>
-                      <Typography
-                        level="body-xs"
-                        sx={{
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {row.intro || '暂无简介'}
-                      </Typography>
-                    </Tooltip>
-                  </Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  {reprintedTypeChip(row.reprintType)}
-                </td>
-                <td style={{ textAlign: 'center', width: 60 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    <Image
-                      src={row.cover}
-                      alt={row.name}
-                      width={60}
-                      height={60}
-                      style={{ objectFit: 'cover' }}
-                    />
-                  </Box>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.like_count}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.view_count}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.collect_count}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">{row.comment_count}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 150 }}>
-                  <Tooltip title={row.original_url} placement="top" arrow>
-                    <Typography
-                      level="body-xs"
-                      sx={{
-                        display: 'block',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {row.original_url}
+            {!fetching ? (
+              workList.map((row) => (
+                <tr key={row.id}>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">
+                      <Tooltip title={row.id} placement="top" arrow>
+                        <Typography
+                          level="body-xs"
+                          sx={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {row.id}
+                        </Typography>
+                      </Tooltip>
                     </Typography>
-                  </Tooltip>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  {statusChip(row.status)}
-                </td>
-                <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">{row.user_name}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">
-                    {row.illustrator_name}
-                  </Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">{row.created_time}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 60 }}>
-                  <Dropdown>
-                    <MenuButton
-                      slots={{ root: IconButton }}
-                      slotProps={{
-                        root: {
-                          variant: 'plain',
-                          color: 'neutral',
-                          size: 'sm',
-                        },
-                      }}
-                    >
-                      <MoreHorizRoundedIcon />
-                    </MenuButton>
-                    <Menu size="sm" sx={{ minWidth: 140 }}>
-                      <MenuItem onClick={() => handlePreview(row.id)}>
-                        查看完整信息
-                      </MenuItem>
-                      <Divider />
-                      <MenuItem color="danger">删除作品</MenuItem>
-                    </Menu>
-                  </Dropdown>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td style={{ textAlign: 'center', width: 120 }}>
+                    <Typography level="body-xs">
+                      {row.name || '无题'}
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 150 }}>
+                    <Typography level="body-xs">
+                      <Tooltip title={row.intro} placement="top" arrow>
+                        <Typography
+                          level="body-xs"
+                          sx={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {row.intro || '暂无简介'}
+                        </Typography>
+                      </Tooltip>
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    {reprintedTypeChip(row.reprintType)}
+                  </td>
+                  <td style={{ textAlign: 'center', width: 60 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      <Image
+                        src={row.cover}
+                        alt={row.name}
+                        width={60}
+                        height={60}
+                        style={{ objectFit: 'cover' }}
+                      />
+                    </Box>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">{row.like_count}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">{row.view_count}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">{row.collect_count}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 120 }}>
+                    <Typography level="body-xs">{row.comment_count}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 150 }}>
+                    <Tooltip title={row.original_url} placement="top" arrow>
+                      <Typography
+                        level="body-xs"
+                        sx={{
+                          display: 'block',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {row.original_url}
+                      </Typography>
+                    </Tooltip>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    {statusChip(row.status)}
+                  </td>
+                  <td style={{ textAlign: 'center', width: 120 }}>
+                    <Typography level="body-xs">{row.user_name}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 120 }}>
+                    <Typography level="body-xs">
+                      {row.illustrator_name}
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 120 }}>
+                    <Typography level="body-xs">{row.created_time}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 60 }}>
+                    <Dropdown>
+                      <MenuButton
+                        slots={{ root: IconButton }}
+                        slotProps={{
+                          root: {
+                            variant: 'plain',
+                            color: 'neutral',
+                            size: 'sm',
+                          },
+                        }}
+                      >
+                        <MoreHorizRoundedIcon />
+                      </MenuButton>
+                      <Menu size="sm" sx={{ minWidth: 140 }}>
+                        <MenuItem onClick={() => handlePreview(row.id)}>
+                          查看完整信息
+                        </MenuItem>
+                        <Divider />
+                        <MenuItem color="danger" onClick={() => preDel(row.id)}>
+                          删除作品
+                        </MenuItem>
+                      </Menu>
+                    </Dropdown>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <CircularProgress />
+            )}
           </tbody>
         </Table>
       </Box>
@@ -347,6 +388,12 @@ export default function WorkTable() {
         visible={visible}
         workId={chosenWorkId}
         setVisible={setVisible}
+      />
+      <ConfirmModal
+        visible={delModalVisible}
+        setVisible={setDelModalVisible}
+        handle={handleDel}
+        message="确定删除该作品吗？这是彻底删除，不可恢复！！"
       />
     </>
   );

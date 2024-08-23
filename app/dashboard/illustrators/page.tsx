@@ -2,6 +2,7 @@ import IllustratorCreateModal from '@/ui/illustrators/CreateModal';
 import IllustratorFilter from '@/ui/illustrators/Filter';
 import IllustratorMobileFilter from '@/ui/illustrators/MobileFilter';
 import IllustratorTable from '@/ui/illustrators/Table';
+import PageLoading from '@/ui/PageLoading';
 import { Box, Button, Typography } from '@mui/joy';
 import { Suspense } from 'react';
 
@@ -14,7 +15,7 @@ export default function Page() {
           新增插画家
         </Button>
       </Box>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<PageLoading />}>
         <IllustratorMobileFilter />
         <IllustratorFilter />
         <IllustratorTable />

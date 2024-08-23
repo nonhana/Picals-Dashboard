@@ -11,6 +11,7 @@ import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
 import {
   Box,
   Chip,
+  CircularProgress,
   ColorPaletteProp,
   Divider,
   Dropdown,
@@ -46,11 +47,14 @@ export default function UserTable() {
 
   const [userList, setUserList] = React.useState<UserItem[]>([]);
   const [total, setTotal] = React.useState(0);
+  const [fetching, setFetching] = React.useState(false);
 
   const fetchUserList = React.useCallback(async () => {
+    setFetching(true);
     const params = Object.fromEntries(searchParams.entries());
     const data = await getUserListAPI(params);
     setUserList(data ?? []);
+    setFetching(false);
   }, [searchParams]);
 
   const fetchUserCount = React.useCallback(async () => {
@@ -188,137 +192,143 @@ export default function UserTable() {
             </tr>
           </thead>
           <tbody>
-            {userList.map((row) => (
-              <tr key={row.id}>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">
-                    <Tooltip title={row.id} placement="top" arrow>
-                      <Typography
-                        level="body-xs"
-                        sx={{
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
+            {!fetching ? (
+              userList.map((row) => (
+                <tr key={row.id}>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">
+                      <Tooltip title={row.id} placement="top" arrow>
+                        <Typography
+                          level="body-xs"
+                          sx={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {row.id}
+                        </Typography>
+                      </Tooltip>
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 120 }}>
+                    <Typography level="body-xs">{row.username}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 150 }}>
+                    <Typography level="body-xs">{row.email}</Typography>
+                  </td>
+                  <td style={{ width: 60 }}>
+                    <Image
+                      src={row.avatar}
+                      alt={row.username}
+                      width={60}
+                      height={60}
+                      style={{ objectFit: 'cover', borderRadius: '50%' }}
+                    />
+                  </td>
+                  <td
+                    style={{
+                      width: 120,
+                      textAlign: 'center',
+                    }}
+                  >
+                    {row.background_img ? (
+                      <Image
+                        src={row.background_img}
+                        alt={row.username}
+                        width={120}
+                        height={60}
+                        style={{ objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <Typography level="body-xs">暂无背景图</Typography>
+                    )}
+                  </td>
+                  <td style={{ textAlign: 'center', width: 150 }}>
+                    <Typography level="body-xs">{row.signature}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 60 }}>
+                    <Typography level="body-xs">
+                      {row.gender === 1 ? '女' : '男'}
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">{row.fan_count}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">{row.follow_count}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 120 }}>
+                    <Typography level="body-xs">{row.origin_count}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 120 }}>
+                    <Typography level="body-xs">
+                      {row.reprinted_count}
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Chip
+                      variant="soft"
+                      size="sm"
+                      startDecorator={
+                        {
+                          0: <CheckRoundedIcon />,
+                          1: <ClearRoundedIcon />,
+                        }[row.status]
+                      }
+                      color={
+                        {
+                          0: 'success',
+                          1: 'danger',
+                        }[row.status] as ColorPaletteProp
+                      }
+                    >
+                      {row.status === 0 ? '正常' : '删除'}
+                    </Chip>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 120 }}>
+                    <Typography level="body-xs">{row.created_time}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 60 }}>
+                    <Dropdown>
+                      <MenuButton
+                        slots={{ root: IconButton }}
+                        slotProps={{
+                          root: {
+                            variant: 'plain',
+                            color: 'neutral',
+                            size: 'sm',
+                          },
                         }}
                       >
-                        {row.id}
-                      </Typography>
-                    </Tooltip>
-                  </Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">{row.username}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 150 }}>
-                  <Typography level="body-xs">{row.email}</Typography>
-                </td>
-                <td style={{ width: 60 }}>
-                  <Image
-                    src={row.avatar}
-                    alt={row.username}
-                    width={60}
-                    height={60}
-                    style={{ objectFit: 'cover', borderRadius: '50%' }}
-                  />
-                </td>
-                <td
-                  style={{
-                    width: 120,
-                    textAlign: 'center',
-                  }}
-                >
-                  {row.background_img ? (
-                    <Image
-                      src={row.background_img}
-                      alt={row.username}
-                      width={120}
-                      height={60}
-                      style={{ objectFit: 'cover' }}
-                    />
-                  ) : (
-                    <Typography level="body-xs">暂无背景图</Typography>
-                  )}
-                </td>
-                <td style={{ textAlign: 'center', width: 150 }}>
-                  <Typography level="body-xs">{row.signature}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 60 }}>
-                  <Typography level="body-xs">
-                    {row.gender === 1 ? '女' : '男'}
-                  </Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.fan_count}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.follow_count}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">{row.origin_count}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">{row.reprinted_count}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Chip
-                    variant="soft"
-                    size="sm"
-                    startDecorator={
-                      {
-                        0: <CheckRoundedIcon />,
-                        1: <ClearRoundedIcon />,
-                      }[row.status]
-                    }
-                    color={
-                      {
-                        0: 'success',
-                        1: 'danger',
-                      }[row.status] as ColorPaletteProp
-                    }
-                  >
-                    {row.status === 0 ? '正常' : '删除'}
-                  </Chip>
-                </td>
-                <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">{row.created_time}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 60 }}>
-                  <Dropdown>
-                    <MenuButton
-                      slots={{ root: IconButton }}
-                      slotProps={{
-                        root: {
-                          variant: 'plain',
-                          color: 'neutral',
-                          size: 'sm',
-                        },
-                      }}
-                    >
-                      <MoreHorizRoundedIcon />
-                    </MenuButton>
-                    <Menu size="sm" sx={{ minWidth: 140 }}>
-                      <MenuItem
-                        onClick={() =>
-                          preEditUser({ id: row.id, username: row.username })
-                        }
-                      >
-                        编辑用户
-                      </MenuItem>
-                      <Divider />
-                      <MenuItem
-                        color="danger"
-                        onClick={() =>
-                          preDelUser({ id: row.id, username: row.username })
-                        }
-                      >
-                        删除用户
-                      </MenuItem>
-                    </Menu>
-                  </Dropdown>
-                </td>
-              </tr>
-            ))}
+                        <MoreHorizRoundedIcon />
+                      </MenuButton>
+                      <Menu size="sm" sx={{ minWidth: 140 }}>
+                        <MenuItem
+                          onClick={() =>
+                            preEditUser({ id: row.id, username: row.username })
+                          }
+                        >
+                          编辑用户
+                        </MenuItem>
+                        <Divider />
+                        <MenuItem
+                          color="danger"
+                          onClick={() =>
+                            preDelUser({ id: row.id, username: row.username })
+                          }
+                        >
+                          删除用户
+                        </MenuItem>
+                      </Menu>
+                    </Dropdown>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <CircularProgress />
+            )}
           </tbody>
         </Table>
       </Box>

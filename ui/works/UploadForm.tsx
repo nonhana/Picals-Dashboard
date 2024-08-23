@@ -34,7 +34,7 @@ import {
   Textarea,
   Typography,
 } from '@mui/joy';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import toast from '../Toast';
@@ -58,6 +58,7 @@ const originForm: IllustrationForm = {
 };
 
 export default function UploadForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const workId = searchParams.get('work_id');
 
@@ -363,6 +364,7 @@ export default function UploadForm() {
       }
     }
     setLoading(false);
+    router.push('success');
   };
 
   return (
@@ -576,6 +578,23 @@ export default function UploadForm() {
                 </FormControl>
               </Stack>
             )}
+            <FormControl sx={{ flexGrow: 1 }}>
+              <FormLabel>作品状态</FormLabel>
+              <RadioGroup
+                orientation="horizontal"
+                value={formInfo.status}
+                onChange={(event) =>
+                  setFormInfo({
+                    ...formInfo,
+                    status: Number(event.target.value),
+                  })
+                }
+              >
+                <Radio value={0} label="已发布" />
+                <Radio value={1} label="审核中" />
+                <Radio value={2} label="已删除" />
+              </RadioGroup>
+            </FormControl>
           </Stack>
         ) : (
           <CircularProgress sx={{ margin: '0 auto' }} />

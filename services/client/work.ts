@@ -28,3 +28,10 @@ export const getWorkDetailAPI =
 export const uploadWorkAPI = postHandler<IUploadWorkReq, string>(
   '/api/work/upload'
 );
+
+/**
+ * @description 删除作品
+ */
+export const deleteWorkAPI = postHandler<{ work_id: string }, string>(
+  '/api/work/delete'
+);

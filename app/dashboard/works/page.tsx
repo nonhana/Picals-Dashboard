@@ -1,3 +1,4 @@
+import PageLoading from '@/ui/PageLoading';
 import ChooseCrawler from '@/ui/works/ChooseCrawler';
 import WorkFilter from '@/ui/works/Filter';
 import WorkMobileFilter from '@/ui/works/MobileFilter';
@@ -19,7 +20,7 @@ export default function Page() {
           </Button>
         </ButtonGroup>
       </Box>
-      <Suspense fallback={<>Loading...</>}>
+      <Suspense fallback={<PageLoading />}>
         <WorkMobileFilter />
         <WorkFilter />
         <WorkTable />

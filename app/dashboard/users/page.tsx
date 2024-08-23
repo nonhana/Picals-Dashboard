@@ -1,3 +1,4 @@
+import PageLoading from '@/ui/PageLoading';
 import UserFilter from '@/ui/users/Filter';
 import UserMobileFilter from '@/ui/users/MobileFilter';
 import UserTable from '@/ui/users/Table';
@@ -8,7 +9,7 @@ export default function Page() {
   return (
     <>
       <Typography level="h2">用户管理</Typography>
-      <Suspense fallback={<>Loading...</>}>
+      <Suspense fallback={<PageLoading />}>
         <UserMobileFilter />
         <UserFilter />
         <UserTable />

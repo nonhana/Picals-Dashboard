@@ -12,6 +12,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
 import {
   Box,
+  CircularProgress,
   Divider,
   Dropdown,
   IconButton,
@@ -42,10 +43,13 @@ export default function LabelTable() {
 
   const [labelList, setLabelList] = React.useState<LabelItem[]>([]);
   const [total, setTotal] = React.useState(0);
+  const [fetching, setFetching] = React.useState(false);
 
   const fetchLabelList = React.useCallback(async () => {
+    setFetching(true);
     const data = await getLabelListAPI(Object.fromEntries(searchParams));
     setLabelList(data ?? []);
+    setFetching(false);
   }, [searchParams]);
 
   const fetchLabelCount = React.useCallback(async () => {
@@ -183,88 +187,94 @@ export default function LabelTable() {
             </tr>
           </thead>
           <tbody>
-            {labelList.map((row) => (
-              <tr key={row.id}>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">
-                    <Tooltip title={row.id} placement="top" arrow>
-                      <Typography
-                        level="body-xs"
+            {!fetching ? (
+              labelList.map((row) => (
+                <tr key={row.id}>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">
+                      <Tooltip title={row.id} placement="top" arrow>
+                        <Typography
+                          level="body-xs"
+                          sx={{
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {row.id}
+                        </Typography>
+                      </Tooltip>
+                    </Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 120 }}>
+                    <Typography level="body-xs">{row.value}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 60 }}>
+                    <Tooltip title={row.color} placement="top" arrow>
+                      <Box
                         sx={{
-                          display: 'block',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
+                          width: 32,
+                          height: 32,
+                          borderRadius: '50%',
+                          backgroundColor: row.color,
+                          margin: '0 auto',
+                        }}
+                      />
+                    </Tooltip>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 60 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                      {row.cover ? (
+                        <Image
+                          src={row.cover}
+                          alt={row.value}
+                          width={32}
+                          height={32}
+                        />
+                      ) : (
+                        <Typography level="body-xs">暂无</Typography>
+                      )}
+                    </Box>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 100 }}>
+                    <Typography level="body-xs">{row.work_count}</Typography>
+                  </td>
+                  <td style={{ textAlign: 'center', width: 60 }}>
+                    <Dropdown>
+                      <MenuButton
+                        slots={{ root: IconButton }}
+                        slotProps={{
+                          root: {
+                            variant: 'plain',
+                            color: 'neutral',
+                            size: 'sm',
+                          },
                         }}
                       >
-                        {row.id}
-                      </Typography>
-                    </Tooltip>
-                  </Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 120 }}>
-                  <Typography level="body-xs">{row.value}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 60 }}>
-                  <Tooltip title={row.color} placement="top" arrow>
-                    <Box
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: '50%',
-                        backgroundColor: row.color,
-                        margin: '0 auto',
-                      }}
-                    />
-                  </Tooltip>
-                </td>
-                <td style={{ textAlign: 'center', width: 60 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    {row.cover ? (
-                      <Image
-                        src={row.cover}
-                        alt={row.value}
-                        width={32}
-                        height={32}
-                      />
-                    ) : (
-                      <Typography level="body-xs">暂无</Typography>
-                    )}
-                  </Box>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.work_count}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 60 }}>
-                  <Dropdown>
-                    <MenuButton
-                      slots={{ root: IconButton }}
-                      slotProps={{
-                        root: {
-                          variant: 'plain',
-                          color: 'neutral',
-                          size: 'sm',
-                        },
-                      }}
-                    >
-                      <MoreHorizRoundedIcon />
-                    </MenuButton>
-                    <Menu size="sm" sx={{ minWidth: 140 }}>
-                      <MenuItem onClick={() => preEdit(row.id)}>
-                        编辑信息
-                      </MenuItem>
-                      <Link href={`/dashboard/works?page=1&label=${row.value}`}>
-                        <MenuItem>查看作品</MenuItem>
-                      </Link>
-                      <Divider />
-                      <MenuItem color="danger" onClick={() => preDel(row.id)}>
-                        删除标签
-                      </MenuItem>
-                    </Menu>
-                  </Dropdown>
-                </td>
-              </tr>
-            ))}
+                        <MoreHorizRoundedIcon />
+                      </MenuButton>
+                      <Menu size="sm" sx={{ minWidth: 140 }}>
+                        <MenuItem onClick={() => preEdit(row.id)}>
+                          编辑信息
+                        </MenuItem>
+                        <Link
+                          href={`/dashboard/works?page=1&label=${row.value}`}
+                        >
+                          <MenuItem>查看作品</MenuItem>
+                        </Link>
+                        <Divider />
+                        <MenuItem color="danger" onClick={() => preDel(row.id)}>
+                          删除标签
+                        </MenuItem>
+                      </Menu>
+                    </Dropdown>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <CircularProgress />
+            )}
           </tbody>
         </Table>
       </Box>

@@ -1,6 +1,8 @@
 'use client';
 
-import { ImageTableData } from '@/test/data';
+import { getImageCountAPI, getImageListAPI } from '@/services/client/image';
+import { ImageItem } from '@/types';
+import { PAGE_SIZE } from '@/utils/constants';
 import { imageTableHeads } from '@/utils/tableHeaders';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
@@ -17,8 +19,11 @@ import {
   Tooltip,
   Typography,
 } from '@mui/joy';
+import Image from 'next/image';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import * as React from 'react';
 import Pagination from '../Pagination';
+import PreviewModal from '../PreviewModal';
 
 export default function ImageTable() {
   const sortableHeads = imageTableHeads
@@ -28,6 +33,26 @@ export default function ImageTable() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
+
+  const [imageList, setImageList] = React.useState<ImageItem[]>([]);
+  const [total, setTotal] = React.useState(0);
+
+  const fetchImageList = React.useCallback(async () => {
+    const params = Object.fromEntries(searchParams.entries());
+    const data = await getImageListAPI(params);
+    setImageList(data ?? []);
+  }, [searchParams]);
+
+  const fetchImageCount = React.useCallback(async () => {
+    const params = Object.fromEntries(searchParams.entries());
+    const data = await getImageCountAPI(params);
+    setTotal(data ?? 0);
+  }, [searchParams]);
+
+  React.useEffect(() => {
+    fetchImageList();
+    fetchImageCount();
+  }, [fetchImageList, fetchImageCount]);
 
   const handleSort = (field: string) => {
     const params = new URLSearchParams(searchParams);
@@ -43,6 +68,14 @@ export default function ImageTable() {
       params.set(field, 'desc');
     }
     replace(`${pathname}?${params.toString()}`);
+  };
+
+  const [previewVisible, setPreviewVisible] = React.useState(false);
+  const [previewSrc, setPreviewSrc] = React.useState('');
+
+  const handlePreview = (src: string) => {
+    setPreviewSrc(src);
+    setPreviewVisible(true);
   };
 
   return (
@@ -117,7 +150,7 @@ export default function ImageTable() {
             </tr>
           </thead>
           <tbody>
-            {ImageTableData.map((row) => (
+            {imageList.map((row) => (
               <tr key={row.id}>
                 <td style={{ textAlign: 'center', width: 100 }}>
                   <Typography level="body-xs">
@@ -160,11 +193,41 @@ export default function ImageTable() {
                   <Typography level="body-xs">{row.originHeight}</Typography>
                 </td>
                 <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.originSize}mb</Typography>
+                  <Typography level="body-xs">{row.originSize}kb</Typography>
                 </td>
                 <td style={{ textAlign: 'center', width: 150 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      width: 60,
+                      height: 60,
+                      overflow: 'hidden',
+                      margin: '0 auto',
+                    }}
+                  >
+                    <Image
+                      src={row.thumbnailUrl}
+                      alt={row.thumbnailUrl}
+                      width={60}
+                      height={60}
+                      style={{ objectFit: 'cover' }}
+                    />
+                  </Box>
+                </td>
+                <td style={{ textAlign: 'center', width: 100 }}>
+                  <Typography level="body-xs">{row.thumbnailWidth}</Typography>
+                </td>
+                <td style={{ textAlign: 'center', width: 100 }}>
+                  <Typography level="body-xs">{row.thumbnailHeight}</Typography>
+                </td>
+                <td style={{ textAlign: 'center', width: 100 }}>
+                  <Typography level="body-xs">{row.thumbnailSize}kb</Typography>
+                </td>
+                <td style={{ textAlign: 'center', width: 100 }}>
                   <Typography level="body-xs">
-                    <Tooltip title={row.thumbnailUrl} placement="top" arrow>
+                    <Tooltip title={row.illustration_id} placement="top" arrow>
                       <Typography
                         level="body-xs"
                         sx={{
@@ -174,23 +237,9 @@ export default function ImageTable() {
                           whiteSpace: 'nowrap',
                         }}
                       >
-                        {row.thumbnailUrl}
+                        {row.illustration_id}
                       </Typography>
                     </Tooltip>
-                  </Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.thumbnailWidth}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.thumbnailHeight}</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">{row.thumbnailSize}mb</Typography>
-                </td>
-                <td style={{ textAlign: 'center', width: 100 }}>
-                  <Typography level="body-xs">
-                    {row.illustration_id ?? '用户信息'}
                   </Typography>
                 </td>
 
@@ -209,7 +258,9 @@ export default function ImageTable() {
                       <MoreHorizRoundedIcon />
                     </MenuButton>
                     <Menu size="sm" sx={{ minWidth: 140 }}>
-                      <MenuItem>编辑信息</MenuItem>
+                      <MenuItem onClick={() => handlePreview(row.originUrl)}>
+                        查看原图
+                      </MenuItem>
                       <Divider />
                       <MenuItem color="danger">删除图片</MenuItem>
                     </Menu>
@@ -220,7 +271,12 @@ export default function ImageTable() {
           </tbody>
         </Table>
       </Box>
-      <Pagination total={1000} pageSize={30} />
+      <Pagination total={total} pageSize={PAGE_SIZE} />
+      <PreviewModal
+        visible={previewVisible}
+        setVisible={setPreviewVisible}
+        src={previewSrc}
+      />
     </>
   );
 }

@@ -1,6 +1,7 @@
 import type {
   illustrations,
   illustrators,
+  images,
   labels,
   users,
 } from '@prisma/client';
@@ -145,3 +146,5 @@ export type CommentForm = {
   id: string;
   content: string;
 };
+
+export type ImageItem = images;

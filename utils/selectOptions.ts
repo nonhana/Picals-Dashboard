@@ -100,7 +100,7 @@ export const commentOptions: SelectOption[] = [
 export const imageOptions: SelectOption[] = [
   {
     label: '原图大小',
-    value: 'originSizeRange',
+    value: 'origin_size_level',
     options: [
       {
         label: '5mb以下',
@@ -118,7 +118,7 @@ export const imageOptions: SelectOption[] = [
   },
   {
     label: '缩略图大小',
-    value: 'thumbnailSizeRange',
+    value: 'thumbnail_size_level',
     options: [
       {
         label: '0.5mb以下',

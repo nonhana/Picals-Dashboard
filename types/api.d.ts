@@ -6,6 +6,7 @@ import type {
   IllustrationItem,
   IllustratorForm,
   IllustratorItem,
+  ImageItem,
   LabelForm,
   LabelItem,
   UserForm,
@@ -45,3 +46,5 @@ export type IGetIllustratorDetailRes = IllustratorForm;
 export type IGetCommentListRes = CommentItem[];
 
 export type IUpdateCommentReq = CommentForm;
+
+export type IGetImageListRes = ImageItem[];

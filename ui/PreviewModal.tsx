@@ -3,6 +3,7 @@
 import PhotoRoundedIcon from '@mui/icons-material/PhotoRounded';
 import {
   Button,
+  CircularProgress,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -29,13 +30,16 @@ export default function PreviewModal({
     width: number;
     height: number;
   }>({ width: 0, height: 0 });
+  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     if (!src) return;
+    setLoading(true);
     const img = new Image();
     img.src = src;
     img.onload = () => {
       setImageSize({ width: img.width, height: img.height });
+      setLoading(false);
     };
   }, [src]);
 
@@ -55,13 +59,17 @@ export default function PreviewModal({
         </DialogTitle>
         <Divider />
         <DialogContent>
-          <NextImg
-            src={src}
-            alt={src}
-            width={imageSize.width}
-            height={imageSize.height}
-            style={{ margin: '0 auto' }}
-          />
+          {!loading ? (
+            <NextImg
+              src={src}
+              alt={src}
+              width={imageSize.width}
+              height={imageSize.height}
+              style={{ margin: '0 auto' }}
+            />
+          ) : (
+            <CircularProgress sx={{ margin: '20px auto' }} />
+          )}
         </DialogContent>
         <DialogActions>
           <Button variant="solid" onClick={() => setVisible(false)}>

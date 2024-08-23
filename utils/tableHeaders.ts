@@ -328,7 +328,7 @@ export const imageTableHeads: TableHead[] = [
     sortable: false,
   },
   {
-    name: '原图',
+    name: '原图URL',
     value: 'originUrl',
     width: 150,
     sortable: false,

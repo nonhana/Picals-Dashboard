@@ -4,13 +4,10 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     optimizePackageImports: [],
-    serverComponentsExternalPackages: ['@prisma/client'], // prisma support
+    serverComponentsExternalPackages: ['@prisma/client'],
   },
   images: {
-    remotePatterns: [
-      { hostname: 'dummyimage.com' },
-      { hostname: 'moe.nonhana.pics' },
-    ],
+    remotePatterns: [{ hostname: 'moe.nonhana.pics' }],
   },
 };
 

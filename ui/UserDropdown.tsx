@@ -1,4 +1,6 @@
 'use client';
+
+import { signOut } from '@/auth';
 import { useUserStore } from '@/store/provider/user-provider';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
@@ -14,8 +16,11 @@ import {
 } from '@mui/joy';
 
 export default function UserDropdown() {
-  'use client';
   const userInfo = useUserStore((state) => state.userInfo);
+  const handleSignout = async () => {
+    'use server';
+    await signOut();
+  };
 
   return (
     <Dropdown>
@@ -67,7 +72,7 @@ export default function UserDropdown() {
           设置
         </MenuItem>
         <ListDivider />
-        <MenuItem>
+        <MenuItem onClick={handleSignout}>
           <LogoutRoundedIcon />
           退出登录
         </MenuItem>

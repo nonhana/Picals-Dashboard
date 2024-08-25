@@ -1,6 +1,6 @@
 'use client';
 
-import { authenticate } from '@/services/server/actions';
+import { register } from '@/services/server/actions';
 import {
   Box,
   Button,
@@ -14,14 +14,14 @@ import {
 } from '@mui/joy';
 import * as React from 'react';
 
-export default function Login() {
+export default function SignUp() {
   const [errorMessage, setErrorMessage] = React.useState<string>();
   const [isPending, setIsPending] = React.useState<boolean>(false);
 
-  const handleSignIn = async (formData: FormData) => {
+  const handleRegister = async (formData: FormData) => {
     setIsPending(true);
     try {
-      const msg = await authenticate(formData);
+      const msg = await register(formData);
       if (msg !== undefined) setErrorMessage(msg);
     } catch (error: any) {
       setErrorMessage(error.message ?? 'Something went wrong.');
@@ -64,36 +64,46 @@ export default function Login() {
             <Typography level="h4" component="h1">
               <strong>Picals Dashboard</strong>
             </Typography>
-            <Typography level="body-sm">Sign in to continue.</Typography>
+            <Typography level="body-sm">Sign up for an account.</Typography>
           </Box>
-          <Box component="form" action={handleSignIn}>
-            <FormControl id="email">
+
+          <Box component="form" action={handleRegister}>
+            <FormControl>
               <FormLabel>Email</FormLabel>
               <Input
                 name="email"
                 type="email"
-                placeholder="please enter your email"
+                placeholder="Please enter your email address."
               />
             </FormControl>
-            <FormControl id="password">
+            <FormControl>
+              <FormLabel>Username</FormLabel>
+              <Input
+                name="username"
+                type="username"
+                placeholder="Please enter your username."
+              />
+            </FormControl>
+            <FormControl>
               <FormLabel>Password</FormLabel>
               <Input
                 name="password"
                 type="password"
-                placeholder="your password is:"
+                placeholder="your password"
               />
             </FormControl>
+
             <Button type="submit" loading={isPending} sx={{ mt: 1 }}>
-              Log in
+              Create account
             </Button>
           </Box>
 
           <Typography
-            endDecorator={<Link href="/sign-up">Sign up</Link>}
+            endDecorator={<Link href="/login">Log in</Link>}
             fontSize="sm"
             sx={{ alignSelf: 'center' }}
           >
-            Don&apos;t have an account?
+            Already have an account?
           </Typography>
         </Sheet>
       </Sheet>

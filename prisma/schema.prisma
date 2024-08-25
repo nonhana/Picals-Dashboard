@@ -264,3 +264,13 @@ model work_push_temp {
   @@index([user_id], map: "FK_8892038c5a1b61a89c3a5138657")
   @@index([author_id], map: "FK_d52120b520b3ca0ba861d956695")
 }
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model admins {
+  id         String   @id @default(uuid()) @db.VarChar(36)
+  username   String   @db.VarChar(31)
+  password   String   @db.VarChar(255)
+  email      String   @db.VarChar(125)
+  status     Int      @default(0) @db.TinyInt
+  created_at DateTime @default(now()) @db.Timestamp(6)
+}

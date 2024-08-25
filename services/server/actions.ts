@@ -2,12 +2,12 @@
 
 import { signIn } from '@/auth';
 import prisma from '@/prisma';
+import bcrypt from 'bcrypt';
 import { AuthError } from 'next-auth';
 import { z } from 'zod';
 
-export async function authenticate(formData: FormData) {
+export async function login(formData: FormData) {
   try {
-    console.log('Authenticating');
     await signIn('credentials', formData);
   } catch (error) {
     if (error instanceof AuthError) {
@@ -38,11 +38,12 @@ export async function register(formData: FormData) {
       .safeParse(body);
     if (parsedBody.success) {
       const { username, email, password } = parsedBody.data;
+      const hashedPsd = await bcrypt.hash(password, 10);
       await prisma.admins.create({
         data: {
           username,
           email,
-          password,
+          password: hashedPsd,
         },
       });
       await signIn('credentials', { email, password });

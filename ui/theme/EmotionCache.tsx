@@ -1,4 +1,5 @@
 'use client';
+
 import type {
   EmotionCache,
   Options as OptionsOfCreateCache,

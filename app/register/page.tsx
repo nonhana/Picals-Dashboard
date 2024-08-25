@@ -107,7 +107,11 @@ export default function SignUp() {
           </Typography>
         </Sheet>
       </Sheet>
-      <Snackbar color="danger" open={errorMessage !== undefined}>
+      <Snackbar
+        color="danger"
+        open={errorMessage !== undefined}
+        onClose={() => setErrorMessage(undefined)}
+      >
         {errorMessage}
       </Snackbar>
     </>

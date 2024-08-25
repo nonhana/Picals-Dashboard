@@ -1,7 +1,4 @@
-'use client';
-
 import { signOut } from '@/auth';
-import { useUserStore } from '@/store/provider/user-provider';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import {
@@ -16,12 +13,6 @@ import {
 } from '@mui/joy';
 
 export default function UserDropdown() {
-  const userInfo = useUserStore((state) => state.userInfo);
-  const handleSignout = async () => {
-    'use server';
-    await signOut();
-  };
-
   return (
     <Dropdown>
       <MenuButton
@@ -34,7 +25,7 @@ export default function UserDropdown() {
         }}
       >
         <Avatar
-          src={userInfo.avatar}
+          src="https://avatars.githubusercontent.com/u/44036562?v=4"
           sx={{ maxWidth: '32px', maxHeight: '32px' }}
         />
       </MenuButton>
@@ -55,13 +46,13 @@ export default function UserDropdown() {
               alignItems: 'center',
             }}
           >
-            <Avatar src={userInfo.avatar} sx={{ borderRadius: '50%' }} />
+            <Avatar src="" sx={{ borderRadius: '50%' }} />
             <Box sx={{ ml: 1.5 }}>
               <Typography level="title-sm" textColor="text.primary">
-                {userInfo.name}
+                non_hana
               </Typography>
               <Typography level="body-xs" textColor="text.tertiary">
-                {userInfo.email}
+                zhouxiang757@gmail.com
               </Typography>
             </Box>
           </Box>
@@ -72,10 +63,18 @@ export default function UserDropdown() {
           设置
         </MenuItem>
         <ListDivider />
-        <MenuItem onClick={handleSignout}>
-          <LogoutRoundedIcon />
-          退出登录
-        </MenuItem>
+
+        <form
+          action={async () => {
+            'use server';
+            await signOut();
+          }}
+        >
+          <MenuItem component="button">
+            <LogoutRoundedIcon />
+            退出登录
+          </MenuItem>
+        </form>
       </Menu>
     </Dropdown>
   );

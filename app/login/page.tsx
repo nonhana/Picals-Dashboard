@@ -1,6 +1,6 @@
 'use client';
 
-import { authenticate } from '@/services/server/actions';
+import { login } from '@/services/server/actions';
 import {
   Box,
   Button,
@@ -21,7 +21,7 @@ export default function Login() {
   const handleSignIn = async (formData: FormData) => {
     setIsPending(true);
     try {
-      const msg = await authenticate(formData);
+      const msg = await login(formData);
       if (msg !== undefined) setErrorMessage(msg);
     } catch (error: any) {
       setErrorMessage(error.message ?? 'Something went wrong.');
@@ -97,7 +97,11 @@ export default function Login() {
           </Typography>
         </Sheet>
       </Sheet>
-      <Snackbar color="danger" open={errorMessage !== undefined}>
+      <Snackbar
+        color="danger"
+        open={errorMessage !== undefined}
+        onClose={() => setErrorMessage(undefined)}
+      >
         {errorMessage}
       </Snackbar>
     </>

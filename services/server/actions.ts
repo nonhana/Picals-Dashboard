@@ -1,6 +1,6 @@
 'use server'; // Server Actions 只在服务端执行
 
-import { signIn } from '@/auth';
+import { auth, signIn } from '@/auth';
 import prisma from '@/prisma';
 import bcrypt from 'bcrypt';
 import { AuthError } from 'next-auth';
@@ -41,7 +41,7 @@ export async function register(formData: FormData) {
       const hashedPsd = await bcrypt.hash(password, 10);
       await prisma.admins.create({
         data: {
-          username,
+          name: username,
           email,
           password: hashedPsd,
         },
@@ -59,4 +59,17 @@ export async function register(formData: FormData) {
     }
     throw error;
   }
+}
+
+export async function getUserInfo() {
+  const session = await auth();
+  if (!session) {
+    throw new Error('No session found');
+  }
+  const user = session.user;
+  return {
+    username: user?.name || '',
+    email: user?.email || '',
+    avatar: user?.image || '',
+  };
 }

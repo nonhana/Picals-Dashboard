@@ -268,9 +268,10 @@ model work_push_temp {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model admins {
   id         String   @id @default(uuid()) @db.VarChar(36)
-  username   String   @db.VarChar(31)
+  name       String   @db.VarChar(31)
   password   String   @db.VarChar(255)
   email      String   @db.VarChar(125)
   status     Int      @default(0) @db.TinyInt
   created_at DateTime @default(now()) @db.Timestamp(6)
+  image      String?  @db.VarChar(255)
 }

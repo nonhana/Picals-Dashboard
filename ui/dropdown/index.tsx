@@ -1,4 +1,5 @@
 import { signOut } from '@/auth';
+import { getUserInfo } from '@/services/server/actions';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import {
@@ -12,7 +13,9 @@ import {
   Typography,
 } from '@mui/joy';
 
-export default function UserDropdown() {
+export default async function UserDropdown() {
+  const { username, email, avatar } = await getUserInfo();
+
   return (
     <Dropdown>
       <MenuButton
@@ -61,19 +64,18 @@ export default function UserDropdown() {
         </MenuItem>
         <ListDivider />
 
-        <MenuItem>
-          <form
-            action={async () => {
-              'use server';
-              await signOut();
-            }}
-          >
-            <button>
-              <LogoutRoundedIcon />
-              退出登录
-            </button>
-          </form>
-        </MenuItem>
+        <form
+          action={async () => {
+            'use server';
+            await signOut();
+          }}
+          method="POST"
+        >
+          <button type="submit">
+            <LogoutRoundedIcon />
+            退出登录
+          </button>
+        </form>
       </Menu>
     </Dropdown>
   );

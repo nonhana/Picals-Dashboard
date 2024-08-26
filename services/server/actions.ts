@@ -38,6 +38,8 @@ export async function register(formData: FormData) {
       .safeParse(body);
     if (parsedBody.success) {
       const { username, email, password } = parsedBody.data;
+      const existedUser = await prisma.admins.findFirst({ where: { email } });
+      if (existedUser) return 'Email already registered, please sign in.';
       const hashedPsd = await bcrypt.hash(password, 10);
       await prisma.admins.create({
         data: {

@@ -30,6 +30,7 @@ export default async function UserDropdown() {
         <Avatar src={avatar} sx={{ maxWidth: '32px', maxHeight: '32px' }} />
       </MenuButton>
       <Menu
+        keepMounted
         placement="bottom-end"
         size="sm"
         sx={{
@@ -69,9 +70,9 @@ export default async function UserDropdown() {
             'use server';
             await signOut();
           }}
-          method="POST"
+          style={{ display: 'contents' }}
         >
-          <button type="submit">
+          <button className="joy-1f7gk5n-JoyMenuItem-root" type="submit">
             <LogoutRoundedIcon />
             退出登录
           </button>

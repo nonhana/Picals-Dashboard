@@ -10,6 +10,7 @@ import {
   Link,
   Sheet,
   Snackbar,
+  Stack,
   Typography,
 } from '@mui/joy';
 import * as React from 'react';
@@ -67,7 +68,7 @@ export default function SignUp() {
             <Typography level="body-sm">Sign up for an account.</Typography>
           </Box>
 
-          <Box component="form" action={handleRegister}>
+          <Stack gap={2} component="form" action={handleRegister}>
             <FormControl>
               <FormLabel>Email</FormLabel>
               <Input
@@ -81,7 +82,7 @@ export default function SignUp() {
               <Input
                 name="username"
                 type="username"
-                placeholder="Please enter your username."
+                placeholder="What is your username?"
               />
             </FormControl>
             <FormControl>
@@ -89,14 +90,14 @@ export default function SignUp() {
               <Input
                 name="password"
                 type="password"
-                placeholder="your password"
+                placeholder="Your password!"
               />
             </FormControl>
 
             <Button type="submit" loading={isPending} sx={{ mt: 1 }}>
               Create account
             </Button>
-          </Box>
+          </Stack>
 
           <Typography
             endDecorator={<Link href="/login">Log in</Link>}

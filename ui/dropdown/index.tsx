@@ -24,10 +24,7 @@ export default function UserDropdown() {
           borderRadius: '9999999px',
         }}
       >
-        <Avatar
-          src="https://avatars.githubusercontent.com/u/44036562?v=4"
-          sx={{ maxWidth: '32px', maxHeight: '32px' }}
-        />
+        <Avatar src={avatar} sx={{ maxWidth: '32px', maxHeight: '32px' }} />
       </MenuButton>
       <Menu
         placement="bottom-end"
@@ -49,10 +46,10 @@ export default function UserDropdown() {
             <Avatar src="" sx={{ borderRadius: '50%' }} />
             <Box sx={{ ml: 1.5 }}>
               <Typography level="title-sm" textColor="text.primary">
-                non_hana
+                {username}
               </Typography>
               <Typography level="body-xs" textColor="text.tertiary">
-                zhouxiang757@gmail.com
+                {email}
               </Typography>
             </Box>
           </Box>
@@ -64,17 +61,19 @@ export default function UserDropdown() {
         </MenuItem>
         <ListDivider />
 
-        <form
-          action={async () => {
-            'use server';
-            await signOut();
-          }}
-        >
-          <MenuItem component="button">
-            <LogoutRoundedIcon />
-            退出登录
-          </MenuItem>
-        </form>
+        <MenuItem>
+          <form
+            action={async () => {
+              'use server';
+              await signOut();
+            }}
+          >
+            <button>
+              <LogoutRoundedIcon />
+              退出登录
+            </button>
+          </form>
+        </MenuItem>
       </Menu>
     </Dropdown>
   );

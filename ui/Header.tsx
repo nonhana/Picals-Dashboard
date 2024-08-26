@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from '@mui/joy';
 import ColorSchemeToggle from './ColorSchemeToggle';
 import OpenButtons from './OpenButtons';
-import UserDropdown from './UserDropdown';
+import UserDropdown from './dropdown';
 
 export default function Header() {
   return (

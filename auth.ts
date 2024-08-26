@@ -6,11 +6,9 @@ import { authConfig } from './auth.config';
 import prisma from './prisma';
 
 async function getUserByEmail(email: string) {
-  console.log('Getting user by email');
   try {
     return await prisma.admins.findFirst({ where: { email } });
   } catch (error) {
-    console.error(error);
     throw new Error('Failed to get user by email');
   }
 }

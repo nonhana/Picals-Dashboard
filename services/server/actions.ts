@@ -1,4 +1,4 @@
-'use server'; // Server Actions 只在服务端执行
+'use server';
 
 import { auth, signIn } from '@/auth';
 import prisma from '@/prisma';

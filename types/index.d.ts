@@ -1,4 +1,5 @@
 import type {
+  admins,
   illustrations,
   illustrators,
   images,
@@ -148,3 +149,15 @@ export type CommentForm = {
 };
 
 export type ImageItem = images;
+
+export type AdminItem = Omit<admins, 'password' | 'created_at'> & {
+  created_at: string;
+};
+
+export type AdminForm = {
+  id: string;
+  name: string;
+  email: string;
+  status: number;
+  image: string | null;
+};

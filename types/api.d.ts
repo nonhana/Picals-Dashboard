@@ -1,4 +1,6 @@
 import type {
+  AdminForm,
+  AdminItem,
   CommentForm,
   CommentItem,
   IllustrationForm,
@@ -48,3 +50,9 @@ export type IGetCommentListRes = CommentItem[];
 export type IUpdateCommentReq = CommentForm;
 
 export type IGetImageListRes = ImageItem[];
+
+export type IGetAdminListRes = AdminItem[];
+
+export type IGetAdminDetailRes = AdminForm;
+
+export type IUpdateAdminReq = AdminForm;

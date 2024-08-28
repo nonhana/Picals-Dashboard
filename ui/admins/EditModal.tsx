@@ -7,6 +7,7 @@ import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
 import {
   Box,
   Button,
+  CircularProgress,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -46,6 +47,7 @@ export default function EditModal({
   refresh: () => void;
 }) {
   const [form, setForm] = React.useState<AdminForm>(originForm);
+  const [gettingInfo, setGettingInfo] = React.useState(false);
 
   React.useEffect(() => {
     if (!visible) setForm(originForm);
@@ -53,10 +55,10 @@ export default function EditModal({
 
   const fetchAdminDetail = React.useCallback(async () => {
     if (!adminId) return;
+    setGettingInfo(true);
     const data = await getAdminDetailAPI({ admin_id: adminId });
-    if (data) {
-      setForm(data);
-    }
+    if (data) setForm(data);
+    setGettingInfo(false);
   }, [adminId]);
 
   React.useEffect(() => {
@@ -124,93 +126,99 @@ export default function EditModal({
           </DialogTitle>
           <Divider />
           <DialogContent>请修改该管理员的相关信息。</DialogContent>
-          <Stack spacing={2}>
-            <FormControl>
-              <FormLabel>ID</FormLabel>
-              <Input disabled required value={form.id} />
-            </FormControl>
-            <FormControl>
-              <FormLabel>用户名</FormLabel>
-              <Input
-                required
-                value={form.name}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, name: e.target.value }))
-                }
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>邮箱</FormLabel>
-              <Input
-                required
-                value={form.email}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, email: e.target.value }))
-                }
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>头像</FormLabel>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: 1,
-                }}
-              >
-                {form.image && (
-                  <Image
-                    src={form.image}
-                    alt="background"
-                    width={60}
-                    height={60}
-                    style={{
-                      objectFit: 'cover',
-                      cursor: 'pointer',
-                      borderRadius: '50%',
-                    }}
-                    onClick={handlePreview}
-                  />
-                )}
-                <Button
-                  loading={avatarUploading}
-                  component="label"
-                  role={undefined}
-                  tabIndex={-1}
-                  variant="outlined"
-                  color="neutral"
-                  startDecorator={<UploadFileRoundedIcon />}
-                  sx={{ width: '100%' }}
+          {!gettingInfo ? (
+            <Stack spacing={2}>
+              <FormControl>
+                <FormLabel>ID</FormLabel>
+                <Input disabled required value={form.id} />
+              </FormControl>
+              <FormControl>
+                <FormLabel>用户名</FormLabel>
+                <Input
+                  required
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, name: e.target.value }))
+                  }
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>邮箱</FormLabel>
+                <Input
+                  required
+                  value={form.email}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, email: e.target.value }))
+                  }
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>头像</FormLabel>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 1,
+                  }}
                 >
-                  上传头像
-                  <VisuallyHiddenInput type="file" onChange={fileSelected} />
+                  {form.image && (
+                    <Image
+                      src={form.image}
+                      alt="background"
+                      width={60}
+                      height={60}
+                      style={{
+                        objectFit: 'cover',
+                        cursor: 'pointer',
+                        borderRadius: '50%',
+                      }}
+                      onClick={handlePreview}
+                    />
+                  )}
+                  <Button
+                    loading={avatarUploading}
+                    component="label"
+                    role={undefined}
+                    tabIndex={-1}
+                    variant="outlined"
+                    color="neutral"
+                    startDecorator={<UploadFileRoundedIcon />}
+                    sx={{ width: '100%' }}
+                  >
+                    上传头像
+                    <VisuallyHiddenInput type="file" onChange={fileSelected} />
+                  </Button>
+                </Box>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel>身份</FormLabel>
+                <Select
+                  defaultValue={form.status}
+                  onChange={(_, value) =>
+                    setForm((prev) => ({ ...prev, status: value as number }))
+                  }
+                >
+                  <Option value={0}>管理员</Option>
+                  <Option value={1}>游客</Option>
+                </Select>
+              </FormControl>
+
+              <DialogActions>
+                <Button loading={loading} onClick={handleEdit}>
+                  提交修改
                 </Button>
-              </Box>
-            </FormControl>
-
-            <FormControl>
-              <FormLabel>身份</FormLabel>
-              <Select
-                defaultValue={form.status}
-                onChange={(_, value) =>
-                  setForm((prev) => ({ ...prev, status: value as number }))
-                }
-              >
-                <Option value={0}>游客</Option>
-                <Option value={1}>管理员</Option>
-              </Select>
-            </FormControl>
-
-            <DialogActions>
-              <Button loading={loading} onClick={handleEdit}>
-                提交修改
-              </Button>
-              <Button variant="plain" color="neutral" onClick={handleClose}>
-                取消修改
-              </Button>
-            </DialogActions>
-          </Stack>
+                <Button variant="plain" color="neutral" onClick={handleClose}>
+                  取消修改
+                </Button>
+              </DialogActions>
+            </Stack>
+          ) : (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+              <CircularProgress />
+            </Box>
+          )}
         </ModalDialog>
       </Modal>
       <PreviewModal

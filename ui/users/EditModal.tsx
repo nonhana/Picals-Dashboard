@@ -49,7 +49,6 @@ export default function UserEditModal({
   refresh: () => void;
 }) {
   const [form, setForm] = React.useState<UserForm>(originForm);
-  const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
     if (!visible) setForm(originForm);

@@ -1,6 +1,6 @@
 'use client';
 
-import { updateAdminAPI } from '@/services/client/admin';
+import { getAdminDetailAPI, updateAdminAPI } from '@/services/client/admin';
 import type { AdminForm } from '@/types';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
@@ -46,16 +46,12 @@ export default function EditBtn({ refresh }: { refresh: () => void }) {
   const fetchSessionInfo = async () => {
     setGettingInfo(true);
     const session = await getSession();
-    if (!session) return;
-    if (!session.user) return;
-    const { id, name, email, image } = session.user;
-    setForm({
-      id: id ?? '',
-      name: name ?? '',
-      email: email ?? '',
-      status: 0,
-      image: image ?? null,
-    });
+    if (!session) throw new Error('No session found');
+    if (!session.user) throw new Error('In session, no user found');
+    const { id } = session.user;
+    if (!id) throw new Error('In session, no user id found');
+    const data = await getAdminDetailAPI({ admin_id: id });
+    if (data) setForm(data);
     setGettingInfo(false);
   };
 
@@ -202,8 +198,8 @@ export default function EditBtn({ refresh }: { refresh: () => void }) {
                     setForm((prev) => ({ ...prev, status: value as number }))
                   }
                 >
-                  <Option value={0}>游客</Option>
-                  <Option value={1}>管理员</Option>
+                  <Option value={0}>管理员</Option>
+                  <Option value={1}>游客</Option>
                 </Select>
               </FormControl>
               <DialogActions>

@@ -7,7 +7,6 @@ import {
   FormControl,
   FormLabel,
   Input,
-  Link,
   Sheet,
   Snackbar,
   Stack,
@@ -65,7 +64,7 @@ export default function Login() {
             <Typography level="h4" component="h1">
               <strong>Picals Dashboard</strong>
             </Typography>
-            <Typography level="body-sm">Sign in to continue.</Typography>
+            <Typography level="body-sm">Sign in to manage the data.</Typography>
           </Box>
           <Stack gap={2} component="form" action={handleSignIn}>
             <FormControl id="email">
@@ -88,13 +87,6 @@ export default function Login() {
               Log in
             </Button>
           </Stack>
-          <Typography
-            endDecorator={<Link href="/register">Sign up</Link>}
-            fontSize="sm"
-            sx={{ alignSelf: 'center' }}
-          >
-            Don&apos;t have an account?
-          </Typography>
         </Sheet>
       </Sheet>
       <Snackbar

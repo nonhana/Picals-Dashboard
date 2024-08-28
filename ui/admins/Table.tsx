@@ -259,7 +259,11 @@ export default function AdminTable() {
                         alt={row.name}
                         width={60}
                         height={60}
-                        style={{ objectFit: 'cover', borderRadius: '50%' }}
+                        style={{
+                          objectFit: 'cover',
+                          borderRadius: '50%',
+                          margin: '0 auto',
+                        }}
                       />
                     ) : (
                       <Typography level="body-xs">暂无头像</Typography>

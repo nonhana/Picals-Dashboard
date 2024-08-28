@@ -1,13 +1,14 @@
 'use client';
 
 import { register } from '@/services/server/actions';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import {
   Box,
   Button,
   FormControl,
   FormLabel,
+  IconButton,
   Input,
-  Link,
   Sheet,
   Snackbar,
   Stack,
@@ -23,7 +24,11 @@ export default function SignUp() {
     setIsPending(true);
     try {
       const msg = await register(formData);
-      if (msg !== undefined) setErrorMessage(msg);
+      if (msg !== undefined) {
+        setErrorMessage(msg);
+      } else {
+        history.back();
+      }
     } catch (error: any) {
       setErrorMessage(error.message ?? 'Something went wrong.');
     } finally {
@@ -55,6 +60,13 @@ export default function SignUp() {
           }}
           variant="outlined"
         >
+          <IconButton
+            onClick={() => history.back()}
+            sx={{ position: 'absolute' }}
+          >
+            <ArrowBackIosNewRoundedIcon />
+          </IconButton>
+
           <Box
             sx={{
               display: 'flex',
@@ -65,7 +77,7 @@ export default function SignUp() {
             <Typography level="h4" component="h1">
               <strong>Picals Dashboard</strong>
             </Typography>
-            <Typography level="body-sm">Sign up for an account.</Typography>
+            <Typography level="body-sm">Sign up as an admin.</Typography>
           </Box>
 
           <Stack gap={2} component="form" action={handleRegister}>
@@ -80,8 +92,8 @@ export default function SignUp() {
             <FormControl>
               <FormLabel>Username</FormLabel>
               <Input
-                name="username"
-                type="username"
+                name="name"
+                type="name"
                 placeholder="What is your username?"
               />
             </FormControl>
@@ -98,14 +110,6 @@ export default function SignUp() {
               Create account
             </Button>
           </Stack>
-
-          <Typography
-            endDecorator={<Link href="/login">Log in</Link>}
-            fontSize="sm"
-            sx={{ alignSelf: 'center' }}
-          >
-            Already have an account?
-          </Typography>
         </Sheet>
       </Sheet>
       <Snackbar

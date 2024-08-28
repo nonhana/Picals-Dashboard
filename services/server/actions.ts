@@ -25,30 +25,31 @@ export async function login(formData: FormData) {
 export async function register(formData: FormData) {
   try {
     const body = {
-      username: formData.get('username') as string,
+      name: formData.get('name') as string,
       email: formData.get('email') as string,
       password: formData.get('password') as string,
     };
     const parsedBody = z
       .object({
-        username: z.string().min(3),
+        name: z.string().min(1),
         email: z.string().email(),
         password: z.string().min(6),
       })
       .safeParse(body);
     if (parsedBody.success) {
-      const { username, email, password } = parsedBody.data;
+      const { name, email, password } = parsedBody.data;
       const existedUser = await prisma.admins.findFirst({ where: { email } });
       if (existedUser) return 'Email already registered, please sign in.';
       const hashedPsd = await bcrypt.hash(password, 10);
       await prisma.admins.create({
         data: {
-          name: username,
+          name,
           email,
           password: hashedPsd,
         },
       });
-      await signIn('credentials', { email, password });
+    } else {
+      return 'Invalid input.';
     }
   } catch (error) {
     if (error instanceof AuthError) {

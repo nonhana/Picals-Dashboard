@@ -6,6 +6,10 @@ import { z } from 'zod';
 const QuerySchema = z.object({
   name: z.string().optional(),
   email: z.string().optional(),
+  status: z.coerce
+    .number()
+    .refine((val) => [0, 1, 2].includes(val))
+    .optional(),
 });
 
 /**
@@ -20,7 +24,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json('Invalid query parameters', { status: 400 });
   }
 
-  const { name, email } = verifyRes.data;
+  const { name, email, status } = verifyRes.data;
 
   const where: p.Prisma.adminsWhereInput = {};
   if (name) {
@@ -28,6 +32,9 @@ export async function GET(req: NextRequest) {
   }
   if (email) {
     where.email = { contains: email };
+  }
+  if (status) {
+    where.status = status;
   }
 
   const result = await prisma.admins.count({ where });

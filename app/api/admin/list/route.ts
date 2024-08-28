@@ -10,6 +10,10 @@ const QuerySchema = z.object({
   pageSize: z.coerce.number().int().positive().optional().default(PAGE_SIZE),
   name: z.string().optional(),
   email: z.string().optional(),
+  status: z.coerce
+    .number()
+    .refine((val) => [0, 1, 2].includes(val))
+    .optional(),
   created_at: z.union([z.literal('asc'), z.literal('desc')]).optional(),
 });
 
@@ -25,7 +29,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json('Invalid query parameters', { status: 400 });
   }
 
-  const { page, pageSize, name, email, created_at } = verifyRes.data;
+  const { page, pageSize, name, email, status, created_at } = verifyRes.data;
 
   // 构建过滤条件
   const where: p.Prisma.adminsWhereInput = {};
@@ -34,6 +38,9 @@ export async function GET(req: NextRequest) {
   }
   if (email) {
     where.email = { contains: email };
+  }
+  if (status) {
+    where.status = status;
   }
 
   // 构建排序条件

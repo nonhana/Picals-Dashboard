@@ -65,13 +65,19 @@ export async function register(formData: FormData) {
 
 export async function getUserInfo() {
   const session = await auth();
-  if (!session) {
-    throw new Error('No session found');
-  }
-  const user = session.user;
-  return {
-    username: user?.name || '',
-    email: user?.email || '',
-    avatar: user?.image || '',
-  };
+  if (!session) throw new Error('No session found');
+  if (!session.user) throw new Error('No user found');
+
+  const adminInfo = await prisma.admins.findUnique({
+    where: { id: session.user.id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      image: true,
+      status: true,
+    },
+  });
+  if (!adminInfo) throw new Error('Failed to get user info');
+  return adminInfo;
 }

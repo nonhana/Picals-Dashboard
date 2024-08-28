@@ -1,12 +1,14 @@
 'use client';
 
-import { getUserDetailAPI, updateUserAPI } from '@/services/client/user';
-import type { UserForm } from '@/types';
+import { updateAdminAPI } from '@/services/client/admin';
+import type { AdminForm } from '@/types';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
 import {
   Box,
   Button,
+  CircularProgress,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -14,60 +16,55 @@ import {
   FormControl,
   FormLabel,
   Input,
+  MenuItem,
   Modal,
   ModalDialog,
   Option,
   Select,
   Stack,
 } from '@mui/joy';
+import { getSession } from 'next-auth/react';
 import Image from 'next/image';
 import * as React from 'react';
 import PreviewModal from '../PreviewModal';
 import toast from '../Toast';
 import VisuallyHiddenInput from '../VisuallyHiddenInput';
 
-const originForm: UserForm = {
-  username: '',
+const originForm: AdminForm = {
+  id: '',
+  name: '',
   email: '',
-  avatar: '',
-  little_avatar: '',
-  signature: '',
-  background_img: '',
-  gender: 0,
   status: 0,
+  image: null,
 };
 
-export default function UserEditModal({
-  visible,
-  userId,
-  setVisible,
-  refresh,
-}: {
-  visible: boolean;
-  userId: string | undefined;
-  setVisible: (visible: boolean) => void;
-  refresh: () => void;
-}) {
-  const [form, setForm] = React.useState<UserForm>(originForm);
+export default function EditBtn({ refresh }: { refresh: () => void }) {
+  const [visible, setVisible] = React.useState(false);
+  const [form, setForm] = React.useState<AdminForm>(originForm);
+  const [gettingInfo, setGettingInfo] = React.useState(false);
+
+  const fetchSessionInfo = async () => {
+    setGettingInfo(true);
+    const session = await getSession();
+    if (!session) return;
+    if (!session.user) return;
+    const { id, name, email, image } = session.user;
+    setForm({
+      id: id ?? '',
+      name: name ?? '',
+      email: email ?? '',
+      status: 0,
+      image: image ?? null,
+    });
+    setGettingInfo(false);
+  };
 
   React.useEffect(() => {
     if (!visible) setForm(originForm);
+    if (visible) fetchSessionInfo();
   }, [visible]);
 
-  const fetchUserDetail = React.useCallback(async () => {
-    if (!userId) return;
-    const data = await getUserDetailAPI({ user_id: userId });
-    if (data) {
-      setForm(data);
-    }
-  }, [userId]);
-
-  React.useEffect(() => {
-    fetchUserDetail();
-  }, [fetchUserDetail]);
-
   const [avatarUploading, setAvatarUploading] = React.useState(false);
-  const [bgUploading, setBgUploading] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
   const handleClose = () => {
@@ -75,63 +72,51 @@ export default function UserEditModal({
     setForm(originForm);
   };
 
-  const fileSelected =
-    (type: 'avatar' | 'background') =>
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const targetFile = e.target.files?.[0];
-      if (!targetFile) {
-        toast.error('未检测到文件，请重新选择');
-        return;
-      }
-      const formData = new FormData();
-      formData.append('image', targetFile);
-      if (type === 'avatar') {
-        setAvatarUploading(true);
-        formData.append('imageType', 'avatar');
-        const res = await fetch('/api/tool/image-upload', {
-          method: 'POST',
-          body: formData,
-        });
-        const { origin_url, thumbnail_url } = await res.json();
-        setForm((prev) => ({
-          ...prev,
-          avatar: origin_url,
-          little_avatar: thumbnail_url,
-        }));
-        setAvatarUploading(false);
-      } else {
-        setBgUploading(true);
-        formData.append('imageType', 'background');
-        const res = await fetch('/api/tool/image-upload', {
-          method: 'POST',
-          body: formData,
-        });
-        const { thumbnail_url } = await res.json();
-        setForm((prev) => ({ ...prev, background_img: thumbnail_url }));
-        setBgUploading(false);
-      }
-    };
+  const fileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const targetFile = e.target.files?.[0];
+    if (!targetFile) {
+      toast.error('未检测到文件，请重新选择');
+      return;
+    }
+    setAvatarUploading(true);
+    const formData = new FormData();
+    formData.append('image', targetFile);
+    formData.append('imageType', 'thumbnail_cover');
+    const res = await fetch('/api/tool/image-upload', {
+      method: 'POST',
+      body: formData,
+    });
+    const { thumbnail_url } = await res.json();
+    setForm((prev) => ({
+      ...prev,
+      image: thumbnail_url,
+    }));
+    setAvatarUploading(false);
+  };
 
   const handleEdit = async () => {
     setLoading(true);
-    await updateUserAPI(form);
-    toast.success('用户信息修改成功');
+    await updateAdminAPI(form);
+    toast.success('管理员信息修改成功');
     refresh();
-    setVisible(false);
     setLoading(false);
+    setVisible(false);
   };
 
   const [previewVisible, setPreviewVisible] = React.useState(false);
   const [previewSrc, setPreviewSrc] = React.useState('');
 
-  const handlePreview = (type: 'avatar' | 'background') => () => {
-    if (type === 'avatar') setPreviewSrc(form.little_avatar);
-    else setPreviewSrc(form.background_img);
+  const handlePreview = () => {
+    setPreviewSrc(form.image!);
     setPreviewVisible(true);
   };
 
   return (
     <>
+      <MenuItem onClick={() => setVisible(true)}>
+        <SettingsRoundedIcon />
+        设置
+      </MenuItem>
       <Modal open={visible} onClose={handleClose}>
         <ModalDialog
           variant="outlined"
@@ -140,157 +125,101 @@ export default function UserEditModal({
         >
           <DialogTitle>
             <EditRoundedIcon />
-            编辑用户
+            编辑管理员
           </DialogTitle>
           <Divider />
-          <DialogContent>请修改该用户的相关信息。</DialogContent>
-          <Stack spacing={2}>
-            <FormControl>
-              <FormLabel>用户名</FormLabel>
-              <Input
-                autoFocus
-                required
-                value={form.username}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, username: e.target.value }))
-                }
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>邮箱</FormLabel>
-              <Input
-                required
-                value={form.email}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, email: e.target.value }))
-                }
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>头像</FormLabel>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: 1,
-                }}
-              >
-                {form.little_avatar && (
-                  <Image
-                    src={form.little_avatar}
-                    alt="background"
-                    width={60}
-                    height={60}
-                    style={{
-                      objectFit: 'cover',
-                      cursor: 'pointer',
-                      borderRadius: '50%',
-                    }}
-                    onClick={handlePreview('avatar')}
-                  />
-                )}
-                <Button
-                  loading={avatarUploading}
-                  component="label"
-                  role={undefined}
-                  tabIndex={-1}
-                  variant="outlined"
-                  color="neutral"
-                  startDecorator={<UploadFileRoundedIcon />}
-                  sx={{ width: '100%' }}
+          <DialogContent>请修改该管理员的相关信息。</DialogContent>
+          {!gettingInfo ? (
+            <Stack spacing={2}>
+              <FormControl>
+                <FormLabel>ID</FormLabel>
+                <Input disabled required value={form.id} />
+              </FormControl>
+              <FormControl>
+                <FormLabel>用户名</FormLabel>
+                <Input
+                  required
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, name: e.target.value }))
+                  }
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>邮箱</FormLabel>
+                <Input
+                  required
+                  value={form.email}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, email: e.target.value }))
+                  }
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>头像</FormLabel>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 1,
+                  }}
                 >
-                  上传头像
-                  <VisuallyHiddenInput
-                    type="file"
-                    onChange={fileSelected('avatar')}
-                  />
-                </Button>
-              </Box>
-            </FormControl>
-
-            <FormControl>
-              <FormLabel>背景图片</FormLabel>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: 1,
-                }}
-              >
-                {form.background_img && (
-                  <Image
-                    src={form.background_img}
-                    alt="background"
-                    width={120}
-                    height={60}
-                    style={{ objectFit: 'cover', cursor: 'pointer' }}
-                    onClick={handlePreview('background')}
-                  />
-                )}
-                <Button
-                  loading={bgUploading}
-                  component="label"
-                  role={undefined}
-                  tabIndex={-1}
-                  variant="outlined"
-                  color="neutral"
-                  startDecorator={<UploadFileRoundedIcon />}
-                  sx={{ width: '100%' }}
+                  {form.image && (
+                    <Image
+                      src={form.image}
+                      alt="background"
+                      width={60}
+                      height={60}
+                      style={{
+                        objectFit: 'cover',
+                        cursor: 'pointer',
+                        borderRadius: '50%',
+                      }}
+                      onClick={handlePreview}
+                    />
+                  )}
+                  <Button
+                    loading={avatarUploading}
+                    component="label"
+                    role={undefined}
+                    tabIndex={-1}
+                    variant="outlined"
+                    color="neutral"
+                    startDecorator={<UploadFileRoundedIcon />}
+                    sx={{ width: '100%' }}
+                  >
+                    上传头像
+                    <VisuallyHiddenInput type="file" onChange={fileSelected} />
+                  </Button>
+                </Box>
+              </FormControl>
+              <FormControl>
+                <FormLabel>身份</FormLabel>
+                <Select
+                  defaultValue={form.status}
+                  onChange={(_, value) =>
+                    setForm((prev) => ({ ...prev, status: value as number }))
+                  }
                 >
-                  上传背景图
-                  <VisuallyHiddenInput
-                    type="file"
-                    onChange={fileSelected('background')}
-                  />
+                  <Option value={0}>游客</Option>
+                  <Option value={1}>管理员</Option>
+                </Select>
+              </FormControl>
+              <DialogActions>
+                <Button loading={loading} onClick={handleEdit}>
+                  提交修改
                 </Button>
-              </Box>
-            </FormControl>
-            <FormControl>
-              <FormLabel>个性签名</FormLabel>
-              <Input
-                value={form.signature}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, signature: e.target.value }))
-                }
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>性别</FormLabel>
-              <Select
-                defaultValue={form.gender}
-                onChange={(_, value) =>
-                  setForm((prev) => ({ ...prev, gender: value as number }))
-                }
-              >
-                <Option value={0}>男</Option>
-                <Option value={1}>女</Option>
-                <Option value={2}>未知</Option>
-              </Select>
-            </FormControl>
-            <FormControl>
-              <FormLabel>删除状态</FormLabel>
-              <Select
-                defaultValue={form.status}
-                onChange={(_, value) =>
-                  setForm((prev) => ({ ...prev, status: value as number }))
-                }
-              >
-                <Option value={0}>正常</Option>
-                <Option value={1}>已删除</Option>
-              </Select>
-            </FormControl>
-
-            <DialogActions>
-              <Button loading={loading} onClick={handleEdit}>
-                提交修改
-              </Button>
-              <Button variant="plain" color="neutral" onClick={handleClose}>
-                取消修改
-              </Button>
-            </DialogActions>
-          </Stack>
+                <Button variant="plain" color="neutral" onClick={handleClose}>
+                  取消修改
+                </Button>
+              </DialogActions>
+            </Stack>
+          ) : (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+              <CircularProgress />
+            </Box>
+          )}
         </ModalDialog>
       </Modal>
       <PreviewModal

@@ -1,5 +1,22 @@
 import type { SelectOption } from '@/types';
 
+export const AdminOptions: SelectOption[] = [
+  {
+    label: '身份',
+    value: 'status',
+    options: [
+      {
+        label: '管理员',
+        value: 0,
+      },
+      {
+        label: '游客',
+        value: 1,
+      },
+    ],
+  },
+];
+
 export const UserOptions: SelectOption[] = [
   {
     label: '删除状态',

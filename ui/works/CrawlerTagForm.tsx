@@ -48,7 +48,6 @@ export default function CrawlerTagForm() {
   }, [settings]);
 
   const handleSubmit = () => {
-    console.log(settings);
     setButtonDisabled(true);
   };
 

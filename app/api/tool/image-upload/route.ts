@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     | 'detail'
     | 'avatar'
     | 'background'
-    | 'label_cover';
+    | 'thumbnail_cover';
 
   if (!file) {
     return NextResponse.json('Cannot detect file, please reselect', {
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
   if (
     !imageType ||
-    (imageType && imageType !== 'background' && imageType !== 'label_cover')
+    (imageType && imageType !== 'background' && imageType !== 'thumbnail_cover')
   ) {
     await S3.send(putCommand);
     result.origin_url = `https://${process.env.R2_DOMAIN}/${targetPath}`;

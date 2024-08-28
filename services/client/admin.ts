@@ -28,3 +28,10 @@ export const updateAdminAPI = postHandler<IUpdateAdminReq, string>(
  */
 export const getAdminDetailAPI =
   getHandler<IGetAdminDetailRes>('/api/admin/detail');
+
+/**
+ * @description 删除管理员
+ */
+export const deleteAdminAPI = postHandler<{ admin_id: string }, string>(
+  '/api/admin/delete'
+);

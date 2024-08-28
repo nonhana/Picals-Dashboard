@@ -1,6 +1,7 @@
 import ThemeRegistry from '@/ui/theme/ThemeRegistry';
 import { Toaster } from '@/ui/Toast';
 import type { Metadata } from 'next';
+import { SessionProvider } from 'next-auth/react';
 import { Inter } from 'next/font/google';
 import '../styles/globals.css';
 
@@ -20,7 +21,9 @@ export default function RootLayout({
     <html lang="cn">
       <body className={`${inter.className} antialiased`}>
         <Toaster />
-        <ThemeRegistry>{children}</ThemeRegistry>
+        <ThemeRegistry>
+          <SessionProvider>{children}</SessionProvider>
+        </ThemeRegistry>
       </body>
     </html>
   );

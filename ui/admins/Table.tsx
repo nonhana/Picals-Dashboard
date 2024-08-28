@@ -1,12 +1,16 @@
 'use client';
 
-import { getUserCountAPI, getUserListAPI } from '@/services/client/user';
-import type { UserItem } from '@/types';
+import {
+  deleteAdminAPI,
+  getAdminCountAPI,
+  getAdminListAPI,
+} from '@/services/client/admin';
+import type { AdminItem } from '@/types';
 import { PAGE_SIZE } from '@/utils/constants';
-import { userTableHeads } from '@/utils/tableHeaders';
+import { adminTableHeads } from '@/utils/tableHeaders';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import BlockRoundedIcon from '@mui/icons-material/BlockRounded';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
-import ClearRoundedIcon from '@mui/icons-material/ClearRounded';
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded';
 import {
   Box,
@@ -29,15 +33,39 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import ConfirmModal from '../ConfirmModal';
 import Pagination from '../Pagination';
-import UserEditModal from './EditModal';
+import toast from '../Toast';
+import AdminEditModal from './EditModal';
 
-type TargetUser = {
-  id: string;
-  username: string;
-};
+function statusChip(type: number) {
+  return (
+    <Chip
+      variant="soft"
+      size="sm"
+      startDecorator={
+        {
+          0: <CheckRoundedIcon />,
+          1: <BlockRoundedIcon />,
+        }[type]
+      }
+      color={
+        {
+          0: 'success',
+          1: 'danger',
+        }[type] as ColorPaletteProp
+      }
+    >
+      {
+        {
+          0: '管理员',
+          1: '游客',
+        }[type]
+      }
+    </Chip>
+  );
+}
 
-export default function UserTable() {
-  const sortableHeads = userTableHeads
+export default function AdminTable() {
+  const sortableHeads = adminTableHeads
     .filter((head) => head.sortable)
     .map((item) => item.value);
 
@@ -45,32 +73,32 @@ export default function UserTable() {
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  const [userList, setUserList] = React.useState<UserItem[]>([]);
+  const [adminList, setAdminList] = React.useState<AdminItem[]>([]);
   const [total, setTotal] = React.useState(0);
   const [fetching, setFetching] = React.useState(false);
 
-  const fetchUserList = React.useCallback(async () => {
+  const fetchAdminList = React.useCallback(async () => {
     setFetching(true);
     const params = Object.fromEntries(searchParams.entries());
-    const data = await getUserListAPI(params);
-    setUserList(data ?? []);
+    const data = await getAdminListAPI(params);
+    setAdminList(data ?? []);
     setFetching(false);
   }, [searchParams]);
 
-  const fetchUserCount = React.useCallback(async () => {
+  const fetchAdminCount = React.useCallback(async () => {
     const params = Object.fromEntries(searchParams.entries());
-    const data = await getUserCountAPI(params);
+    const data = await getAdminCountAPI(params);
     setTotal(data ?? 0);
   }, [searchParams]);
 
   React.useEffect(() => {
-    fetchUserList();
-    fetchUserCount();
-  }, [fetchUserList, fetchUserCount]);
+    fetchAdminList();
+    fetchAdminCount();
+  }, [fetchAdminList, fetchAdminCount]);
 
   const refresh = async () => {
-    await fetchUserList();
-    await fetchUserCount();
+    await fetchAdminList();
+    await fetchAdminCount();
   };
 
   const handleSort = (field: string) => {
@@ -91,32 +119,39 @@ export default function UserTable() {
 
   const [delModalVisible, setDelModalVisible] = React.useState(false);
   const [editModalVisible, setEditModalVisible] = React.useState(false);
-  const [targetUser, setTargetUser] = React.useState<TargetUser>();
+  const [targetId, setTargetId] = React.useState<string | undefined>();
 
-  const preEditUser = (target: TargetUser) => {
-    setTargetUser(target);
+  const preEditAdmin = (id: string) => {
+    setTargetId(id);
     setEditModalVisible(true);
   };
 
   React.useEffect(() => {
     if (!editModalVisible) {
-      setTargetUser(undefined);
+      setTargetId(undefined);
     }
   }, [editModalVisible]);
 
-  const preDelUser = (target: TargetUser) => {
-    setTargetUser(target);
+  const preDelAdmin = (id: string) => {
+    setTargetId(id);
     setDelModalVisible(true);
   };
 
   React.useEffect(() => {
     if (!delModalVisible) {
-      setTargetUser(undefined);
+      setTargetId(undefined);
     }
   }, [delModalVisible]);
 
-  const handleDelUser = () => {
-    setDelModalVisible(false);
+  const handleDelAdmin = async () => {
+    if (targetId) {
+      const data = await deleteAdminAPI({ admin_id: targetId });
+      if (data === 'success') {
+        toast.success('删除成功');
+        setDelModalVisible(false);
+        refresh();
+      }
+    }
   };
 
   return (
@@ -130,7 +165,7 @@ export default function UserTable() {
         }}
       >
         <Table
-          aria-labelledby="userTable"
+          aria-labelledby="adminTable"
           stickyHeader
           hoverRow
           sx={{
@@ -145,7 +180,7 @@ export default function UserTable() {
         >
           <thead>
             <tr>
-              {userTableHeads.map((head) => (
+              {adminTableHeads.map((head) => (
                 <th
                   key={head.value}
                   style={{
@@ -192,7 +227,7 @@ export default function UserTable() {
           </thead>
           <tbody>
             {!fetching ? (
-              userList.map((row) => (
+              adminList.map((row) => (
                 <tr key={row.id}>
                   <td style={{ textAlign: 'center', width: 100 }}>
                     <Typography level="body-xs">
@@ -212,82 +247,29 @@ export default function UserTable() {
                     </Typography>
                   </td>
                   <td style={{ textAlign: 'center', width: 120 }}>
-                    <Typography level="body-xs">{row.username}</Typography>
+                    <Typography level="body-xs">{row.name}</Typography>
                   </td>
                   <td style={{ textAlign: 'center', width: 150 }}>
                     <Typography level="body-xs">{row.email}</Typography>
                   </td>
                   <td style={{ width: 60 }}>
-                    <Image
-                      src={row.avatar}
-                      alt={row.username}
-                      width={60}
-                      height={60}
-                      style={{ objectFit: 'cover', borderRadius: '50%' }}
-                    />
-                  </td>
-                  <td
-                    style={{
-                      width: 120,
-                      textAlign: 'center',
-                    }}
-                  >
-                    {row.background_img ? (
+                    {row.image ? (
                       <Image
-                        src={row.background_img}
-                        alt={row.username}
-                        width={120}
+                        src={row.image}
+                        alt={row.name}
+                        width={60}
                         height={60}
-                        style={{ objectFit: 'cover' }}
+                        style={{ objectFit: 'cover', borderRadius: '50%' }}
                       />
                     ) : (
-                      <Typography level="body-xs">暂无背景图</Typography>
+                      <Typography level="body-xs">暂无头像</Typography>
                     )}
                   </td>
-                  <td style={{ textAlign: 'center', width: 150 }}>
-                    <Typography level="body-xs">{row.signature}</Typography>
-                  </td>
-                  <td style={{ textAlign: 'center', width: 60 }}>
-                    <Typography level="body-xs">
-                      {row.gender === 1 ? '女' : '男'}
-                    </Typography>
-                  </td>
                   <td style={{ textAlign: 'center', width: 100 }}>
-                    <Typography level="body-xs">{row.fan_count}</Typography>
-                  </td>
-                  <td style={{ textAlign: 'center', width: 100 }}>
-                    <Typography level="body-xs">{row.follow_count}</Typography>
+                    {statusChip(row.status)}
                   </td>
                   <td style={{ textAlign: 'center', width: 120 }}>
-                    <Typography level="body-xs">{row.origin_count}</Typography>
-                  </td>
-                  <td style={{ textAlign: 'center', width: 120 }}>
-                    <Typography level="body-xs">
-                      {row.reprinted_count}
-                    </Typography>
-                  </td>
-                  <td style={{ textAlign: 'center', width: 100 }}>
-                    <Chip
-                      variant="soft"
-                      size="sm"
-                      startDecorator={
-                        {
-                          0: <CheckRoundedIcon />,
-                          1: <ClearRoundedIcon />,
-                        }[row.status]
-                      }
-                      color={
-                        {
-                          0: 'success',
-                          1: 'danger',
-                        }[row.status] as ColorPaletteProp
-                      }
-                    >
-                      {row.status === 0 ? '正常' : '删除'}
-                    </Chip>
-                  </td>
-                  <td style={{ textAlign: 'center', width: 120 }}>
-                    <Typography level="body-xs">{row.created_time}</Typography>
+                    <Typography level="body-xs">{row.created_at}</Typography>
                   </td>
                   <td style={{ textAlign: 'center', width: 60 }}>
                     <Dropdown>
@@ -304,21 +286,15 @@ export default function UserTable() {
                         <MoreHorizRoundedIcon />
                       </MenuButton>
                       <Menu size="sm" sx={{ minWidth: 140 }}>
-                        <MenuItem
-                          onClick={() =>
-                            preEditUser({ id: row.id, username: row.username })
-                          }
-                        >
-                          编辑用户
+                        <MenuItem onClick={() => preEditAdmin(row.id)}>
+                          编辑管理员
                         </MenuItem>
                         <Divider />
                         <MenuItem
                           color="danger"
-                          onClick={() =>
-                            preDelUser({ id: row.id, username: row.username })
-                          }
+                          onClick={() => preDelAdmin(row.id)}
                         >
-                          删除用户
+                          删除管理员
                         </MenuItem>
                       </Menu>
                     </Dropdown>
@@ -334,13 +310,13 @@ export default function UserTable() {
       <ConfirmModal
         visible={delModalVisible}
         setVisible={setDelModalVisible}
-        handle={handleDelUser}
-        message={`确定删除用户 ${targetUser?.username} 吗？`}
+        handle={handleDelAdmin}
+        message="确定删除该管理员账户吗？"
       />
-      <UserEditModal
+      <AdminEditModal
         visible={editModalVisible}
         setVisible={setEditModalVisible}
-        userId={targetUser?.id}
+        adminId={targetId}
         refresh={refresh}
       />
       <Pagination total={total} pageSize={PAGE_SIZE} />

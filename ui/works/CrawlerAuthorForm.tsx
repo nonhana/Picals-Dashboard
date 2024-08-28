@@ -48,7 +48,6 @@ export default function CrawlerAuthorForm() {
   }, [settings]);
 
   const handleSubmit = () => {
-    console.log(settings);
     setButtonDisabled(true);
   };
 

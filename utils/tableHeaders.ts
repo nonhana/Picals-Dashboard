@@ -5,6 +5,51 @@ type TableHead = {
   sortable: boolean;
 };
 
+export const adminTableHeads: TableHead[] = [
+  {
+    name: '管理员id',
+    value: 'id',
+    width: 100,
+    sortable: false,
+  },
+  {
+    name: '用户名',
+    value: 'name',
+    width: 120,
+    sortable: false,
+  },
+  {
+    name: '邮箱',
+    value: 'email',
+    width: 150,
+    sortable: false,
+  },
+  {
+    name: '头像',
+    value: 'image',
+    width: 60,
+    sortable: false,
+  },
+  {
+    name: '状态',
+    value: 'status',
+    width: 100,
+    sortable: false,
+  },
+  {
+    name: '创建时间',
+    value: 'created_at',
+    width: 120,
+    sortable: true,
+  },
+  {
+    name: '操作',
+    value: 'action',
+    width: 60,
+    sortable: false,
+  },
+];
+
 export const userTableHeads: TableHead[] = [
   {
     name: '用户id',

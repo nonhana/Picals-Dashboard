@@ -1,5 +1,4 @@
 import { getUserInfo } from '@/services/server/actions';
-import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import {
   Avatar,
   Box,
@@ -10,10 +9,11 @@ import {
   MenuItem,
   Typography,
 } from '@mui/joy';
+import EditBtn from './EditBtn';
 import LogoutBtn from './LogoutBtn';
 
 export default async function UserDropdown() {
-  const { username, email, avatar } = await getUserInfo();
+  const { name, email, image } = await getUserInfo();
 
   return (
     <Dropdown>
@@ -26,7 +26,10 @@ export default async function UserDropdown() {
           borderRadius: '9999999px',
         }}
       >
-        <Avatar src={avatar} sx={{ maxWidth: '32px', maxHeight: '32px' }} />
+        <Avatar
+          src={image ?? ''}
+          sx={{ maxWidth: '32px', maxHeight: '32px' }}
+        />
       </MenuButton>
       <Menu
         keepMounted
@@ -46,10 +49,10 @@ export default async function UserDropdown() {
               alignItems: 'center',
             }}
           >
-            <Avatar src="" sx={{ borderRadius: '50%' }} />
+            <Avatar src={image ?? ''} sx={{ borderRadius: '50%' }} />
             <Box sx={{ ml: 1.5 }}>
               <Typography level="title-sm" textColor="text.primary">
-                {username}
+                {name}
               </Typography>
               <Typography level="body-xs" textColor="text.tertiary">
                 {email}
@@ -58,10 +61,7 @@ export default async function UserDropdown() {
           </Box>
         </MenuItem>
         <ListDivider />
-        <MenuItem>
-          <SettingsRoundedIcon />
-          设置
-        </MenuItem>
+        <EditBtn refresh={getUserInfo} />
         <ListDivider />
         <LogoutBtn />
       </Menu>

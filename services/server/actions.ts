@@ -6,6 +6,7 @@ import bcrypt from 'bcrypt';
 import { AuthError } from 'next-auth';
 import { z } from 'zod';
 
+// 管理员登录
 export async function login(formData: FormData) {
   try {
     await signIn('credentials', formData);
@@ -22,6 +23,7 @@ export async function login(formData: FormData) {
   }
 }
 
+// 管理员注册
 export async function register(formData: FormData) {
   try {
     const body = {
@@ -64,6 +66,7 @@ export async function register(formData: FormData) {
   }
 }
 
+// 获取管理员信息
 export async function getUserInfo() {
   const session = await auth();
   if (!session) throw new Error('No session found');
@@ -81,4 +84,9 @@ export async function getUserInfo() {
   });
   if (!adminInfo) throw new Error('Failed to get user info');
   return adminInfo;
+}
+
+// (test) 手动抛出错误
+export async function throwError() {
+  throw new Error('This is a test error');
 }

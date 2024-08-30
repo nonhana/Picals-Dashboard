@@ -38,7 +38,7 @@ const originForm: AdminForm = {
   image: null,
 };
 
-export default function EditBtn({ refresh }: { refresh: () => void }) {
+export default function EditBtn() {
   const [visible, setVisible] = React.useState(false);
   const [form, setForm] = React.useState<AdminForm>(originForm);
   const [gettingInfo, setGettingInfo] = React.useState(false);
@@ -46,10 +46,19 @@ export default function EditBtn({ refresh }: { refresh: () => void }) {
   const fetchSessionInfo = async () => {
     setGettingInfo(true);
     const session = await getSession();
-    if (!session) throw new Error('No session found');
-    if (!session.user) throw new Error('In session, no user found');
+    if (!session) {
+      toast.error('未检测到登录信息，请重新登录');
+      return;
+    }
+    if (!session.user) {
+      toast.error('未检测到用户信息，请重新登录');
+      return;
+    }
     const { id } = session.user;
-    if (!id) throw new Error('In session, no user id found');
+    if (!id) {
+      toast.error('未检测到用户ID，请重新登录');
+      return;
+    }
     const data = await getAdminDetailAPI({ admin_id: id });
     if (data) setForm(data);
     setGettingInfo(false);
@@ -93,10 +102,12 @@ export default function EditBtn({ refresh }: { refresh: () => void }) {
   const handleEdit = async () => {
     setLoading(true);
     await updateAdminAPI(form);
-    toast.success('管理员信息修改成功');
-    refresh();
+    toast.success('个人信息修改成功，即将刷新页面');
     setLoading(false);
     setVisible(false);
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000);
   };
 
   const [previewVisible, setPreviewVisible] = React.useState(false);

@@ -61,7 +61,7 @@ export default async function UserDropdown() {
           </Box>
         </MenuItem>
         <ListDivider />
-        <EditBtn refresh={getUserInfo} />
+        <EditBtn />
         <ListDivider />
         <LogoutBtn />
       </Menu>

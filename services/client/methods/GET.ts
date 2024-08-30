@@ -1,5 +1,10 @@
 import http from '../..';
 
+/**
+ * GET request handler
+ * @param url - API endpoint
+ * @returns - Function to handle GET requests
+ */
 export const getHandler = <T>(url: string) => {
   return async (data: Record<string, string>): Promise<T | null> => {
     try {
